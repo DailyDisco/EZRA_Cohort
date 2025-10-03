@@ -28,6 +28,14 @@ var UserKey UserContextKey = "user"
 
 func ClerkAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Skip authentication for webhook endpoints
+		log.Printf("[CLERK_MIDDLEWARE] Checking path: %s", r.URL.Path)
+		if r.URL.Path == "/webhooks/clerk" || r.URL.Path == "/admin/leases/webhooks/documenso" {
+			log.Printf("[CLERK_MIDDLEWARE] Skipping auth for webhook path: %s", r.URL.Path)
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		userCtx := GetUserCtx(r)
 		if userCtx == nil {
 			log.Println("[CLERK_MIDDLEWARE] Unauthorized no user ctx")
@@ -92,7 +100,7 @@ func GetUserCtx(r *http.Request) *clerk.User {
 	return user
 }
 
-func getClerkUser(r *http.Request) (*clerk.User, error) {
+func GetClerkUser(r *http.Request) (*clerk.User, error) {
 	userCtx := r.Context().Value("user")
 	clerkUser, ok := userCtx.(*clerk.User)
 	if !ok {

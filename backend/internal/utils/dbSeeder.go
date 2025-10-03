@@ -5,12 +5,13 @@ import (
 	_ "database/sql"
 	"errors"
 	"fmt"
-	db "github.com/careecodes/RentDaddy/internal/db/generated"
-	"github.com/go-faker/faker/v4"
-	_ "github.com/jackc/pgx/v5/pgtype"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"math/rand"
+
+	db "github.com/careecodes/RentDaddy/internal/db/generated"
+	"github.com/go-faker/faker/v4"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func RandomWorkCategory() db.WorkCategory {
@@ -47,27 +48,16 @@ func RandomStatus() db.Status {
 }
 
 func createWorkOrders(queries *db.Queries, user db.User, ctx context.Context) error {
-	orders, err := queries.CountWorkOrdersByUser(ctx, user.ID)
-	if err != nil {
-		return errors.New("[SEEDER] error getting work orders: " + err.Error())
-	}
-	if orders > 0 {
-		log.Println("[SEEDER] work orders already exist")
-		return nil
-	}
-
 	for i := 0; i < 10; i++ {
-		orderNum := user.ID + int64(rand.Intn(1000))
 		_, err := queries.CreateWorkOrder(context.Background(), db.CreateWorkOrderParams{
 			CreatedBy:   user.ID,
-			OrderNumber: orderNum,
 			Category:    RandomWorkCategory(),
 			Title:       faker.Sentence(),
 			Description: faker.Paragraph(),
-			Status:      RandomStatus(),
+			UnitNumber:  int64(rand.Intn(100) + 1), // Random unit number
 		})
 		if err != nil {
-			return errors.New(fmt.Sprintf("[SEEDER] error creating work order: %d %v", orderNum, err.Error()))
+			return errors.New(fmt.Sprintf("[SEEDER] error creating work order: %v", err.Error()))
 		}
 	}
 
@@ -78,17 +68,15 @@ func createWorkOrders(queries *db.Queries, user db.User, ctx context.Context) er
 
 func createComplaints(queries *db.Queries, user db.User, ctx context.Context) error {
 	for i := 0; i < 10; i++ {
-		complaintNum := user.ID + int64(rand.Intn(1000))
 		_, err := queries.CreateComplaint(ctx, db.CreateComplaintParams{
-			CreatedBy:       user.ID,
-			ComplaintNumber: complaintNum,
-			Category:        RandomComplaintCategory(),
-			Title:           faker.Sentence(),
-			Description:     faker.Paragraph(),
-			Status:          RandomStatus(),
+			CreatedBy:   user.ID,
+			Category:    RandomComplaintCategory(),
+			Title:       faker.Sentence(),
+			Description: faker.Paragraph(),
+			UnitNumber:  pgtype.Int8{Int64: int64(rand.Intn(100) + 1), Valid: true},
 		})
 		if err != nil {
-			return errors.New(fmt.Sprintf("[SEEDER] error creating complaint: %d %v", complaintNum, err.Error()))
+			return errors.New(fmt.Sprintf("[SEEDER] error creating complaint: %v", err.Error()))
 		}
 	}
 
@@ -177,7 +165,7 @@ func SeedDB(queries *db.Queries, pool *pgxpool.Pool, adminID int32) error {
 			}
 		}
 
-		cCount, err := queries.ListWorkOrdersByUser(ctx, u.ID)
+		cCount, err := queries.ListTenantComplaints(ctx, u.ID)
 		if err != nil {
 			log.Println("[SEEDER] error counting complaints: " + err.Error())
 		}

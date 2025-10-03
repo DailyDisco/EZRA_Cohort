@@ -99,6 +99,11 @@ func ClerkWebhookHandler(w http.ResponseWriter, r *http.Request, pool *pgxpool.P
 }
 
 func Verify(payload []byte, headers http.Header) bool {
+	// TEMPORARY: Skip signature validation for testing
+	// log.Println("[CLERK_WEBHOOK] ⚠️  WARNING: Signature validation disabled for testing!")
+	// return true
+
+	// TODO: Re-enable signature validation with correct secret
 	webhookSecret := os.Getenv("CLERK_WEBHOOK")
 	if webhookSecret == "" {
 		log.Println("[CLERK_WEBHOOK] Environment variable is required")

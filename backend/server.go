@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +11,7 @@ import (
 	"time"
 
 	"github.com/careecodes/RentDaddy/internal/db"
-	"github.com/careecodes/RentDaddy/middleware"
+	"github.com/careecodes/RentDaddy/internal/utils"
 	mymiddleware "github.com/careecodes/RentDaddy/middleware"
 
 	"github.com/careecodes/RentDaddy/pkg/handlers"
@@ -38,6 +39,7 @@ func main() {
 	if clerkSecretKey == "" {
 		log.Fatal("[ENV] CLERK_SECRET_KEY environment vars are required")
 	}
+	log.Printf("[CLERK] Initializing Clerk with key: %s", clerkSecretKey)
 	webhookSecret := os.Getenv("CLERK_WEBHOOK")
 
 	if webhookSecret == "" {
@@ -66,17 +68,59 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
-	// Added to make this work for testing.
-	r.Use(clerkhttp.WithHeaderAuthorization())
-	r.Use(mymiddleware.ClerkAuthMiddleware)
 
-	// Webhooks
+	// Webhooks - Public routes (no auth required)
 	r.Post("/webhooks/clerk", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("[WEBHOOK] Clerk webhook endpoint hit!")
 		handlers.ClerkWebhookHandler(w, r, pool, queries)
 	})
 
+	// Test endpoint - verify public access works
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
+	// Test route to seed data (for development/testing only - PUBLIC)
+	r.Post("/test/seed-data", func(w http.ResponseWriter, r *http.Request) {
+		err := utils.SeedDB(queries, pool, 1) // Pass admin ID as 1 (not used in current implementation)
+		if err != nil {
+			log.Printf("[TEST] Error seeding data: %v", err)
+			http.Error(w, "Failed to seed data", http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Successfully seeded test data for random users"}`))
+	})
+
+	// Protected routes - Apply auth middleware using With()
+	r.With(clerkhttp.WithHeaderAuthorization()).With(mymiddleware.ClerkAuthMiddleware).Group(func(r chi.Router) {
+
 	// Routers
 	userHandler := handlers.NewUserHandler(pool, queries)
+
+	// Test route to check user metadata (for debugging)
+	r.Get("/test/user-metadata", func(w http.ResponseWriter, r *http.Request) {
+		userCtx := mymiddleware.GetUserCtx(r)
+		if userCtx == nil {
+			w.Write([]byte(`{"error": "No user context"}`))
+			return
+		}
+
+		var metadata map[string]interface{}
+		err := json.Unmarshal(userCtx.PublicMetadata, &metadata)
+		if err != nil {
+			w.Write([]byte(`{"error": "Failed to parse metadata"}`))
+			return
+		}
+
+		response := map[string]interface{}{
+			"user_id": userCtx.ID,
+			"metadata": metadata,
+		}
+
+		json.NewEncoder(w).Encode(response)
+	})
 
 	// Locker Handler
 	lockerHandler := handlers.NewLockerHandler(pool, queries)
@@ -88,19 +132,7 @@ func main() {
 	complaintHandler := handlers.NewComplaintHandler(pool, queries)
 	leaseHandler := handlers.NewLeaseHandler(pool, queries)
 
-	// // Test routes - no auth required
-	// r.Post("/test/complaints", complaintHandler.CreateManyComplaintsForTestingHandler)
-
-	// r.Post("/test/work-orders", workOrderHandler.CreateManyWorkOrdersHandler)
-
-	// r.Post("/test/lockers", lockerHandler.CreateManyLockers)
-
-	// Application Routes
-	r.Group(func(r chi.Router) {
-		// Clerk middleware
-		r.Use(clerkhttp.WithHeaderAuthorization(), middleware.ClerkAuthMiddleware)
-
-		// Admin Endpoints
+		// Admin Endpoints  
 		r.Route("/admin", func(r chi.Router) {
 			r.Use(mymiddleware.IsAdmin) // Clerk Admin middleware
 			r.Get("/", userHandler.GetAdminOverview)
@@ -269,13 +301,13 @@ func main() {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("Session revoked successfully"))
 		})
-	})
 
-	// ChatBot routes
-	r.Route("/api/chat", func(r chi.Router) {
-		r.Post("/", chatbotHandler.ChatHandler)
-		r.Get("/", chatbotHandler.ChatGetHandler)
-	})
+		// ChatBot routes
+		r.Route("/api/chat", func(r chi.Router) {
+			r.Post("/", chatbotHandler.ChatHandler)
+			r.Get("/", chatbotHandler.ChatGetHandler)
+		})
+	}) // End of protected routes group
 
 	// Server config
 	port := os.Getenv("PORT")

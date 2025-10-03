@@ -460,8 +460,15 @@ func (u UserHandler) TenantGetWorkOrders(w http.ResponseWriter, r *http.Request)
 	err := json.Unmarshal(tenantCtx.PublicMetadata, &tenantMetadata)
 	if err != nil {
 		log.Printf("[USER_HANDLER] Failed parsing JSON: %v", err)
-		http.Error(w, "Error parsing JSON", http.StatusInternalServerError)
-		return
+		// Try to find user by Clerk ID if metadata is missing
+		user, err := u.queries.GetUserByClerkId(r.Context(), tenantCtx.ID)
+		if err != nil {
+			log.Printf("[USER_HANDLER] Failed finding user by Clerk ID: %v", err)
+			http.Error(w, "Error finding user", http.StatusInternalServerError)
+			return
+		}
+		tenantMetadata.DbId = int32(user.ID)
+		log.Printf("[USER_HANDLER] Found user ID %d by Clerk ID", user.ID)
 	}
 
 	workOrders, err := u.queries.ListTenantWorkOrders(r.Context(), int64(tenantMetadata.DbId))
@@ -495,8 +502,15 @@ func (u UserHandler) TenantGetComplaints(w http.ResponseWriter, r *http.Request)
 	err := json.Unmarshal(tenantCtx.PublicMetadata, &tenantMetadata)
 	if err != nil {
 		log.Printf("[USER_HANDLER] Failed parsing JSON: %v", err)
-		http.Error(w, "Error parsing JSON", http.StatusInternalServerError)
-		return
+		// Try to find user by Clerk ID if metadata is missing
+		user, err := u.queries.GetUserByClerkId(r.Context(), tenantCtx.ID)
+		if err != nil {
+			log.Printf("[USER_HANDLER] Failed finding user by Clerk ID: %v", err)
+			http.Error(w, "Error finding user", http.StatusInternalServerError)
+			return
+		}
+		tenantMetadata.DbId = int32(user.ID)
+		log.Printf("[USER_HANDLER] Found user ID %d by Clerk ID", user.ID)
 	}
 
 	complaints, err := u.queries.ListTenantComplaints(r.Context(), int64(tenantMetadata.DbId))
@@ -552,11 +566,11 @@ func (u UserHandler) TenantCreateComplaint(w http.ResponseWriter, r *http.Reques
 	log.Printf("NEW COMPLAINT CATEGORY: %s", createComplaintReq.Category)
 
 	res, err := u.queries.CreateComplaint(r.Context(), db.CreateComplaintParams{
-		CreatedBy:   int64(tenantMetadata.DbId),
-		Category:    createComplaintReq.Category,
-		Title:       createComplaintReq.Title,
-		Description: createComplaintReq.Description,
-		UnitNumber:  pgtype.Int2{Int16: createComplaintReq.UnitNumber.Int16, Valid: true},
+	CreatedBy:   int64(tenantMetadata.DbId),
+	Category:    createComplaintReq.Category,
+	Title:       createComplaintReq.Title,
+	Description: createComplaintReq.Description,
+	UnitNumber:  pgtype.Int8{Int64: createComplaintReq.UnitNumber.Int64, Valid: true},
 	})
 	if err != nil {
 		log.Printf("[USER_HANDLER] Failed creating tenant complaint: %v", err)

@@ -86,7 +86,7 @@ func (c ChatBotHandler) ChatGetHandler(w http.ResponseWriter, r *http.Request) {
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(message),
 		},
-		Model: openai.ChatModelGPT4o,
+		Model: openai.ChatModelGPT4oMini,
 	}
 	chatCompletion, err := client.Chat.Completions.New(r.Context(), params)
 	if err != nil {
