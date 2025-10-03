@@ -1,11 +1,12 @@
 {
     "build": {
-        "builder": "NIXPACKS"
+        "builder": "dockerfile"
     },
     "deploy": {
-        "startCommand": "npm run build && npm run preview"
+        "startCommand": "./entrypoint.sh"
     },
     "variables": {
+        "USE_AIR": "false",
         "NODE_ENV": "production"
     }
 }

@@ -4,5 +4,9 @@
   },
   "deploy": {
     "startCommand": "./entrypoint.sh"
+  },
+  "variables": {
+    "USE_AIR": "false",
+    "NODE_ENV": "production"
   }
 }
