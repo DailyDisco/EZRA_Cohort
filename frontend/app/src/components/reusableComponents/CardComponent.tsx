@@ -16,18 +16,34 @@ export const CardComponent = (props: CardComponentProps) => {
             <Card
                 title={
                     <>
-                        <div className="flex flex-column align-items-center">
-                            <span className="me-2 mt-2">{props.icon}</span>
-                            <span>{props.title}</span>
+                        <div className="flex flex-column align-items-center text-center">
+                            <div
+                                className="mb-3 pulse-on-hover"
+                                style={{ fontSize: "2.5rem", color: "#00674f" }}>
+                                {props.icon}
+                            </div>
+                            <h5
+                                className="mb-0"
+                                style={{ fontWeight: "600", color: "#1e293b" }}>
+                                {props.title}
+                            </h5>
                         </div>
                     </>
                 }
                 hoverable={props.hoverable}
                 className="card pb-2"
-                actions={[props.button]}>
-                <div className="flex flex-column">
-                    <span className="text-muted fs-1">{props.value}</span>
-                    {props.description && <span className="text-muted ">{props.description}</span>}
+                actions={[props.button]}
+                style={{ border: "none", boxShadow: "var(--shadow-sm)" }}
+                bodyStyle={{ padding: "1.5rem" }}>
+                <div className="flex flex-column text-center">
+                    {props.value && (
+                        <span
+                            className="mb-3"
+                            style={{ fontSize: "2rem", fontWeight: "700", color: "#00674f" }}>
+                            {props.value}
+                        </span>
+                    )}
+                    {props.description && <span style={{ color: "#64748b", lineHeight: "1.6", fontSize: "0.95rem" }}>{props.description}</span>}
                 </div>
             </Card>
         </>

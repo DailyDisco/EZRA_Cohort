@@ -47,37 +47,38 @@ const PreAuthedLayout: React.FC = () => {
 
     return (
         <Layout>
-            <Header className="header">
+            <Header className="modern-header">
                 {/* Left Side Nav */}
-                <div style={{ width: "200px" }}>
-                    <Link to="/">
-                        <div className="demo-logo">
+                <div className="header-left">
+                    <Link
+                        to="/"
+                        className="logo-link">
+                        <div className="logo-container">
                             <img
                                 src="/logo.png"
-                                alt="logo"
-                                style={{ width: "56px", height: "56px" }}
-                                className="rounded"
+                                alt="EZRA Logo"
+                                className="logo-image"
                             />
+                            <div className="logo-glow" />
                         </div>
                     </Link>
                 </div>
 
                 {/* Center Nav */}
-                <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+                <div className="header-center">
                     <Link
                         to="/"
-                        style={{ color: "white", fontSize: "24px", textDecoration: "none" }}>
-                        EZRA
+                        className="brand-link">
+                        <span className="brand-text">EZRA</span>
+                        <div className="brand-accent" />
                     </Link>
                 </div>
 
                 {/* Top right Nav */}
-                <div style={{ width: "200px" }}>
+                <div className="header-right">
                     <Menu
-                        // theme="dark"
                         mode="horizontal"
-                        inlineCollapsed={false}
-                        // defaultSelectedKeys={["1"]}
+                        className="header-menu"
                         items={items}
                     />
                 </div>
@@ -95,44 +96,62 @@ const PreAuthedLayout: React.FC = () => {
                 </div>
             </Content>
             {/* Footer Container */}
-            <Footer className="footer">
-                {/*  EZRA */}
-                <h3 className="footer-title">EZRA</h3>
-                {/* Logo */}
-                <img
-                    src="/logo.png"
-                    alt="logo"
-                    className="footer-logo"
-                    // style={{
-                    //     display: "block",
-                    //     margin: "0 auto",
-                    //     marginBottom: "24px",
-                    //     borderRadius: "8px",
-                    // }}
-                />
-                <div>
-                    <Link
-                        to="/about"
-                        className="link disabled-link">
-                        About
-                    </Link>
-                    <Link
-                        to="/contact"
-                        className="link disabled-link">
-                        Contact
-                    </Link>
-                    <Link
-                        to="/privacy"
-                        className="link disabled-link">
-                        Privacy Policy
-                    </Link>
-                    <Link
-                        to="/terms"
-                        className="link disabled-link">
-                        Terms of Service
-                    </Link>
+            <Footer className="modern-footer">
+                <div className="footer-content">
+                    <div className="footer-brand">
+                        <div className="footer-logo-container">
+                            <img
+                                src="/logo.png"
+                                alt="EZRA Logo"
+                                className="footer-logo"
+                            />
+                            <div className="footer-logo-shine" />
+                        </div>
+                        <h3 className="footer-brand-text">EZRA</h3>
+                        <p className="footer-tagline">Modern apartment management made simple</p>
+                    </div>
+
+                    <div className="footer-links">
+                        <div className="footer-link-group">
+                            <h4 className="footer-link-title">Company</h4>
+                            <Link
+                                to="/about"
+                                className="footer-link disabled-link">
+                                About Us
+                            </Link>
+                            <Link
+                                to="/contact"
+                                className="footer-link disabled-link">
+                                Contact
+                            </Link>
+                        </div>
+
+                        <div className="footer-link-group">
+                            <h4 className="footer-link-title">Legal</h4>
+                            <Link
+                                to="/privacy"
+                                className="footer-link disabled-link">
+                                Privacy Policy
+                            </Link>
+                            <Link
+                                to="/terms"
+                                className="footer-link disabled-link">
+                                Terms of Service
+                            </Link>
+                        </div>
+                    </div>
                 </div>
-                <p className="footer-text">EZRA © {new Date().getFullYear()} | All Rights Reserved</p>
+
+                <div className="footer-bottom">
+                    <div className="footer-copyright">
+                        <p>© {new Date().getFullYear()} EZRA. All rights reserved.</p>
+                    </div>
+                    <div className="footer-decorations">
+                        <div className="footer-sparkle sparkle-1" />
+                        <div className="footer-sparkle sparkle-2" />
+                        <div className="footer-sparkle sparkle-3" />
+                    </div>
+                </div>
             </Footer>
         </Layout>
     );

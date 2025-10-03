@@ -1,35 +1,34 @@
-import Icon, { ToolOutlined, WarningOutlined, InboxOutlined, CalendarOutlined, UserOutlined, CarOutlined } from "@ant-design/icons";
-import { Tag, Modal, Button } from "antd";
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router";
-import { TenantLeaseStatusAndURL } from "../types/types";
 import { ToolOutlined, WarningOutlined, InboxOutlined, CarOutlined } from "@ant-design/icons";
 import { Modal, Button, Divider, Form, Input, Select } from "antd";
 import { useState, useEffect } from "react";
+import { ComplaintsData, Parking, ParkingEntry, WorkOrderData } from "../types/types";
 import ModalComponent from "../components/ModalComponent";
 import AlertComponent from "../components/reusableComponents/AlertComponent";
 import ButtonComponent from "../components/reusableComponents/ButtonComponent";
 import { CardComponent } from "../components/reusableComponents/CardComponent";
 import PageTitleComponent from "../components/reusableComponents/PageTitleComponent";
 import MyChatBot from "../components/ChatBot";
-import { useAuth } from "@clerk/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useAuth, useUser } from "@clerk/react-router";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const DOMAIN_URL = import.meta.env.VITE_DOMAIN_URL || import.meta.env.DOMAIN_URL || 'http://localhost';
-const PORT = import.meta.env.VITE_PORT || import.meta.env.PORT || '8080';
+interface LeaseStatus {
+    lease_status: string;
+    url: string;
+}
+
+const DOMAIN_URL = import.meta.env.VITE_DOMAIN_URL || import.meta.env.DOMAIN_URL || "http://localhost";
+const PORT = import.meta.env.VITE_PORT || import.meta.env.PORT || "8080";
 const API_URL = `${DOMAIN_URL}:${PORT}`.replace(/\/$/, "");
 
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ComplaintsData, Parking, ParkingEntry, WorkOrderData } from "../types/types";
-
-const serverUrl = import.meta.env.VITE_SERVER_URL;
+// Use API_URL as fallback if VITE_SERVER_URL is not properly set
+const serverUrl = import.meta.env.VITE_SERVER_URL && import.meta.env.VITE_SERVER_URL !== "xxxxxxx" ? import.meta.env.VITE_SERVER_URL : API_URL;
 const absoluteServerUrl = `${serverUrl}`;
 
 export const TenantDashBoard = () => {
     const [isSigningModalVisible, setSigningModalVisible] = useState(false);
     const { user } = useUser();
     const userId = user?.publicMetadata["db_id"];
-    const { getToken, userId } = useAuth();
+    const { getToken } = useAuth();
 
     async function getParkingPermit() {
         const authToken = await getToken();
@@ -116,60 +115,64 @@ export const TenantDashBoard = () => {
         ],
     });
 
-    // Simulate fetching lease status using TanStack Query
-    const {
-        data: leaseStatus,
-        isLoading,
-        isError,
-    } = useQuery({
+    // Fetch lease status using TanStack Query
+    const { data: leaseStatus, isLoading } = useQuery<LeaseStatus>({
         queryKey: ["leaseStatus", userId], // Unique key for the query
         queryFn: async () => {
-            // Simulate a delay to mimic network request and give dummy data
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            const leaseData = {
-                // userId: userId,
-                userId: "notme",
-                lease_status: "pending_approval",
-            };
-            // const response = await fetch(`/api/leases?tenantId=${userId}`);
-            // if (!response.ok) {
-            //     throw new Error("Failed to fetch lease status");
-            // }
-            // const data = await response.json();
-
-            // Return dummy data if the userId matches
-            if (userId === leaseData.userId) {
-                console.log(leaseData.lease_status);
-                return leaseData.lease_status;
-            } else {
-                return "active";
+            const authToken = await getToken();
+            if (!authToken) {
+                throw new Error("[TENANT_DASHBOARD] Error unauthorized");
             }
+
+            const response = await fetch(`${absoluteServerUrl}/tenant/leases/${userId}/signing-url`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch lease status");
+            }
+            const data = await response.json();
+            return data;
         },
         enabled: !!userId,
     });
 
     // This is the recommended approach in newer versions of TanStack Query. `onSuccess` is deprecated
     useEffect(() => {
-        if (leaseData && leaseData.status) {
-            console.log("Lease status updated:", leaseData.status);
-            if (["pending_approval", "terminated", "expired"].includes(leaseData.status)) {
+        if (leaseStatus && leaseStatus.lease_status) {
+            console.log("Lease status updated:", leaseStatus.lease_status);
+            if (["pending_approval", "terminated", "expired"].includes(leaseStatus.lease_status)) {
                 console.log("Setting modal visible based on lease status");
                 setSigningModalVisible(true);
             }
         }
-    }, [leaseData]);
+    }, [leaseStatus]);
 
     // This is used to redirect to signing URL when button is clicked
     const handleOk = () => {
-        if (leaseData && leaseData.url) {
-            window.location.href = leaseData.url;
+        if (leaseStatus?.url) {
+            window.location.href = leaseStatus.url;
         } else {
             console.error("No signing URL available");
         }
     };
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[40vh]">
+                <span className="mb-4 text-lg font-medium text-gray-700">Loading your dashboard...</span>
+                <div className="flex items-center justify-center">
+                    <span
+                        className="inline-block w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"
+                        aria-label="Loading"
+                    />
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -180,7 +183,7 @@ export const TenantDashBoard = () => {
             <AlertComponent
                 title=""
                 message="Welcome to the Tenant Dashboard"
-                description="Sign Yo Lease. Pay Daddy Rent"
+                description="Please review and sign your lease agreement. Remember to make timely rent payments."
                 type="warning"
             />
             {/* </div> */}
@@ -194,15 +197,6 @@ export const TenantDashBoard = () => {
                     description="Something not working right or disturbing you? Let us know."
                     hoverable={true}
                     icon={<ToolOutlined className="icon" />}
-                    button={
-                        <Link to="/tenant/tenant-work-orders-and-complaints">
-                            <ButtonComponent
-                                title="View All"
-                                type="primary"
-                                onClick={() => { }}
-                            />
-                        </Link>
-                    }
                     button={<TenantCreateComplaintsModal />}
                 />
                 <CardComponent
@@ -219,15 +213,6 @@ export const TenantDashBoard = () => {
                     description="Got a guest coming to visit? Make sure they have spots to park"
                     hoverable={true}
                     icon={<CarOutlined className="icon" />}
-                    button={
-                        <ModalComponent
-                            type="Guest Parking"
-                            buttonTitle="Add Guest"
-                            content="Add guest to be able to park in the complex"
-                            buttonType="primary"
-                            handleOkay={() => { }}
-                        />
-                    }
                     button={<TenantParkingPeritModal userParkingPermitsUsed={parking.data?.length ?? 0} />}
                 />
             </div>
@@ -245,7 +230,11 @@ export const TenantDashBoard = () => {
                             buttonTitle="View Lease"
                             content="Lease should go here"
                             buttonType="primary"
-                            handleOkay={() => { }}
+                            handleOkay={async () => {}}
+                            setUserId={() => {}}
+                            setAccessCode={() => {}}
+                            selectedUserId=""
+                            accessCode=""
                         />
                     }
                 />
@@ -253,15 +242,6 @@ export const TenantDashBoard = () => {
                     title="Work Orders"
                     description={"View your work orders here."}
                     hoverable={true}
-                    button={
-                        <Link to="/tenant/tenant-work-orders-and-complaints">
-                            <ButtonComponent
-                                title="View all workorders"
-                                type="primary"
-                                onClick={() => { }}
-                            />
-                        </Link>
-                    }
                     value={workOrders.data?.length}
                     button={<TenantViewWorkOrdersModal data={workOrders.data} />}
                 />
@@ -269,15 +249,6 @@ export const TenantDashBoard = () => {
                     title="Complaints"
                     description={"View your complaints here."}
                     hoverable={true}
-                    button={
-                        <ModalComponent
-                            type="default"
-                            buttonTitle="View all complaints"
-                            content="Complaint should go here"
-                            buttonType="primary"
-                            handleOkay={() => { }}
-                        />
-                    }
                     value={complaints.data?.length}
                     button={<TenantViewComplaintsModal data={complaints.data} />}
                 />
@@ -290,7 +261,7 @@ export const TenantDashBoard = () => {
                 title="Action Required: Lease Signing"
                 open={isSigningModalVisible}
                 onOk={handleOk}
-                onCancel={() => { }} // Empty function prevents closing
+                onCancel={() => {}} // Empty function prevents closing
                 maskClosable={false} // Prevents closing when clicking outside
                 keyboard={false} // Prevents closing with ESC key
                 closable={false} // Removes the X button
@@ -306,7 +277,7 @@ export const TenantDashBoard = () => {
                     <WarningOutlined style={{ fontSize: "4rem", color: "#faad14", marginBottom: "1rem" }} />
                     <h3 style={{ marginBottom: "1rem" }}>Your Lease Requires Attention</h3>
                     <p>
-                        Your lease status is <strong>{leaseStatus === "pending_approval" ? "Pending Approval" : leaseStatus}</strong>.
+                        Your lease status is <strong>{leaseStatus?.lease_status === "pending_approval" ? "Pending Approval" : leaseStatus?.lease_status}</strong>.
                     </p>
                     <p>You must sign your lease to continue using the tenant portal.</p>
                     <p style={{ marginTop: "1rem", fontStyle: "italic" }}>This action is required and cannot be dismissed.</p>
@@ -450,7 +421,7 @@ function TenantViewWorkOrdersModal(props: WorkOrderModalProps) {
                 className="p-3 flex-wrap-row"
                 title={<h3>Complaints</h3>}
                 open={internalModalOpen}
-                onOk={() => { }}
+                onOk={() => {}}
                 onCancel={handleCancel}
                 okButtonProps={{ hidden: true, disabled: true }}
                 cancelButtonProps={{ hidden: true, disabled: true }}>
@@ -690,7 +661,7 @@ function TenantOpenLockerModal(props: LockerModalProps) {
         if (internalModalOpen) {
             openLocker();
         }
-    }, [internalModalOpen, setInternalModalOpen]);
+    }, [internalModalOpen, openLocker, setInternalModalOpen]);
 
     return (
         <>

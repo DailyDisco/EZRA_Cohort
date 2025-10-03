@@ -26,20 +26,30 @@ const faqs: FAQ[] = [
 
 const HomePageFAQs: React.FC = () => {
     return (
-        <div className="my-2">
-            <h2>Frequently Asked Questions</h2>
-            <Collapse
-                accordion
-                defaultActiveKey={["0"]}
-                className="my-4">
-                {faqs.map((faq, index) => (
-                    <Panel
-                        header={faq.question}
-                        key={index}>
-                        <p>{faq.answer}</p>
-                    </Panel>
-                ))}
-            </Collapse>
+        <div className="modern-container fade-in-up">
+            <h2
+                className="text-center mb-5"
+                style={{ color: "#1e293b", fontSize: "2.5rem", fontWeight: "700" }}>
+                Frequently Asked Questions
+            </h2>
+            <div
+                className="mx-auto"
+                style={{ maxWidth: "800px" }}>
+                <Collapse
+                    accordion
+                    defaultActiveKey={["0"]}
+                    className="modern-card"
+                    style={{ border: "none", background: "transparent" }}>
+                    {faqs.map((faq, index) => (
+                        <Panel
+                            header={<span style={{ fontWeight: "500", color: "#1e293b" }}>{faq.question}</span>}
+                            key={index}
+                            className="hover-lift">
+                            <p style={{ color: "#64748b", lineHeight: "1.7" }}>{faq.answer}</p>
+                        </Panel>
+                    ))}
+                </Collapse>
+            </div>
         </div>
     );
 };

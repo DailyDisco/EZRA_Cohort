@@ -36,19 +36,50 @@ const HeroBanner: React.FC = () => {
 
     return (
         <div
-            className="hero-banner text-white img-fluid flex flex-column justify-content-center align-items-center text-center py-5"
+            className="hero-banner text-white img-fluid flex flex-column justify-content-center align-items-center text-center position-relative overflow-hidden"
             style={{
                 backgroundImage: `url(${heroContent.imageSrc})`,
-                minHeight: "50vh",
+                minHeight: "60vh",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
             }}>
-            <h1 className="bg-dark p-3 my-2">{heroContent.title}</h1>
-            <p className="bg-dark p-3 my-3">{heroContent.subtitle}</p>
+            {/* Modern gradient overlay */}
+            <div
+                className="position-absolute top-0 start-0 w-100 h-100"
+                style={{
+                    background: "linear-gradient(135deg, rgba(0, 103, 79, 0.85) 0%, rgba(119, 137, 244, 0.75) 100%)",
+                    backdropFilter: "blur(1px)",
+                }}></div>
 
-            <Button
-                type="primary"
-                onClick={showModal}>
-                {heroContent.buttonText}
-            </Button>
+            {/* Content */}
+            <div className="position-relative z-1 fade-in-up">
+                <h1
+                    className="display-4 fw-bold mb-4 text-shadow-lg"
+                    style={{ letterSpacing: "-0.025em" }}>
+                    {heroContent.title}
+                </h1>
+                <p
+                    className="lead mb-5 fs-5 text-shadow"
+                    style={{ maxWidth: "600px", margin: "0 auto" }}>
+                    {heroContent.subtitle}
+                </p>
+
+                <Button
+                    type="primary"
+                    size="large"
+                    className="modern-button pulse-on-hover glow-on-hover px-4 py-3"
+                    onClick={showModal}
+                    style={{
+                        background: "linear-gradient(135deg, #00674f 0%, #00a86b 100%)",
+                        border: "none",
+                        fontSize: "1.1rem",
+                        fontWeight: "600",
+                        minHeight: "48px",
+                        boxShadow: "0 4px 14px 0 rgba(0, 103, 79, 0.39)",
+                    }}>
+                    {heroContent.buttonText}
+                </Button>
+            </div>
             <Modal
                 title="Contact Info"
                 open={open}

@@ -113,8 +113,15 @@ go run main.go
 Build and run using Docker:
 
 ```bash
-docker build -t rentdaddy .
-docker run -p 8080:8080 rentdaddy
+docker-compose up -d
+
+or 
+
+docker-compose up
+
+# If you need to rebuild the image
+
+docker compose up --build
 ```
 
 Access the application by navigating to `http://localhost:8080`.
