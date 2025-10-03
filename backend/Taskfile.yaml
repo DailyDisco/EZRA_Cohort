@@ -1,14 +1,14 @@
-version: "3"
+version: '3'
 
-dotenv: ["../.env"]
+dotenv: ['../.env']
 
 vars:
-  MPATH: "internal/db/migrations/"
-  PG_URL: postgresql://{{.POSTGRES_USER}}@{{.POSTGRES_HOST}}:{{.POSTGRES_PORT}}/{{.POSTGRES_DB}}?sslmode=disable
+  MPATH: 'internal/db/migrations/'
+  PG_URL: postgresql://{{.POSTGRES_USER}}:{{.POSTGRES_PASSWORD}}@{{.POSTGRES_HOST}}:{{.POSTGRES_PORT}}/{{.POSTGRES_DB}}?sslmode=disable
   DATABASE_URL: .PG_URL
 tasks:
   seed-users:
-    desc: "Seed users into the database and syncs with Clerk"
+    desc: 'Seed users into the database and syncs with Clerk'
     cmds:
       - go run scripts/seed_users.go
       # - docker compose exec backend go run scripts/seed_users.go
@@ -19,18 +19,18 @@ tasks:
       - go build -v -i server.go
 
   run:
-    desc: "Run Go app with Air reloading"
+    desc: 'Run Go app with Air reloading'
     cmds:
       - air -c .air.toml
 
   make-migration:
-    desc: "Create a new migration set with a user provided name. ie: task make-migration -- <name-input>"
+    desc: 'Create a new migration set with a user provided name. ie: task make-migration -- <name-input>'
     cmds:
       - migrate create -ext sql -dir internal/db/migrations -seq {{.CLI_ARGS}}
       - echo 'New migration generated! Make sure to verify new files in internal/db/migrations'
 
   migrate:up:
-    desc: "Apply migrations to the database"
+    desc: 'Apply migrations to the database'
     cmds:
       # The commented block prints credentials to the logs/command-line
       # - |
@@ -53,34 +53,34 @@ tasks:
       - migrate -path {{.MPATH}} -database "{{.PG_URL}}" -verbose version
 
   migrate:status:
-    desc: "Check migration version and if database is dirty"
+    desc: 'Check migration version and if database is dirty'
     cmds:
       - migrate -path {{.MPATH}} -database "{{.PG_URL}}" -verbose version
 
   migrate:fix-dirty:
-    desc: "Fix a dirty database state by forcing last successful version"
+    desc: 'Fix a dirty database state by forcing last successful version'
     cmds:
       - echo "Checking migration status..."
       - migrate -path {{.MPATH}} -database "{{.PG_URL}}" force 1
       - echo "Database migration state reset!"
 
   migrate:reset:
-    desc: "Reset database (wipe all data and re-run migrations)"
+    desc: 'Reset database (wipe all data and re-run migrations)'
     cmds:
       - migrate -path {{.MPATH}} -database "{{.PG_URL}}" -verbose down
       - migrate -path {{.MPATH}} -database "{{.PG_URL}}" -verbose up
   test:all:
-    desc: "Test all in backend in container"
+    desc: 'Test all in backend in container'
     cmds:
       - chmod +x ./scripts/test-all.sh
       - ./scripts/test-all.sh
   test:changed:
-    desc: "Test changed files only in backend in container"
+    desc: 'Test changed files only in backend in container'
     cmds:
       - chmod +x ./scripts/test-changed.sh
       - ./scripts/test-changed.sh
   db:connect:
-    desc: "Test changed files only in backend in container"
+    desc: 'Test changed files only in backend in container'
     cmds:
       # Check if container is running
       - |
@@ -92,26 +92,26 @@ tasks:
         echo "Running all tests in container: $CONTAINER_NAME..."
         psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB
   cron:expire-leases:
-    desc: "Run lease expiration job manually in backend container"
+    desc: 'Run lease expiration job manually in backend container'
     cmds:
       - docker exec rentdaddy-backend /app/bin/expire-leases
   cron:test-expired-leases:
-    desc: "Seed db with leases to expire"
+    desc: 'Seed db with leases to expire'
     cmds:
       - docker exec rentdaddy-backend sh -c "PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -f /app/internal/db/migrations/cron_test_seeder.sql"
 
   cron:test-status-update:
-    desc: "Test the lease status update endpoint"
+    desc: 'Test the lease status update endpoint'
     cmds:
       - bash ./scripts/lease-status-test.sh
 
   cron:simulate-midnight:
-    desc: "Simulate the midnight cron job"
+    desc: 'Simulate the midnight cron job'
     cmds:
       - bash ./scripts/simulate-cron.sh
 
   cron:run-all-tests:
-    desc: "Run all lease cron job tests in sequence"
+    desc: 'Run all lease cron job tests in sequence'
     cmds:
       - task: cron:test-expired-leases
       - echo "Waiting 2 seconds for database to process changes..."
@@ -121,6 +121,6 @@ tasks:
       - sleep 2
       - task: cron:test-status-update
   cron:test-notify:
-    desc: "Test the lease expiration notification system"
+    desc: 'Test the lease expiration notification system'
     cmds:
       - bash ./scripts/test-lease-notify.sh
