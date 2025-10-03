@@ -182,10 +182,10 @@ createRoot(document.getElementById("root")!).render(
                                             path="guest-parking"
                                             element={<h1>Guest Parking</h1>}
                                         />
-                                        <Route
+                                        {/* <Route
                                             path="tenant-view-and-edit-leases"
                                             element={<h1>Digital Documents</h1>}
-                                        />
+                                        /> */}
                                         <Route
                                             path="tenant-complaints"
                                             element={<TenantComplaints />}
