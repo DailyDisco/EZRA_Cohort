@@ -1,0 +1,11 @@
+{
+    "build": {
+        "builder": "NIXPACKS"
+    },
+    "deploy": {
+        "startCommand": "npm run build && npm run preview"
+    },
+    "variables": {
+        "NODE_ENV": "production"
+    }
+}
