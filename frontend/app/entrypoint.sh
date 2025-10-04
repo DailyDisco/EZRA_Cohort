@@ -3,7 +3,7 @@ set -e
 
 if [ "$NODE_ENV" = "production" ]; then
   echo "Starting production server..."
-  exec serve -s dist -l 3000
+  exec npx serve -s dist -l 3000
 else
   echo "Starting development server..."
   exec npm run dev -- --host 0.0.0.0
