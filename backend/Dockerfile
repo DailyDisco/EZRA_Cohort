@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.25-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -24,13 +24,22 @@ RUN apk --no-cache add \
     postgresql-client \
     ca-certificates \
     tzdata \
+    curl \
     && rm -rf /var/cache/apk/*
+
+# Install golang-migrate
+RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.18.1/migrate.linux-amd64.tar.gz | tar xvz && \
+    mv migrate /usr/local/bin/migrate && \
+    chmod +x /usr/local/bin/migrate
 
 # Create app directory
 WORKDIR /app
 
 # Copy binary from builder stage
 COPY --from=builder /app/server .
+
+# Copy migrations directory
+COPY --from=builder /app/internal/db/migrations ./internal/db/migrations/
 
 # Copy entrypoint script
 COPY entrypoint.sh .

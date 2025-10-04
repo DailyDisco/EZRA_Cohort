@@ -7,11 +7,23 @@
         "dev": "vite",
         "build": "vite build",
         "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "lint:watch": "eslint . --watch",
         "preview": "vite preview",
         "test": "vitest",
         "test:ui": "vitest --ui",
         "test:run": "vitest run",
-        "pretty": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
+        "test:coverage": "vitest run --coverage",
+        "test:watch": "vitest --watch",
+        "pretty": "npx prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+        "pretty:check": "npx prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+        "format": "npm run pretty && npm run lint:fix",
+        "format:check": "npm run pretty:check && npm run lint",
+        "type-check": "tsc --noEmit",
+        "type-check:watch": "tsc --noEmit --watch",
+        "dev:full": "concurrently \"npm run dev\" \"npm run type-check:watch\" \"npm run lint:watch\"",
+        "clean": "rm -rf dist coverage .vite node_modules/.vite",
+        "analyze": "npm run build && npx vite-bundle-analyzer dist/stats.html"
     },
     "dependencies": {
         "@ant-design/icons": "^5.6.1",
@@ -37,6 +49,8 @@
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
         "@vitejs/plugin-react": "^4.3.4",
+        "@vitest/coverage-v8": "^3.2.4",
+        "concurrently": "^8.2.2",
         "eslint": "^9.21.0",
         "eslint-plugin-react-hooks": "^5.1.0",
         "eslint-plugin-react-refresh": "^0.4.19",
@@ -46,6 +60,7 @@
         "typescript": "~5.7.2",
         "typescript-eslint": "^8.24.1",
         "vite": "^6.2.0",
+        "vite-bundle-analyzer": "^0.11.1",
         "vitest": "^3.2.4"
     }
 }

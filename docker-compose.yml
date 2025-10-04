@@ -32,12 +32,10 @@ services:
     container_name: rentdaddy-backend
     restart: always
     volumes:
-      - ./backend:/app
       - /app/tmp
       - /app/temp
       - ./backend/tmp:/app/tmp
       - ./backend/temp:/app/temp
-      - go-mod-cache:/go/pkg/mod
     env_file: .env
     environment:
       - POSTGRES_HOST=postgres
@@ -51,8 +49,11 @@ services:
     build:
       context: ./frontend/app
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+        - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
     ports:
-      - "${FRONTEND_PORT:-5173}:3000"
+      - "${FRONTEND_PORT:-5173}:80"
     volumes:
       - ./frontend/app:/app
       - /app/node_modules

@@ -41,7 +41,7 @@ done
 
 echo "Running database migrations..."
 # Pass the dynamically generated PG_URL to the migrate command directly
-migrate -path internal/db/migrations/ -database "$PG_URL" -verbose up || echo "Migration failed!"
+migrate -path /app/internal/db/migrations/ -database "$PG_URL" -verbose up || echo "Migration failed!"
 echo "Database migrations complete."
 
 # Check if we should seed the database (only in production with specific environment variable)
