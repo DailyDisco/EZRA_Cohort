@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "../styles/styles.scss";
-import { Space, Spin, Alert } from "antd";
+import { Spin, Alert } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import TableComponent from "../components/reusableComponents/TableComponent.tsx";
@@ -13,7 +13,7 @@ import { Input, message } from "antd";
 import type { ColumnType } from "antd/es/table";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/clerk-react";
-import { FileTextOutlined } from "@ant-design/icons";
+import { FileTextOutlined, SendOutlined, SyncOutlined, EditOutlined, StopOutlined } from "@ant-design/icons";
 import { PageLoader } from "../components/reusableComponents/CardSkeletonLoader";
 
 // Use VITE_API_URL for the server URL, ensuring no trailing slash
@@ -523,49 +523,62 @@ export default function AdminViewEditLeases() {
             title: "Actions",
             key: "actions",
             render: (_, record: LeaseData & { adminDocUrl?: string }) => (
-                <Space
-                    size="middle"
-                    wrap={true}>
+                <div className="action-buttons">
+                    {/* View button - always first if available */}
                     {record.adminDocUrl && (
-                        <a
-                            href={record.adminDocUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn btn-info"
-                            style={{ padding: "4px 10px", borderRadius: 4 }}>
-                            <FileTextOutlined style={{ marginRight: 4 }} />
-                            View Lease
-                        </a>
+                        <button
+                            className="btn btn-view"
+                            onClick={() => window.open(record.adminDocUrl, "_blank")}
+                            title="View Lease Document">
+                            <FileTextOutlined />
+                            <span>View</span>
+                        </button>
                     )}
+
+                    {/* Primary actions based on status */}
                     {record.status === "draft" && (
-                        <ButtonComponent
-                            type="primary"
-                            title="Send Lease"
+                        <button
+                            className="btn btn-send"
                             onClick={() => showSendModal(record)}
-                        />
+                            title="Send Lease">
+                            <SendOutlined />
+                            <span>Send</span>
+                        </button>
                     )}
+
+                    {/* Renewal for expired/expiring leases */}
                     {(record.status === "expired" || record.status === "expires_soon") && (
-                        <ButtonComponent
-                            type="default"
-                            title="Renew Lease"
+                        <button
+                            className="btn btn-renew"
                             onClick={() => handleRenew(record)}
-                        />
+                            title="Renew Lease">
+                            <SyncOutlined />
+                            <span>Renew</span>
+                        </button>
                     )}
+
+                    {/* Amendment for active/pending leases */}
                     {(record.status === "active" || record.status === "expires_soon" || record.status === "draft") && (
-                        <ButtonComponent
-                            type="info"
-                            title="Amend Lease"
+                        <button
+                            className="btn btn-amend"
                             onClick={() => handleAmend(record)}
-                        />
+                            title="Amend Lease">
+                            <EditOutlined />
+                            <span>Amend</span>
+                        </button>
                     )}
+
+                    {/* Termination - always last as it's destructive */}
                     {(record.status === "active" || record.status === "pending_approval" || record.status === "expires_soon") && (
-                        <ButtonComponent
-                            type="danger"
-                            title="Terminate Lease"
+                        <button
+                            className="btn btn-terminate"
                             onClick={() => handleTerminate(record.id)}
-                        />
+                            title="Terminate Lease">
+                            <StopOutlined />
+                            <span>Terminate</span>
+                        </button>
                     )}
-                </Space>
+                </div>
             ),
         },
     ];

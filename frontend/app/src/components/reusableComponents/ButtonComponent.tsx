@@ -12,7 +12,6 @@ export interface ButtonComponentProps {
     loading?: boolean; // Added loading prop
 }
 
-
 const ButtonComponent = (props: ButtonComponentProps) => {
     return (
         <ConfigProvider
