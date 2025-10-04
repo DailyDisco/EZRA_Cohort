@@ -99,6 +99,33 @@ get_item() {
 extract_id() {
   echo "$1" | grep -o '[0-9]\+' | head -1
 }
+
+# Function to update Clerk user metadata
+update_clerk_metadata() {
+  local clerk_user_id="$1"
+  local role="$2"
+  local db_id="$3"
+
+  echo "Updating Clerk metadata for user $clerk_user_id (role: $role, db_id: $db_id)"
+
+  # Create the metadata JSON
+  local metadata_json="{\"public_metadata\":{\"role\":\"$role\",\"db_id\":$db_id}}"
+
+  # Update user metadata via Clerk API
+  local update_response=$(curl -s -X PATCH \
+    -H "Authorization: Bearer $CLERK_SECRET_KEY" \
+    -H "Content-Type: application/json" \
+    -d "$metadata_json" \
+    "https://api.clerk.com/v1/users/$clerk_user_id/metadata")
+
+  # Check if update was successful
+  if echo "$update_response" | grep -q '"updated_at"'; then
+    echo "✅ Successfully updated Clerk metadata for $clerk_user_id"
+  else
+    echo "❌ Failed to update Clerk metadata for $clerk_user_id"
+    echo "Response: $update_response"
+  fi
+}
 make_api_call() {
   method=$1
   endpoint=$2
@@ -143,13 +170,20 @@ if [ "$ADMIN_EXISTS" -eq "0" ]; then
     VALUES ($admin_db_id, '$CLERK_LANDLORD_USER_ID', '$admin_first_name', '$admin_last_name', '$admin_email', '$admin_phone', 'admin', 'active');
     "
     echo "Created admin user with ID: $admin_db_id"
+    # Update Clerk metadata
+    update_clerk_metadata "$CLERK_LANDLORD_USER_ID" "admin" "$admin_db_id"
   else
     # ID is taken, insert without specifying ID
     psql -h $PG_HOST -U $PG_USER -d $PG_DB -c "
     INSERT INTO users (clerk_id, first_name, last_name, email, phone, role, status)
     VALUES ('$CLERK_LANDLORD_USER_ID', '$admin_first_name', '$admin_last_name', '$admin_email', '$admin_phone', 'admin', 'active');
     "
-    echo "Created admin user (ID auto-assigned)"
+    # Get the auto-assigned ID
+    NEW_ADMIN_ID=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "SELECT id FROM users WHERE clerk_id = '$CLERK_LANDLORD_USER_ID';")
+    admin_db_id=$(extract_id "$NEW_ADMIN_ID")
+    echo "Created admin user (ID auto-assigned): $admin_db_id"
+    # Update Clerk metadata
+    update_clerk_metadata "$CLERK_LANDLORD_USER_ID" "admin" "$admin_db_id"
   fi
 else
   echo "Admin user already exists"
@@ -157,6 +191,8 @@ else
   EXISTING_ID=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "SELECT id FROM users WHERE clerk_id = '$CLERK_LANDLORD_USER_ID';")
   admin_db_id=$(extract_id "$EXISTING_ID")
   echo "Using existing admin user with ID: $admin_db_id"
+  # Update Clerk metadata even for existing users
+  update_clerk_metadata "$CLERK_LANDLORD_USER_ID" "admin" "$admin_db_id"
 fi
 
 # Create client user
@@ -176,11 +212,15 @@ if [ "$USER_EXISTS" -eq "0" ]; then
   TENANT_ID_RAW=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "$TENANT_SQL")
   TENANT_ID=$(extract_id "$TENANT_ID_RAW")
   echo "Created client user with ID: $TENANT_ID"
+  # Update Clerk metadata
+  update_clerk_metadata "$TENANT_CLERK_ID" "tenant" "$TENANT_ID"
 else
   echo "Client user already exists, getting existing ID..."
   TENANT_ID_RAW=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "SELECT id FROM users WHERE clerk_id = '$TENANT_CLERK_ID';")
   TENANT_ID=$(extract_id "$TENANT_ID_RAW")
   echo "Using existing client user with ID: $TENANT_ID"
+  # Update Clerk metadata even for existing users
+  update_clerk_metadata "$TENANT_CLERK_ID" "tenant" "$TENANT_ID"
 fi
 
 # Check for ID conflicts (shouldn't happen but just in case)
