@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -59,6 +58,17 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(chiMiddleware.Logger)
+
+	// Handlers
+	userHandler := handlers.NewUserHandler(pool, queries)
+	lockerHandler := handlers.NewLockerHandler(pool, queries)
+	parkingPermitHandler := handlers.NewParkingPermitHandler(pool, queries)
+	workOrderHandler := handlers.NewWorkOrderHandler(pool, queries)
+	apartmentHandler := handlers.NewApartmentHandler(pool, queries)
+	chatbotHandler := handlers.NewChatBotHandler(pool, queries)
+	complaintHandler := handlers.NewComplaintHandler(pool, queries)
+	leaseHandler := handlers.NewLeaseHandler(pool, queries)
+
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"*"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
@@ -103,41 +113,6 @@ func main() {
 	r.With(clerkhttp.WithHeaderAuthorization()).With(mymiddleware.ClerkAuthMiddleware).Group(func(r chi.Router) {
 
 	// Routers
-	userHandler := handlers.NewUserHandler(pool, queries)
-
-	// Test route to check user metadata (for debugging)
-	r.Get("/test/user-metadata", func(w http.ResponseWriter, r *http.Request) {
-		userCtx := mymiddleware.GetUserCtx(r)
-		if userCtx == nil {
-			w.Write([]byte(`{"error": "No user context"}`))
-			return
-		}
-
-		var metadata map[string]interface{}
-		err := json.Unmarshal(userCtx.PublicMetadata, &metadata)
-		if err != nil {
-			w.Write([]byte(`{"error": "Failed to parse metadata"}`))
-			return
-		}
-
-		response := map[string]interface{}{
-			"user_id": userCtx.ID,
-			"metadata": metadata,
-		}
-
-		json.NewEncoder(w).Encode(response)
-	})
-
-	// Locker Handler
-	lockerHandler := handlers.NewLockerHandler(pool, queries)
-
-	parkingPermitHandler := handlers.NewParkingPermitHandler(pool, queries)
-	workOrderHandler := handlers.NewWorkOrderHandler(pool, queries)
-	apartmentHandler := handlers.NewApartmentHandler(pool, queries)
-	chatbotHandler := handlers.NewChatBotHandler(pool, queries)
-	complaintHandler := handlers.NewComplaintHandler(pool, queries)
-	leaseHandler := handlers.NewLeaseHandler(pool, queries)
-
 		// Admin Endpoints  
 		r.Route("/admin", func(r chi.Router) {
 			r.Use(mymiddleware.IsAdmin) // Clerk Admin middleware
