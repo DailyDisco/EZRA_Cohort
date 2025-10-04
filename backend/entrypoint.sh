@@ -2,23 +2,31 @@
 set -e
 
 echo "Waiting for PostgreSQL to be ready..."
-# Check if we're using Railway's PostgreSQL or local docker-compose
-if [ -n "$POSTGRES_HOST" ] && [ "$POSTGRES_HOST" != "postgres" ]; then
-  # Railway PostgreSQL
-  until PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c '\q'; do
-    echo "PostgreSQL is unavailable - sleeping"
-    sleep 2
-  done
+
+# Check if we're running in a Railway environment (PGHOST is set by Railway)
+if [ -n "$PGHOST" ]; then
+  DB_HOST="$PGHOST"
+  DB_USER="$PGUSER"
+  DB_PASSWORD="$PGPASSWORD"
+  DB_NAME="$PGDATABASE"
+  
+  # Railway does not need ~/.pgpass or PGPASSFILE
 else
-  # Local docker-compose PostgreSQL
-  echo "postgres:5432:${POSTGRES_DB}:${POSTGRES_USER}:${POSTGRES_PASSWORD}" >~/.pgpass
+  # Local docker-compose environment
+  DB_HOST="postgres"
+  DB_USER="$POSTGRES_USER"
+  DB_PASSWORD="$POSTGRES_PASSWORD"
+  DB_NAME="$POSTGRES_DB"
+
+  echo "postgres:5432:${DB_NAME}:${DB_USER}:${DB_PASSWORD}" >~/.pgpass
   chmod 600 ~/.pgpass
   export PGPASSFILE=~/.pgpass
-  until PGPASSWORD="$POSTGRES_PASSWORD" psql -h postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c '\q'; do
-    echo "PostgreSQL is unavailable - sleeping"
-    sleep 2
-  done
 fi
+
+until PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c '\q'; do
+  echo "PostgreSQL is unavailable - sleeping"
+  sleep 2
+done
 
 echo "Running database migrations..."
 task migrate:up || echo "Migration failed!"
