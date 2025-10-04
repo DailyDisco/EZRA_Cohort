@@ -9,9 +9,8 @@ WORKDIR /app
 # Copy package files for better layer caching
 COPY package*.json ./
 
-# Install dependencies with cache mount for faster builds
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --only=production --no-audit --no-fund --prefer-offline
+# Install dependencies (cache mounts not supported on Railway)
+RUN npm ci --only=production --no-audit --no-fund --prefer-offline
 
 # Production build stage
 FROM base AS build
@@ -20,8 +19,7 @@ FROM base AS build
 COPY package*.json ./
 
 # Install all dependencies (including dev dependencies) for build
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --no-audit --no-fund --prefer-offline
+RUN npm ci --no-audit --no-fund --prefer-offline
 
 # Declare build arguments for Vite environment variables
 ARG VITE_API_URL
