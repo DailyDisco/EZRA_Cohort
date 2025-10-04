@@ -49,8 +49,17 @@ const MyChatBot: React.FC = () => {
 
         const updatedConversation = [...conversation, userMessage];
 
+        // Get API URL from environment variables
+        const API_URL = import.meta.env.VITE_API_URL;
+
+        if (!API_URL) {
+            console.error("VITE_API_URL is not defined.");
+            await params.injectMessage("Configuration error: API URL is missing. Please contact support.");
+            return;
+        }
+
         try {
-            const response = await fetch("http://localhost:8080/api/chat", {
+            const response = await fetch(`${API_URL}/api/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ conversation: updatedConversation }),
