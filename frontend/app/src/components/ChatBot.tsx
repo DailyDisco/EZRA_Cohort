@@ -58,8 +58,11 @@ const MyChatBot: React.FC = () => {
             return;
         }
 
+        // Remove trailing slash from API_URL if present
+        const cleanedAPI_URL = API_URL.endsWith("/") ? API_URL.slice(0, -1) : API_URL;
+
         try {
-            const response = await fetch(`${API_URL}/api/chat`, {
+            const response = await fetch(`${cleanedAPI_URL}/api/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ conversation: updatedConversation }),
