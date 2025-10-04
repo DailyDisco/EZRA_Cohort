@@ -41,7 +41,7 @@ done
 
 echo "Running database migrations..."
 # Pass the dynamically generated PG_URL to the task command
-task migrate:up -- -database "$PG_URL" || echo "Migration failed!"
+task migrate:up "$PG_URL" || echo "Migration failed!"
 echo "Database migrations complete."
 
 # Start cron in background
