@@ -323,6 +323,122 @@ body {
     box-shadow: var(--shadow-md);
 }
 
+// Action button styles for lease management
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-start;
+
+    .btn {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        height: auto;
+        min-width: auto;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        letter-spacing: 0.025em;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow:
+            0 1px 3px rgba(0, 0, 0, 0.12),
+            0 1px 2px rgba(0, 0, 0, 0.24);
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                0 2px 4px rgba(0, 0, 0, 0.12);
+
+            &::before {
+                left: 100%;
+            }
+        }
+
+        &:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .anticon {
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        // Responsive text - hide text on very small screens
+        @media (max-width: 768px) {
+            span:not(.anticon) {
+                display: none;
+            }
+            padding: 6px 8px;
+        }
+    }
+
+    .btn-view {
+        background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
+        color: white;
+
+        &:hover {
+            background: linear-gradient(135deg, #40a9ff 0%, #5cdbd3 100%);
+        }
+    }
+
+    .btn-send {
+        background: linear-gradient(135deg, #722ed1 0%, #9254de 100%);
+        color: white;
+
+        &:hover {
+            background: linear-gradient(135deg, #9254de 0%, #b37feb 100%);
+        }
+    }
+
+    .btn-renew {
+        background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+        color: white;
+
+        &:hover {
+            background: linear-gradient(135deg, #73d13d 0%, #95de64 100%);
+        }
+    }
+
+    .btn-amend {
+        background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%);
+        color: #1f2937;
+
+        &:hover {
+            background: linear-gradient(135deg, #ffc53d 0%, #ffd666 100%);
+        }
+    }
+
+    .btn-terminate {
+        background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+        color: white;
+
+        &:hover {
+            background: linear-gradient(135deg, #ff7875 0%, #ffa39e 100%);
+        }
+    }
+}
+
 // Modern typography
 h1,
 h2,
