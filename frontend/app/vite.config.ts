@@ -1,13 +1,13 @@
-import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [react()],
     server: {
-        host: "0.0.0.0",
+        host: '0.0.0.0',
         port: 3000,
-        allowedHosts: ["frontend-production-aa55.up.railway.app"],
+        allowedHosts: ['frontend-production-aa55.up.railway.app'],
     },
     build: {
         // Optimize chunks for better caching
@@ -22,13 +22,11 @@ export default defineConfig({
                 },
             },
         },
-        // Enable compression and minification
-        minify: 'terser',
-        terserOptions: {
-            compress: {
-                drop_console: true,
-                drop_debugger: true,
-            },
+        // Enable compression and minification with esbuild
+        minify: 'esbuild',
+        esbuild: {
+            drop: ['console', 'debugger'],
+            legalComments: 'none',
         },
         // Generate sourcemaps for production debugging
         sourcemap: true,

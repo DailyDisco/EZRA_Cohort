@@ -1,23 +1,70 @@
 
-# Ignore binaries and executables
+# Binaries for programs and plugins
 *.exe
-*.out
-*.so
+*.exe~
 *.dll
+*.so
+*.dylib
 
-# Ignore envs
-.env*
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+*.prof
+
+# Go workspace file
+go.work
+
+# Dependency directories
+vendor/
+
+# Environment variables
+.env
+.env.*
 .env.local*
+!.env.example
 
-# Ignore todos
-todo.md
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Ignore all sqlite files
-*.sqlite
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Ignore builds
+# Build outputs
 /bin/
 /tmp/
+/temp/
+/dist/
 
-# Ignore logs
+# Logs
 *.log
+logs/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+
+# Air live reload
+tmp/
+
+# Test coverage
+coverage.html
+coverage.xml
+
+# Documentation
+todo.md

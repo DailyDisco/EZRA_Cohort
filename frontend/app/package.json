@@ -11,7 +11,7 @@
         "test": "vitest",
         "test:ui": "vitest --ui",
         "test:run": "vitest run",
-        "pretty": "prettier --write \"src/**/*.js\""
+        "pretty": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
     },
     "dependencies": {
         "@ant-design/icons": "^5.6.1",
