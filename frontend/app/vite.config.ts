@@ -8,6 +8,11 @@ export default defineConfig({
         react(),
         // ...,
     ],
+    server: {
+        host: "0.0.0.0",
+        port: 3000,
+        allowedHosts: ["frontend-production-aa55.up.railway.app"],
+    },
     // These build options make the build more resilient in CI environments
     build: {
         // Generate sourcemaps for better debugging
@@ -16,4 +21,3 @@ export default defineConfig({
         reportCompressedSize: false,
     },
 });
-
