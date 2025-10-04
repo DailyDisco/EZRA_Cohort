@@ -122,61 +122,70 @@ TENANT_IDS_FILE=$(mktemp)
 APARTMENT_IDS_FILE=$(mktemp)
 LEASE_IDS_FILE=$(mktemp)
 
-# Step 1: Create admin user with ID from Clerk (using OVERRIDING SYSTEM VALUE)
 echo "Step 1: Creating admin user with ID $admin_db_id..."
 
-# First check if user with the specified ID already exists
-USER_EXISTS=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "SELECT COUNT(*) FROM users WHERE id = $admin_db_id;")
-USER_EXISTS=$(extract_id "$USER_EXISTS")
+# Check if admin user already exists by Clerk ID
+ADMIN_EXISTS=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "SELECT COUNT(*) FROM users WHERE clerk_id = '$CLERK_LANDLORD_USER_ID';")
+ADMIN_EXISTS=$(extract_id "$ADMIN_EXISTS")
 
-if [ "$USER_EXISTS" -eq "0" ]; then
-  # Create the admin user with specified ID using the correct OVERRIDING SYSTEM VALUE syntax
-  psql -h $PG_HOST -U $PG_USER -d $PG_DB -c "
-  -- Delete existing user with the same clerk_id if it exists
-  DELETE FROM users WHERE clerk_id = '$CLERK_LANDLORD_USER_ID';
-  
-  -- Create the admin user with the specified ID
-  INSERT INTO users (id, clerk_id, first_name, last_name, email, phone, role, status) 
-  OVERRIDING SYSTEM VALUE
-  VALUES ($admin_db_id, '$CLERK_LANDLORD_USER_ID', '$admin_first_name', '$admin_last_name', '$admin_email', '$admin_phone', 'admin', 'active');
-  "
-  echo "Created admin user with ID: $admin_db_id"
+if [ "$ADMIN_EXISTS" -eq "0" ]; then
+  echo "Creating new admin user..."
+
+  # Check if the desired ID is available
+  ID_EXISTS=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "SELECT COUNT(*) FROM users WHERE id = $admin_db_id;")
+  ID_EXISTS=$(extract_id "$ID_EXISTS")
+
+  if [ "$ID_EXISTS" -eq "0" ]; then
+    # Create the admin user with the specified ID
+    psql -h $PG_HOST -U $PG_USER -d $PG_DB -c "
+    INSERT INTO users (id, clerk_id, first_name, last_name, email, phone, role, status)
+    OVERRIDING SYSTEM VALUE
+    VALUES ($admin_db_id, '$CLERK_LANDLORD_USER_ID', '$admin_first_name', '$admin_last_name', '$admin_email', '$admin_phone', 'admin', 'active');
+    "
+    echo "Created admin user with ID: $admin_db_id"
+  else
+    # ID is taken, insert without specifying ID
+    psql -h $PG_HOST -U $PG_USER -d $PG_DB -c "
+    INSERT INTO users (clerk_id, first_name, last_name, email, phone, role, status)
+    VALUES ('$CLERK_LANDLORD_USER_ID', '$admin_first_name', '$admin_last_name', '$admin_email', '$admin_phone', 'admin', 'active');
+    "
+    echo "Created admin user (ID auto-assigned)"
+  fi
 else
-  echo "Admin user with ID $admin_db_id already exists"
+  echo "Admin user already exists"
+  # Update the admin_db_id to the existing user's ID
+  EXISTING_ID=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "SELECT id FROM users WHERE clerk_id = '$CLERK_LANDLORD_USER_ID';")
+  admin_db_id=$(extract_id "$EXISTING_ID")
+  echo "Using existing admin user with ID: $admin_db_id"
 fi
 
 # Create client user
 echo "Step 2: Creating client user..."
 
-# First delete any existing user with the same clerk_id
-psql -h $PG_HOST -U $PG_USER -d $PG_DB -c "DELETE FROM users WHERE clerk_id = '$TENANT_CLERK_ID';"
+# Check if user already exists
+USER_EXISTS=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "SELECT COUNT(*) FROM users WHERE clerk_id = '$TENANT_CLERK_ID';")
+USER_EXISTS=$(extract_id "$USER_EXISTS")
 
-# Create tenant user
-TENANT_SQL="INSERT INTO users (clerk_id, first_name, last_name, email, phone, role, status)
-           VALUES ('$TENANT_CLERK_ID', '$TENANT_FIRST_NAME', '$TENANT_LAST_NAME', '$TENANT_EMAIL', '$TENANT_PHONE', 'tenant', 'active')
-           RETURNING id;"
-
-TENANT_ID_RAW=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "$TENANT_SQL")
-TENANT_ID=$(extract_id "$TENANT_ID_RAW")
-
-# Verify that the tenant ID is not the same as the admin ID
-if [ "$TENANT_ID" -eq "$admin_db_id" ]; then
-  echo "WARNING: Tenant ID conflicts with admin ID. This should not happen with SERIAL/IDENTITY columns."
-  echo "Attempting to reassign tenant ID..."
-
-  # Delete the tenant and try again with explicit ID assignment
-  psql -h $PG_HOST -U $PG_USER -d $PG_DB -c "DELETE FROM users WHERE id = $TENANT_ID;"
-
-  # Find a new ID that's not the admin ID (admin ID + 1000 to be safe)
-  NEW_ID=$((admin_db_id + 1000 + 1))
-
-  TENANT_SQL="INSERT INTO users (id, clerk_id, first_name, last_name, email, phone, role, status)
-             OVERRIDING SYSTEM VALUE
-             VALUES ($NEW_ID, '$TENANT_CLERK_ID', '$TENANT_FIRST_NAME', '$TENANT_LAST_NAME', '$TENANT_EMAIL', '$TENANT_PHONE', 'tenant', 'active')
+if [ "$USER_EXISTS" -eq "0" ]; then
+  echo "Creating new client user..."
+  # Create tenant user
+  TENANT_SQL="INSERT INTO users (clerk_id, first_name, last_name, email, phone, role, status)
+             VALUES ('$TENANT_CLERK_ID', '$TENANT_FIRST_NAME', '$TENANT_LAST_NAME', '$TENANT_EMAIL', '$TENANT_PHONE', 'tenant', 'active')
              RETURNING id;"
 
   TENANT_ID_RAW=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "$TENANT_SQL")
   TENANT_ID=$(extract_id "$TENANT_ID_RAW")
+  echo "Created client user with ID: $TENANT_ID"
+else
+  echo "Client user already exists, getting existing ID..."
+  TENANT_ID_RAW=$(psql -h $PG_HOST -U $PG_USER -d $PG_DB -t -c "SELECT id FROM users WHERE clerk_id = '$TENANT_CLERK_ID';")
+  TENANT_ID=$(extract_id "$TENANT_ID_RAW")
+  echo "Using existing client user with ID: $TENANT_ID"
+fi
+
+# Check for ID conflicts (shouldn't happen but just in case)
+if [ "$TENANT_ID" -eq "$admin_db_id" ]; then
+  echo "WARNING: Tenant ID ($TENANT_ID) conflicts with admin ID ($admin_db_id). This is unexpected."
 fi
 
 echo "Created client user: $TENANT_FIRST_NAME $TENANT_LAST_NAME (ID: $TENANT_ID)"

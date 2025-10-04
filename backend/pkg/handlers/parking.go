@@ -223,10 +223,10 @@ func (p ParkingPermitHandler) TenantGetParkingPermit(w http.ResponseWriter, r *h
 		return
 	}
 
-	userCtx, err := middleware.GetClerkUser(r)
-	if err != nil {
+	userCtx := middleware.GetUserCtx(r)
+	if userCtx == nil {
 		log.Println("[PARKING_HANDLER] Failed no user CTX")
-		http.Error(w, "Error no user CTX", http.StatusNotFound)
+		http.Error(w, "Error no user CTX", http.StatusUnauthorized)
 		return
 	}
 
@@ -250,8 +250,8 @@ func (p ParkingPermitHandler) TenantGetParkingPermit(w http.ResponseWriter, r *h
 }
 
 func (p ParkingPermitHandler) TenantGetParkingPermits(w http.ResponseWriter, r *http.Request) {
-	userCtx, err := middleware.GetClerkUser(r)
-	if err != nil {
+	userCtx := middleware.GetUserCtx(r)
+	if userCtx == nil {
 		log.Printf("[USER_HANDLER] No user CTX")
 		http.Error(w, "Error No user CTX", http.StatusUnauthorized)
 		return
