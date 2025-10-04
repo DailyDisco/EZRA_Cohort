@@ -69,6 +69,12 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
+	// Root route - Basic status message
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Backend API is running"}`))
+	})
+
 	// Webhooks - Public routes (no auth required)
 	r.Post("/webhooks/clerk", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("[WEBHOOK] Clerk webhook endpoint hit!")

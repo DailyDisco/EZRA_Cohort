@@ -25,7 +25,9 @@ RUN npm install -g serve
 RUN echo "Node $(node --version) / NPM $(npm --version)" && \
     echo "Key files:" && \
     ls -la vite.config.* 2>/dev/null || echo "No vite config found" && \
-    ls -la src/ 2>/dev/null || echo "No src directory found"
+    ls -la src/ 2>/dev/null || echo "No src directory found" && \
+    echo "VITE_ environment variables during build:" && \
+    env | grep VITE_ || echo "No VITE_ variables found"
 
 # Set host for Vite development server to allow external access
 ENV HOST=0.0.0.0
