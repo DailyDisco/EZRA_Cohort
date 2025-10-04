@@ -42,7 +42,7 @@ ENV HOST=0.0.0.0
 EXPOSE 5173 3000
 
 # Make entrypoint executable
-RUN chmod +x entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 # Choose between development and production based on NODE_ENV
 ENTRYPOINT ["./entrypoint.sh"]
