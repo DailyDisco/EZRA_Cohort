@@ -21,7 +21,7 @@ const PORT = import.meta.env.VITE_PORT || import.meta.env.PORT || "8080";
 const API_URL = `${DOMAIN_URL}:${PORT}`.replace(/\/$/, "");
 
 // Use API_URL as fallback if VITE_SERVER_URL is not properly set
-const serverUrl = import.meta.env.VITE_SERVER_URL && import.meta.env.VITE_SERVER_URL !== "xxxxxxx" ? import.meta.env.VITE_SERVER_URL : API_URL;
+const serverUrl = import.meta.env.VITE_API_URL;
 const absoluteServerUrl = `${serverUrl}`;
 
 export const TenantDashBoard = () => {

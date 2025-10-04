@@ -8,9 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import PageTitleComponent from "../components/reusableComponents/PageTitleComponent";
 import { useAuth } from "@clerk/clerk-react";
 
-const DOMAIN_URL = import.meta.env.VITE_DOMAIN_URL;
-const PORT = import.meta.env.VITE_PORT;
-const API_URL = `${DOMAIN_URL}:${PORT}`.replace(/\/$/, ""); // :white_check_mark: Remove trailing slashes
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Make the Add Locations a Modal that adds a building, floor, and room number
 // The user can add multiple locations

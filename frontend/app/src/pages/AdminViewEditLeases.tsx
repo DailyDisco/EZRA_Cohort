@@ -15,9 +15,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/clerk-react";
 import { FileTextOutlined } from "@ant-design/icons";
 
-const DOMAIN_URL = import.meta.env.VITE_DOMAIN_URL || import.meta.env.DOMAIN_URL || 'http://localhost';
-const PORT = import.meta.env.VITE_PORT || import.meta.env.PORT || '8080'; // Changed to match your server port
-const API_URL = `${DOMAIN_URL}:${PORT}`.replace(/\/$/, "");
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Log the API_URL to ensure it's correctly formed
 console.log("API URL:", API_URL);
@@ -29,7 +27,7 @@ const DEFAULT_STATUS_FILTERS = [
     { text: "Expired", value: "expired" },
     { text: "Draft", value: "draft" },
     { text: "Terminated", value: "terminated" },
-    { text: "Pending Approval", value: "pending_approval" }
+    { text: "Pending Approval", value: "pending_approval" },
 ];
 
 export default function AdminViewEditLeases() {
@@ -39,7 +37,7 @@ export default function AdminViewEditLeases() {
     const [modalConfig, setModalConfig] = useState({
         visible: false,
         mode: "add" as "add" | "send" | "renew" | "amend",
-        selectedLease: null as LeaseData | null
+        selectedLease: null as LeaseData | null,
     });
     const [statusFilters, setStatusFilters] = useState<{ text: string; value: string }[]>(DEFAULT_STATUS_FILTERS);
 
@@ -75,17 +73,17 @@ export default function AdminViewEditLeases() {
         if (data && Array.isArray(data)) {
             try {
                 // Extract unique status values from the lease data
-                const uniqueStatuses = [...new Set(data.map(lease => lease.status))];
+                const uniqueStatuses = [...new Set(data.map((lease) => lease.status))];
 
                 // Format the status values for display
                 const formattedFilters = uniqueStatuses
-                    .filter(status => status) // Filter out any null/undefined values
-                    .map(status => {
+                    .filter((status) => status) // Filter out any null/undefined values
+                    .map((status) => {
                         // Parse the status string
                         const text = String(status)
-                            .split('_')
-                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                            .join(' ');
+                            .split("_")
+                            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(" ");
 
                         return { text, value: status };
                     });
@@ -107,33 +105,33 @@ export default function AdminViewEditLeases() {
         isLoading,
         isError,
         error,
-        refetch
+        refetch,
     } = useQuery<LeaseData[]>({
-        queryKey: ['tenants', 'leases'],
+        queryKey: ["tenants", "leases"],
         queryFn: async () => {
             if (!API_URL) {
-                throw new Error('API URL is not configured');
+                throw new Error("API URL is not configured");
             }
 
             // Get the authentication token
             const token = await getToken();
             if (!token) {
-                throw new Error('Authentication token is required');
+                throw new Error("Authentication token is required");
             }
 
             console.log(`Fetching leases from: ${API_URL}/admin/leases/`);
-            console.log('Using auth token:', token ? 'Token available' : 'No token');
+            console.log("Using auth token:", token ? "Token available" : "No token");
 
             const response = await fetch(`${API_URL}/admin/leases/`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
             });
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    throw new Error('Authentication failed. Please sign in again.');
+                    throw new Error("Authentication failed. Please sign in again.");
                 }
                 throw new Error(`Failed to fetch leases: ${response.statusText}`);
             }
@@ -168,7 +166,7 @@ export default function AdminViewEditLeases() {
                             placeholder={"Search " + title}
                             value={filterDropdownProps.selectedKeys[0]}
                             onChange={(e) => filterDropdownProps.setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                            style={{ width: 188, marginBottom: 8, display: 'block' }}
+                            style={{ width: 188, marginBottom: 8, display: "block" }}
                         />
                         <ButtonComponent
                             type="primary"
@@ -214,24 +212,25 @@ export default function AdminViewEditLeases() {
         return record.status;
     };
 
-
     // Prepare lease data before rendering
-    const filteredData: LeaseData[] = Array.isArray(leases) ? leases.map((lease) => {
-        return {
-            ...lease,
-            key: lease.id,
-            id: lease.id,
-            tenantId: lease.tenantId || lease.id,
-            apartmentId: lease.apartmentId,
-            tenantName: lease.tenantName || '',
-            apartment: lease.apartment || '',
-            leaseStartDate: dayjs(lease.leaseStartDate).format("YYYY-MM-DD"),
-            leaseEndDate: dayjs(lease.leaseEndDate).format("YYYY-MM-DD"),
-            rentAmount: lease.rentAmount ? lease.rentAmount / 100 : 0,
-            status: lease.status === "terminated" ? "terminated" : getLeaseStatus(lease),
-            adminDocUrl: lease.admin_doc_url
-        };
-    }) : [];
+    const filteredData: LeaseData[] = Array.isArray(leases)
+        ? leases.map((lease) => {
+              return {
+                  ...lease,
+                  key: lease.id,
+                  id: lease.id,
+                  tenantId: lease.tenantId || lease.id,
+                  apartmentId: lease.apartmentId,
+                  tenantName: lease.tenantName || "",
+                  apartment: lease.apartment || "",
+                  leaseStartDate: dayjs(lease.leaseStartDate).format("YYYY-MM-DD"),
+                  leaseEndDate: dayjs(lease.leaseEndDate).format("YYYY-MM-DD"),
+                  rentAmount: lease.rentAmount ? lease.rentAmount / 100 : 0,
+                  status: lease.status === "terminated" ? "terminated" : getLeaseStatus(lease),
+                  adminDocUrl: lease.admin_doc_url,
+              };
+          })
+        : [];
 
     const showSendModal = (lease: LeaseData) => {
         console.log("Opening send modal", lease);
@@ -242,22 +241,22 @@ export default function AdminViewEditLeases() {
                 ...lease,
                 formattedStartDate: dayjs(lease.leaseStartDate),
                 formattedEndDate: dayjs(lease.leaseEndDate),
-            }
+            },
         });
     };
 
     const handleModalClose = () => {
-        setModalConfig(prev => ({ ...prev, visible: false }));
+        setModalConfig((prev) => ({ ...prev, visible: false }));
 
         // Invalidate the query to trigger a refetch
-        queryClient.invalidateQueries({ queryKey: ['tenants', 'leases'] });
+        queryClient.invalidateQueries({ queryKey: ["tenants", "leases"] });
     };
 
     const handleAddLease = () => {
         setModalConfig({
             visible: true,
             mode: "add",
-            selectedLease: null
+            selectedLease: null,
         });
     };
 
@@ -275,12 +274,11 @@ export default function AdminViewEditLeases() {
             mode: "renew",
             selectedLease: {
                 ...lease,
-                formattedStartDate: dayjs().add(1, 'day'),
-                formattedEndDate: dayjs().add(1, 'year'),
-            }
+                formattedStartDate: dayjs().add(1, "day"),
+                formattedEndDate: dayjs().add(1, "year"),
+            },
         });
     };
-
 
     const handleAmend = (lease: LeaseData) => {
         console.log("Amend button clicked", lease);
@@ -299,7 +297,7 @@ export default function AdminViewEditLeases() {
                 ...lease,
                 formattedStartDate: dayjs(lease.leaseStartDate),
                 formattedEndDate: dayjs(lease.leaseEndDate),
-            }
+            },
         });
 
         setModalConfig({
@@ -309,7 +307,7 @@ export default function AdminViewEditLeases() {
                 ...lease,
                 formattedStartDate: dayjs(lease.leaseStartDate),
                 formattedEndDate: dayjs(lease.leaseEndDate),
-            }
+            },
         });
 
         // Log state change after setting it
@@ -322,7 +320,7 @@ export default function AdminViewEditLeases() {
         try {
             const token = await getToken();
             if (!token) {
-                throw new Error('Authentication token is required');
+                throw new Error("Authentication token is required");
             }
 
             const payload = {
@@ -331,23 +329,22 @@ export default function AdminViewEditLeases() {
             };
 
             const response = await fetch(`${API_URL}/admin/leases/terminate/${leaseId}`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
-                throw new Error('Failed to terminate lease');
+                throw new Error("Failed to terminate lease");
             }
 
             message.success("Lease successfully terminated");
 
             // Invalidate the query to trigger a refetch
-            queryClient.invalidateQueries({ queryKey: ['tenants', 'leases'] });
-
+            queryClient.invalidateQueries({ queryKey: ["tenants", "leases"] });
         } catch (err) {
             console.error("Error terminating lease:", err);
             message.error("Failed to terminate lease");
@@ -395,7 +392,10 @@ export default function AdminViewEditLeases() {
             dataIndex: "status",
             key: "status",
             render: (status) => (
-                <AlertComponent title={status} type={status === "active" ? "success" : "warning"} />
+                <AlertComponent
+                    title={status}
+                    type={status === "active" ? "success" : "warning"}
+                />
             ),
             filters: statusFilters,
             onFilter: (value, record) => record.status === value,
@@ -404,16 +404,16 @@ export default function AdminViewEditLeases() {
             title: "Actions",
             key: "actions",
             render: (_, record) => (
-
-                <Space size="middle" wrap={true}>
+                <Space
+                    size="middle"
+                    wrap={true}>
                     {record.admin_doc_url && (
                         <a
                             href={record.admin_doc_url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-info"
-                            style={{ padding: '4px 10px', borderRadius: 4 }}
-                        >
+                            style={{ padding: "4px 10px", borderRadius: 4 }}>
                             <FileTextOutlined style={{ marginRight: 4 }} />
                             View Lease
                         </a>
@@ -448,8 +448,7 @@ export default function AdminViewEditLeases() {
                     )}
                 </Space>
             ),
-        }
-
+        },
     ];
 
     // Render authentication errors if needed
@@ -457,7 +456,10 @@ export default function AdminViewEditLeases() {
         return (
             <div className="container overflow-hidden">
                 <h1 className="p-3 text-primary">Admin View & Edit Leases</h1>
-                <Spin size="large" tip="Loading authentication..." />
+                <Spin
+                    size="large"
+                    tip="Loading authentication..."
+                />
             </div>
         );
     }
@@ -503,27 +505,26 @@ export default function AdminViewEditLeases() {
                 />
             </div>
 
-            {
-                isLoading ? (
-                    <Spin size="large" />
-                ) : isError ? (
-                    <Alert
-                        message="Error Loading Leases"
-                        description={(error as Error)?.message || "Failed to fetch leases"}
-                        type="error"
-                        showIcon
-                    />
-                ) : (
-                    <TableComponent<LeaseData>
-                        columns={leaseColumns}
-                        dataSource={filteredData}
-                        scroll={{ x: "100%" }}
-                        onChange={(pagination, filters, sorter, extra) => {
-                            // This properly forwards the event to the underlying Table component
-                            console.log('Table changed:', { pagination, filters, sorter, extra });
-                        }}
-                    />
-                )}
+            {isLoading ? (
+                <Spin size="large" />
+            ) : isError ? (
+                <Alert
+                    message="Error Loading Leases"
+                    description={(error as Error)?.message || "Failed to fetch leases"}
+                    type="error"
+                    showIcon
+                />
+            ) : (
+                <TableComponent<LeaseData>
+                    columns={leaseColumns}
+                    dataSource={filteredData}
+                    scroll={{ x: "100%" }}
+                    onChange={(pagination, filters, sorter, extra) => {
+                        // This properly forwards the event to the underlying Table component
+                        console.log("Table changed:", { pagination, filters, sorter, extra });
+                    }}
+                />
+            )}
             <LeaseModalComponent
                 visible={modalConfig.visible}
                 onClose={handleModalClose}

@@ -13,9 +13,7 @@ import PageTitleComponent from "../components/reusableComponents/PageTitleCompon
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/clerk-react";
 
-const DOMAIN_URL = import.meta.env.VITE_DOMAIN_URL;
-const PORT = import.meta.env.VITE_PORT;
-const API_URL = `${DOMAIN_URL}:${PORT}`.replace(/\/$/, "");
+const serverUrl = import.meta.env.VITE_API_URL;
 
 interface Locker {
     id: number;
@@ -81,7 +79,7 @@ const AdminDashboard = () => {
                 throw new Error("No authentication token available");
             }
 
-            const res = await fetch(`${API_URL}/admin/tenants`, {
+            const res = await fetch(`${serverUrl}/admin/tenants`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -108,9 +106,9 @@ const AdminDashboard = () => {
                 throw new Error("No authentication token available");
             }
             console.log("Fetching work orders...");
-            console.log("API URL:", `${API_URL}/admin/work_orders`);
+            console.log("API URL:", `${serverUrl}/admin/work_orders`);
 
-            const res = await fetch(`${API_URL}/admin/work_orders`, {
+            const res = await fetch(`${serverUrl}/admin/work_orders`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -141,8 +139,8 @@ const AdminDashboard = () => {
                 throw new Error("No authentication token available");
             }
             console.log("Fetching complaints...");
-            console.log("API URL:", `${API_URL}/admin/complaints`);
-            const res = await fetch(`${API_URL}/admin/complaints`, {
+            console.log("API URL:", `${serverUrl}/admin/complaints`);
+            const res = await fetch(`${serverUrl}/admin/complaints`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
             });
@@ -173,7 +171,7 @@ const AdminDashboard = () => {
                     throw new Error("No authentication token available");
                 }
 
-                const res = await fetch(`${API_URL}/admin/lockers`, {
+                const res = await fetch(`${serverUrl}/admin/lockers`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -209,7 +207,7 @@ const AdminDashboard = () => {
                 throw new Error("No authentication token available");
             }
 
-            const res = await fetch(`${API_URL}/admin/lockers/in-use/count`, {
+            const res = await fetch(`${serverUrl}/admin/lockers/in-use/count`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -229,14 +227,14 @@ const AdminDashboard = () => {
         mutationFn: async ({ lockerId, updates }: { lockerId: number; updates: { user_id?: string; in_use?: boolean; access_code?: string } }) => {
             console.log("Original updates:", updates);
             console.log("lockerId:", lockerId);
-            console.log("API URL:", `${API_URL}/admin/lockers/${lockerId}`);
+            console.log("API URL:", `${serverUrl}/admin/lockers/${lockerId}`);
 
             const token = await getToken();
             if (!token) {
                 throw new Error("No authentication token available");
             }
 
-            const response = await fetch(`${API_URL}/admin/lockers/${lockerId}`, {
+            const response = await fetch(`${serverUrl}/admin/lockers/${lockerId}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

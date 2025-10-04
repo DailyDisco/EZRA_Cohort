@@ -10,9 +10,7 @@ import ButtonComponent from "../components/reusableComponents/ButtonComponent";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { Button, Dropdown, MenuProps, Modal } from "antd";
 
-const DOMAIN_URL = import.meta.env.VITE_DOMAIN_URL;
-const PORT = import.meta.env.VITE_PORT;
-const API_URL = `${DOMAIN_URL}:${PORT}`.replace(/\/$/, ""); // :white_check_mark: Remove trailing slashes
+const API_URL = import.meta.env.VITE_API_URL;
 
 type Locker = {
     id: number;
