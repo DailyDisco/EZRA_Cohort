@@ -136,6 +136,13 @@ func NewLeaseHandler(pool *pgxpool.Pool, queries *db.Queries) *LeaseHandler {
 	log.Printf("Documenso API URL: %s", baseURL)
 	log.Printf("Documenso API Key: %s", apiKey)
 
+	var documensoClient *documenso.DocumensoClient
+	if baseURL != "" && apiKey != "" {
+		documensoClient = documenso.NewDocumensoClient(baseURL, apiKey)
+	} else {
+		log.Println("[DOCUMENSO] Warning: DOCUMENSO_API_URL or DOCUMENSO_API_KEY not set. Documenso features will be disabled.")
+	}
+
 	// Default fallback values
 	currentLandlordID := int64(100) // Default to the original hardcoded value
 	currentLandlordName := "First Landlord"
@@ -148,7 +155,7 @@ func NewLeaseHandler(pool *pgxpool.Pool, queries *db.Queries) *LeaseHandler {
 	return &LeaseHandler{
 		pool:             pool,
 		queries:          queries,
-		documenso_client: documenso.NewDocumensoClient(baseURL, apiKey),
+		documenso_client: documensoClient, // Use the conditionally created client
 		landlordID:       currentLandlordID,
 		landlordName:     currentLandlordName,
 		landlordEmail:    currentLandlordEmail,
@@ -232,10 +239,14 @@ func (h *LeaseHandler) AmendLease(w http.ResponseWriter, r *http.Request) {
 
 	// Conditionally delete old Documenso document only on apartment change
 	if isApartmentChange && existingLease.ExternalDocID != "" {
-		log.Printf("[LEASE_AMEND] Deleting previous Documenso document ID %s", existingLease.ExternalDocID)
-		if err := h.documenso_client.DeleteDocument(existingLease.ExternalDocID); err != nil {
-			log.Printf("[LEASE_AMEND] Failed to delete old document: %v", err)
-			// Not fatal — continue
+		if h.documenso_client == nil {
+			log.Println("[LEASE_AMEND] Documenso client not initialized, skipping document deletion.")
+		} else {
+			log.Printf("[LEASE_AMEND] Deleting previous Documenso document ID %s", existingLease.ExternalDocID)
+			if err := h.documenso_client.DeleteDocument(existingLease.ExternalDocID); err != nil {
+				log.Printf("[LEASE_AMEND] Failed to delete old document: %v", err)
+				// Not fatal — continue
+			}
 		}
 	} else {
 		log.Printf("[LEASE_AMEND] Skipping Documenso deletion (no apartment change or no external doc ID)")
@@ -412,25 +423,37 @@ func (h *LeaseHandler) handleLeaseUpsertWithContext(w http.ResponseWriter, r *ht
 
 	// Upload to Documenso and populate fields
 	log.Println("[LEASE_UPSERT] Uploading lease PDF to Documenso")
-	docID, _, landlordSigningURL, tenantSigningURL, s3bucket, err := h.handleDocumensoUploadAndSetup(
-		pdfData,
-		LeaseWithSignersRequest{
-			TenantName:      req.TenantName,
-			TenantEmail:     req.TenantEmail,
-			PropertyAddress: req.PropertyAddress,
-			RentAmount:      req.RentAmount,
-			StartDate:       startDate.Format("2006-01-02"),
-			EndDate:         endDate.Format("2006-01-02"),
-			DocumentTitle:   req.DocumentTitle,
-		},
-		landlordName,
-		landlordEmail,
-	)
+	var docID string
+	var tenantSigningURL string
+	var landlordSigningURL string
+	var s3bucket string
 
-	if err != nil {
-		log.Printf("[LEASE_UPSERT] Documenso upload error: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if h.documenso_client == nil {
+		log.Println("[LEASE_UPSERT] Documenso client not initialized. Skipping Documenso upload and using fallback values.")
+		docID = "fallback-doc-id"
+		tenantSigningURL = "#"
+		landlordSigningURL = "#"
+		s3bucket = "fallback-s3-url"
+	} else {
+		docID, _, landlordSigningURL, tenantSigningURL, s3bucket, err = h.handleDocumensoUploadAndSetup(
+			pdfData,
+			LeaseWithSignersRequest{
+				TenantName:      req.TenantName,
+				TenantEmail:     req.TenantEmail,
+				PropertyAddress: req.PropertyAddress,
+				RentAmount:      req.RentAmount,
+				StartDate:       startDate.Format("2006-01-02"),
+				EndDate:         endDate.Format("2006-01-02"),
+				DocumentTitle:   req.DocumentTitle,
+			},
+			landlordName,
+			landlordEmail,
+		)
+		if err != nil {
+			log.Printf("[LEASE_UPSERT] Documenso upload error: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	log.Printf("[LEASE_UPSERT] Documenso Document ID: %s", docID)
@@ -1320,6 +1343,13 @@ func (h *LeaseHandler) DocumensoGetDocumentURL(w http.ResponseWriter, r *http.Re
 	}
 
 	// Get the document download URL from Documenso
+	// If Documenso client is not initialized, return an error
+	if h.documenso_client == nil {
+		log.Println("[DOCUMENSO_URL] Documenso client not initialized, cannot retrieve document URL.")
+		http.Error(w, "Document signing service is not configured", http.StatusServiceUnavailable)
+		return
+	}
+
 	downloadURL, err := h.documenso_client.GetDocumentDownloadURL(lease.ExternalDocID)
 	unescapedURL := downloadURL
 	decodedURL, decodeErr := url.QueryUnescape(downloadURL)
@@ -1394,6 +1424,13 @@ func (h *LeaseHandler) PdfS3GetDocumentURL(w http.ResponseWriter, r *http.Reques
 	}
 }
 func (h *LeaseHandler) DocumensoWebhookHandler(w http.ResponseWriter, r *http.Request) {
+
+	// If Documenso client is not initialized, disable webhook processing
+	if h.documenso_client == nil {
+		log.Println("[WEBHOOK] Documenso client not initialized. Skipping webhook processing.")
+		http.Error(w, "Documenso service not configured", http.StatusServiceUnavailable)
+		return
+	}
 
 	// Read the request body
 	body, err := io.ReadAll(r.Body)
@@ -1534,24 +1571,27 @@ func (h *LeaseHandler) DocumensoWebhookHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	// 4. Download the signed document from Documenso if needed
-	downloadURL, err := h.documenso_client.GetDocumentDownloadURL(documentID)
-	if err == nil {
-		unescapedURL := downloadURL
-		decodedURL, decodeErr := url.QueryUnescape(downloadURL)
-		if decodeErr == nil {
-			unescapedURL = decodedURL
-		}
-		log.Printf("[WEBHOOK] Document download URL: %s", downloadURL)
-		// Update the lease record with the signed document URL
-		err = h.queries.UpdateSignedLeasePdfS3URL(ctx, db.UpdateSignedLeasePdfS3URLParams{
-			ID:         updatedLease.ID,
-			LeasePdfS3: pgtype.Text{String: unescapedURL, Valid: true},
-		})
+	// Only attempt download if client is available
+	if h.documenso_client != nil {
+		downloadURL, err := h.documenso_client.GetDocumentDownloadURL(documentID)
+		if err == nil {
+			unescapedURL := downloadURL
+			decodedURL, decodeErr := url.QueryUnescape(downloadURL)
+			if decodeErr == nil {
+				unescapedURL = decodedURL
+			}
+			log.Printf("[WEBHOOK] Document download URL: %s", downloadURL)
+			// Update the lease record with the signed document URL
+			err = h.queries.UpdateSignedLeasePdfS3URL(ctx, db.UpdateSignedLeasePdfS3URLParams{
+				ID:         updatedLease.ID,
+				LeasePdfS3: pgtype.Text{String: unescapedURL, Valid: true},
+			})
 
-		if err != nil {
-			log.Printf("[WEBHOOK] Failed to update signed document URL: %v", err)
-		} else {
-			log.Printf("[WEBHOOK] Updated lease %d with signed document URL %v", updatedLease.ID, unescapedURL)
+			if err != nil {
+				log.Printf("[WEBHOOK] Failed to update signed document URL: %v", err)
+			} else {
+				log.Printf("[WEBHOOK] Updated lease %d with signed document URL %v", updatedLease.ID, unescapedURL)
+			}
 		}
 	}
 	// }()
@@ -1601,6 +1641,12 @@ func (h *LeaseHandler) SendLease(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 4. Get both signing URLs from Documenso
+	if h.documenso_client == nil {
+		log.Println("[LEASE_SEND] Documenso client not initialized. Cannot send lease for signing.")
+		http.Error(w, "Document signing service is not configured", http.StatusServiceUnavailable)
+		return
+	}
+
 	tenantSigningURL, landlordSigningURL, err := h.documenso_client.GetSigningURLs(lease.ExternalDocID, tenant.Email, landlordEmail)
 	if err != nil {
 		http.Error(w, "Failed to fetch signing URLs", http.StatusInternalServerError)
