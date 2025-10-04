@@ -3,6 +3,14 @@ FROM node:20-alpine AS base
 # Set working directory
 WORKDIR /app
 
+# Declare build arguments for Vite environment variables
+ARG VITE_API_URL
+ARG VITE_CLERK_PUBLISHABLE_KEY
+
+# Pass build arguments as environment variables for Vite to pick up during build
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+
 # Install additional utilities for troubleshooting
 RUN apk add --no-cache curl bash
 
@@ -25,9 +33,7 @@ RUN npm install -g serve
 RUN echo "Node $(node --version) / NPM $(npm --version)" && \
     echo "Key files:" && \
     ls -la vite.config.* 2>/dev/null || echo "No vite config found" && \
-    ls -la src/ 2>/dev/null || echo "No src directory found" && \
-    echo "VITE_ environment variables during build:" && \
-    env | grep VITE_ || echo "No VITE_ variables found"
+    ls -la src/ 2>/dev/null || echo "No src directory found"
 
 # Set host for Vite development server to allow external access
 ENV HOST=0.0.0.0
