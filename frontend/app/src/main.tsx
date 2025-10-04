@@ -118,17 +118,13 @@ createRoot(document.getElementById("root")!).render(
                                 <Route path="auth">
                                     <Route
                                         path="sign-in/*"
-                                        element={<SignIn />}
+                                        element={
+                                            <div className="d-flex justify-content-center align-items-center min-vh-100 py-5">
+                                                <SignIn />
+                                            </div>
+                                        }
                                     />
                                 </Route>
-
-                                <Route
-                                    path="/auth/sign-in/"
-                                    element={
-                                        <div className="d-flex justify-content-center align-items-center h-100 py-5">
-                                            <SignIn />
-                                        </div>
-                                    }></Route>
 
                                 {/* Testing Routes */}
                                 <Route path="test">
