@@ -11,8 +11,8 @@ function App() {
     useEffect(() => {
         const fetchSession = async () => {
             try {
-                const token = await getToken();
-                console.log(token);
+                await getToken();
+                // Token fetched successfully for authentication
             } catch (error) {
                 console.error("Error fetching session token:", error);
             }
