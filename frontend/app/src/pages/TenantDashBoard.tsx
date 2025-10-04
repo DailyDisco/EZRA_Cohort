@@ -1,6 +1,6 @@
 import { ToolOutlined, WarningOutlined, InboxOutlined, CarOutlined } from "@ant-design/icons";
 import { Modal, Button, Divider, Form, Input, Select } from "antd";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ComplaintsData, Parking, ParkingEntry, WorkOrderData } from "../types/types";
 import ModalComponent from "../components/ModalComponent";
 import AlertComponent from "../components/reusableComponents/AlertComponent";
@@ -26,9 +26,7 @@ export const TenantDashBoard = () => {
     const userId = user?.publicMetadata["db_id"];
     const { getToken } = useAuth();
 
-    console.log("[TENANT_DASHBOARD] User:", user);
-    console.log("[TENANT_DASHBOARD] User ID from metadata:", userId);
-    console.log("[TENANT_DASHBOARD] Clerk User ID:", user?.id);
+    // Removed excessive logging for performance
 
     async function getParkingPermit() {
         const authToken = await getToken();
@@ -66,7 +64,6 @@ export const TenantDashBoard = () => {
             throw new Error("[TENANT_DASHBOARD] Error complaints request failed");
         }
         const data = (await res.json()) as ComplaintsData[];
-        console.log("[TENANT_DASHBOARD] Complaints data:", data);
         return data;
     }
 
@@ -87,7 +84,6 @@ export const TenantDashBoard = () => {
             throw new Error("[TENANT_DASHBOARD] Error work orders request failed");
         }
         const data = (await res.json()) as WorkOrderData[];
-        console.log("[TENANT_DASHBOARD] Work orders data:", data);
         return data;
     }
 
@@ -113,15 +109,39 @@ export const TenantDashBoard = () => {
     const clerkUserId = user?.id;
     const [complaints, workOrders, lockers, parking] = useQueries({
         queries: [
-            { queryKey: [`${clerkUserId}-complaints`], queryFn: getComplaints },
-            { queryKey: [`${clerkUserId}-work-orders`], queryFn: getWorkOrders },
-            { queryKey: [`${clerkUserId}-lockers`], queryFn: getLockers },
-            { queryKey: [`${clerkUserId}-parking`], queryFn: getParkingPermit },
+            {
+                queryKey: [`${clerkUserId}-complaints`],
+                queryFn: getComplaints,
+                retry: 2,
+                staleTime: 5 * 60 * 1000, // 5 minutes
+            },
+            {
+                queryKey: [`${clerkUserId}-work-orders`],
+                queryFn: getWorkOrders,
+                retry: 2,
+                staleTime: 5 * 60 * 1000, // 5 minutes
+            },
+            {
+                queryKey: [`${clerkUserId}-lockers`],
+                queryFn: getLockers,
+                retry: 2,
+                staleTime: 5 * 60 * 1000, // 5 minutes
+            },
+            {
+                queryKey: [`${clerkUserId}-parking`],
+                queryFn: getParkingPermit,
+                retry: 2,
+                staleTime: 5 * 60 * 1000, // 5 minutes
+            },
         ],
     });
 
     // Fetch lease status using TanStack Query
-    const { data: leaseStatus, isLoading } = useQuery<LeaseStatus>({
+    const {
+        data: leaseStatus,
+        isLoading,
+        error: leaseError,
+    } = useQuery<LeaseStatus>({
         queryKey: ["leaseStatus", clerkUserId], // Unique key for the query
         queryFn: async () => {
             const authToken = await getToken();
@@ -144,14 +164,14 @@ export const TenantDashBoard = () => {
             return data;
         },
         enabled: !!userId,
+        retry: 2,
+        staleTime: 10 * 60 * 1000, // 10 minutes
     });
 
     // This is the recommended approach in newer versions of TanStack Query. `onSuccess` is deprecated
     useEffect(() => {
-        if (leaseStatus && leaseStatus.lease_status) {
-            console.log("Lease status updated:", leaseStatus.lease_status);
+        if (leaseStatus && leaseStatus.lease_status && leaseStatus.lease_status !== "no_lease") {
             if (["pending_approval", "terminated", "expired"].includes(leaseStatus.lease_status)) {
-                console.log("Setting modal visible based on lease status");
                 setSigningModalVisible(true);
             }
         }
@@ -166,24 +186,38 @@ export const TenantDashBoard = () => {
         }
     };
 
-    if (isLoading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[40vh]">
-                <span className="mb-4 text-lg font-medium text-gray-700">Loading your dashboard...</span>
-                <div className="flex items-center justify-center">
-                    <span
-                        className="inline-block w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"
-                        aria-label="Loading"
-                    />
-                </div>
-            </div>
-        );
-    }
+    // Show loading only for lease status, other data can load independently
+    const isLeaseLoading = isLoading;
+
+    // Check if any queries have errors
+    const hasErrors = complaints.error || workOrders.error || lockers.error || parking.error || leaseError;
+
+    // Memoize card values to prevent unnecessary recalculations
+    const cardValues = useMemo(
+        () => ({
+            complaintsCount: complaints.data?.length ?? 0,
+            workOrdersCount: workOrders.data?.length ?? 0,
+            lockersCount: lockers.data?.length ?? 0,
+            parkingCount: parking.data?.length ?? 0,
+        }),
+        [complaints.data?.length, workOrders.data?.length, lockers.data?.length, parking.data?.length]
+    );
 
     return (
         <div className="container">
             {/* <h1 className="my-4">Tenant Dashboard</h1> */}
             <PageTitleComponent title="Tenant Dashboard" />
+
+            {/* Show error alert if any queries failed */}
+            {hasErrors && (
+                <AlertComponent
+                    title="Data Loading Error"
+                    message="Some dashboard data could not be loaded"
+                    description="Please refresh the page or contact support if the problem persists."
+                    type="error"
+                />
+            )}
+
             {/* <div className="alert-container"> */}
             <AlertComponent
                 title=""
@@ -198,7 +232,7 @@ export const TenantDashBoard = () => {
             <div className="flex-container my-3">
                 <CardComponent
                     title="Complaints"
-                    value={complaints.data?.length ?? 0}
+                    value={cardValues.complaintsCount}
                     description="Something not working right or disturbing you? Let us know."
                     hoverable={true}
                     icon={<ToolOutlined className="icon" />}
@@ -206,19 +240,19 @@ export const TenantDashBoard = () => {
                 />
                 <CardComponent
                     title="Package info"
-                    value={lockers.data?.length ?? 0}
-                    description={`${lockers.data?.length ? "You have a package. Click the button at your locker to open it." : "When package arrives you will be notified here."}`}
+                    value={cardValues.lockersCount}
+                    description={`${cardValues.lockersCount ? "You have a package. Click the button at your locker to open it." : "When package arrives you will be notified here."}`}
                     hoverable={true}
                     icon={<InboxOutlined className="icon" />}
-                    button={<TenantOpenLockerModal numberOfPackages={lockers.data?.length ?? 0} />}
+                    button={<TenantOpenLockerModal numberOfPackages={cardValues.lockersCount} />}
                 />
                 <CardComponent
                     title="Guest Parking"
-                    value={parking.data?.length ?? 0}
+                    value={cardValues.parkingCount}
                     description="Got a guest coming to visit? Make sure they have spots to park"
                     hoverable={true}
                     icon={<CarOutlined className="icon" />}
-                    button={<TenantParkingPeritModal userParkingPermitsUsed={parking.data?.length ?? 0} />}
+                    button={<TenantParkingPeritModal userParkingPermitsUsed={cardValues.parkingCount} />}
                 />
             </div>
 
@@ -247,14 +281,14 @@ export const TenantDashBoard = () => {
                     title="Work Orders"
                     description={"View your work orders here."}
                     hoverable={true}
-                    value={workOrders.data?.length}
+                    value={cardValues.workOrdersCount}
                     button={<TenantViewWorkOrdersModal data={workOrders.data} />}
                 />
                 <CardComponent
                     title="Complaints"
                     description={"View your complaints here."}
                     hoverable={true}
-                    value={complaints.data?.length}
+                    value={cardValues.complaintsCount}
                     button={<TenantViewComplaintsModal data={complaints.data} />}
                 />
 

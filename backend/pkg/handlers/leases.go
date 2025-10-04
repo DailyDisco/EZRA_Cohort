@@ -1784,15 +1784,37 @@ func (h *LeaseHandler) GetTenantLeaseStatusAndURLByUserID(w http.ResponseWriter,
 		return
 	}
 
-	lease, err := h.queries.GetTenantLeaseStatusAndURLByUserID(r.Context(), userId)
+	// Get all active leases for this tenant
+	leases, err := h.queries.GetActiveLeasesByTenant(r.Context(), userId)
 	if err != nil {
-		http.Error(w, "Failed to retrieve signing URL: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to retrieve leases: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// If no leases exist, return empty response
+	if len(leases) == 0 {
+		if err := json.NewEncoder(w).Encode(map[string]string{
+			"url":           "",
+			"lease_status": "no_lease",
+		}); err != nil {
+			http.Error(w, "Failed to encode response: "+err.Error(), http.StatusInternalServerError)
+			log.Printf("Error encoding response: %v", err)
+			return
+		}
+		return
+	}
+
+	// Find the most recent lease (highest lease number)
+	var mostRecentLease db.Lease
+	for _, lease := range leases {
+		if lease.LeaseNumber > mostRecentLease.LeaseNumber {
+			mostRecentLease = lease
+		}
+	}
+
 	if err := json.NewEncoder(w).Encode(map[string]string{
-		"url":    lease.TenantSigningUrl.String,
-		"status": string(lease.Status),
+		"url":           mostRecentLease.TenantSigningUrl.String,
+		"lease_status": string(mostRecentLease.Status),
 	}); err != nil {
 		http.Error(w, "Failed to encode response: "+err.Error(), http.StatusInternalServerError)
 		log.Printf("Error encoding response: %v", err)
