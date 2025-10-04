@@ -12,15 +12,15 @@ interface FAQ {
 const faqs: FAQ[] = [
     {
         question: "What is the lease length?",
-        answer: "We often reccomend one year, but you can lease for up to 3 years at a time!",
+        answer: "We offer flexible lease terms starting from 6 months, with standard 12-month leases. Multi-year leases up to 3 years are available with additional incentives.",
     },
     {
         question: "Do you have mailboxes?",
-        answer: "Yes! We implement a smart notification system to let you know when your package arrives!",
+        answer: "Yes! We provide secure smart package lockers with instant notifications when deliveries arrive. No more missed packages or waiting for mail.",
     },
     {
         question: "Why EZRA?",
-        answer: "Because its so much better than RentDaddy",
+        answer: "EZRA combines modern smart home technology with exceptional resident services. Our integrated platform makes managing your living experience seamless and secure.",
     },
 ];
 
