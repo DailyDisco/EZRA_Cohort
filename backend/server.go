@@ -69,6 +69,13 @@ func main() {
 	complaintHandler := handlers.NewComplaintHandler(pool, queries)
 	leaseHandler := handlers.NewLeaseHandler(pool, queries)
 
+	// Security headers middleware
+	r.Use(chiMiddleware.SetHeader("X-Content-Type-Options", "nosniff"))
+	r.Use(chiMiddleware.SetHeader("X-Frame-Options", "DENY"))
+	r.Use(chiMiddleware.SetHeader("X-XSS-Protection", "1; mode=block"))
+	r.Use(chiMiddleware.SetHeader("Referrer-Policy", "strict-origin-when-cross-origin"))
+	r.Use(chiMiddleware.SetHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()"))
+
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"*"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
@@ -89,12 +96,26 @@ func main() {
 	r.Post("/webhooks/clerk", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("[WEBHOOK] Clerk webhook endpoint hit!")
 		handlers.ClerkWebhookHandler(w, r, pool, queries)
+		log.Println("[WEBHOOK] Clerk webhook processing completed")
 	})
 
-	// Test endpoint - verify public access works
+	// Health check endpoint - verify service and database connectivity
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		// Test database connectivity
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		if err := pool.Ping(ctx); err != nil {
+			log.Printf("[HEALTH] Database ping failed: %v", err)
+			w.WriteHeader(http.StatusServiceUnavailable)
+			w.Write([]byte(`{"status":"unhealthy","database":"down","error":"database connection failed"}`))
+			return
+		}
+
+		// Return healthy status
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		w.Write([]byte(`{"status":"healthy","database":"up","timestamp":"` + time.Now().Format(time.RFC3339) + `"}`))
 	})
 
 	// Test route to seed data (for development/testing only - PUBLIC)
@@ -112,8 +133,8 @@ func main() {
 	// Protected routes - Apply auth middleware using With()
 	r.With(clerkhttp.WithHeaderAuthorization()).With(mymiddleware.ClerkAuthMiddleware).Group(func(r chi.Router) {
 
-	// Routers
-		// Admin Endpoints  
+		// Routers
+		// Admin Endpoints
 		r.Route("/admin", func(r chi.Router) {
 			r.Use(mymiddleware.IsAdmin) // Clerk Admin middleware
 			r.Get("/", userHandler.GetAdminOverview)
@@ -242,27 +263,7 @@ func main() {
 				})
 			})
 		})
-		// NOTE: Destory session / ctx on sign out
-		r.Post("/signout", func(w http.ResponseWriter, r *http.Request) {
-			claims, ok := clerk.SessionClaimsFromContext(r.Context())
-			if !ok {
-				log.Printf("[SIGN_OUT] Failed destorying session %v", err)
-				http.Error(w, "Error destorying session", http.StatusInternalServerError)
-				return
-			}
-			_, err := session.Revoke(r.Context(), &session.RevokeParams{
-				ID: claims.ID,
-			})
-			if err != nil {
-				log.Printf("[SIGN_OUT] Failed to revoke session: %v", err)
-				http.Error(w, "Error revoking session", http.StatusInternalServerError)
-				return
-			}
-
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("Session revoked successfully"))
-		})
-		// NOTE: Destory session / ctx on sign out
+		// NOTE: Destroy session / ctx on sign out
 		r.Post("/signout", func(w http.ResponseWriter, r *http.Request) {
 			claims, ok := clerk.SessionClaimsFromContext(r.Context())
 			if !ok {
@@ -292,6 +293,9 @@ func main() {
 
 	// Server config
 	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("[ENV] PORT environment variable is required")
+	}
 
 	// ChatBot routes (moved outside protected group for testing)
 	r.Route("/api/chat", func(r chi.Router) {
@@ -312,14 +316,22 @@ func main() {
 		}
 	}()
 
-	// Block until we revive an interrupt signal
+	// Block until we receive an interrupt signal
 	<-sigChan
-	log.Println("shutting down server...")
+	log.Println("shutting down server gracefully...")
 
-	// Gracefully shutdown the server
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// Close database connection pool first
+	pool.Close()
+	log.Println("database connection pool closed")
+
+	// Gracefully shutdown the server with timeout
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer shutdownCancel()
+
 	if err := server.Shutdown(shutdownCtx); err != nil {
-		log.Fatalf("server shutdown failed: %v", err)
+		log.Printf("server shutdown error: %v", err)
+		// Don't use Fatalf, allow graceful exit
+	} else {
+		log.Println("server shutdown completed successfully")
 	}
 }

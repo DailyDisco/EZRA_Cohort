@@ -1,12 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import PageTitleComponent from "../components/reusableComponents/PageTitleComponent";
-import TableComponent from "../components/reusableComponents/TableComponent";
-import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/react-router";
-import { Button, Divider, Dropdown, Form, Input, MenuProps, Modal } from "antd";
-import { CheckOutlined, CloseCircleOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
-import { ComplaintsData, TenantsWithLeaseStatus, User, WorkOrderData } from "../types/types";
-import { ColumnsType } from "antd/es/table";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import PageTitleComponent from '../components/reusableComponents/PageTitleComponent';
+import TableComponent from '../components/reusableComponents/TableComponent';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@clerk/react-router';
+import { Button, Divider, Dropdown, Form, Input, MenuProps, Modal } from 'antd';
+import { CheckOutlined, CloseCircleOutlined, MailOutlined, PlusOutlined } from '@ant-design/icons';
+import { ComplaintsData, TenantsWithLeaseStatus, User, WorkOrderData } from '../types/types';
+import { ColumnsType } from 'antd/es/table';
 
 type InviteTenant = {
     email: string;
@@ -15,28 +15,28 @@ type InviteTenant = {
 interface InviteStatusNotification {
     show: boolean;
     message: string;
-    type: "default" | "success" | "error";
+    type: 'default' | 'success' | 'error';
 }
 
 const AddTenant = () => {
     const { getToken } = useAuth();
     const { data: tenants } = useQuery({
-        queryKey: ["tenants"],
+        queryKey: ['tenants'],
         queryFn: async () => {
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_TABLE] Error unauthorized");
+                throw new Error('[TENANT_TABLE] Error unauthorized');
             }
 
-            const res = await fetch(`http://localhost:8080/admin/tenants`, {
-                method: "GET",
+            const res = await fetch('http://localhost:8080/admin/tenants', {
+                method: 'GET',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
             });
             if (!res.ok) {
-                throw new Error("[TENANT_TABLE] Error request failed");
+                throw new Error('[TENANT_TABLE] Error request failed');
             }
 
             return (await res.json()) as TenantsWithLeaseStatus[];
@@ -48,77 +48,77 @@ const AddTenant = () => {
     // Mock data for tenant table
     const columns: ColumnsType<TenantsWithLeaseStatus> = [
         {
-            title: "ID",
-            dataIndex: "id",
-            key: "id",
-            fixed: "left",
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            fixed: 'left',
         },
         {
-            title: "Name",
-            dataIndex: "",
-            key: "fullName",
+            title: 'Name',
+            dataIndex: '',
+            key: 'fullName',
             render: (record: User) => `${record.first_name} ${record.last_name}`,
         },
         {
-            title: "Email",
-            dataIndex: "email",
-            key: "email",
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
         },
         {
-            title: "Phone",
-            dataIndex: "phone",
-            key: "phone",
-            render: (phone: string | null) => phone ?? "N/A",
+            title: 'Phone',
+            dataIndex: 'phone',
+            key: 'phone',
+            render: (phone: string | null) => phone ?? 'N/A',
         },
         {
-            title: "Role",
-            dataIndex: "role",
-            key: "role",
+            title: 'Role',
+            dataIndex: 'role',
+            key: 'role',
         },
         {
-            title: "Unit Number",
-            dataIndex: "unitNumber",
-            key: "unitNumber",
-            render: (unitNumber: number | null) => unitNumber ?? "N/A",
+            title: 'Unit Number',
+            dataIndex: 'unitNumber',
+            key: 'unitNumber',
+            render: (unitNumber: number | null) => unitNumber ?? 'N/A',
         },
         {
-            title: "Status",
-            dataIndex: "status",
-            key: "status",
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
         },
         {
-            title: "Created At",
-            dataIndex: "created_at",
-            key: "createdAt",
+            title: 'Created At',
+            dataIndex: 'created_at',
+            key: 'createdAt',
             render: (createdAt: string) =>
-                new Date(createdAt).toLocaleDateString("en-US", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "2-digit",
+                new Date(createdAt).toLocaleDateString('en-US', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: '2-digit',
                 }),
         },
         {
-            title: "Lease Status",
-            dataIndex: "lease_status",
-            key: "leaseStatus",
-            render: (status: { Lease_Status: string; valid: boolean }) => status?.Lease_Status || "Draft",
+            title: 'Lease Status',
+            dataIndex: 'lease_status',
+            key: 'leaseStatus',
+            render: (status: { Lease_Status: string; valid: boolean }) => status?.Lease_Status || 'Draft',
         },
         {
-            title: "Lease Start",
-            dataIndex: "lease_start_date",
-            key: "leaseStart",
-            render: (date: string | null) => date ?? "N/A",
+            title: 'Lease Start',
+            dataIndex: 'lease_start_date',
+            key: 'leaseStart',
+            render: (date: string | null) => date ?? 'N/A',
         },
         {
-            title: "Lease End",
-            dataIndex: "lease_end_date",
-            key: "leaseEnd",
-            render: (date: string | null) => date ?? "N/A",
+            title: 'Lease End',
+            dataIndex: 'lease_end_date',
+            key: 'leaseEnd',
+            render: (date: string | null) => date ?? 'N/A',
         },
         {
-            title: "Actions",
-            key: "actions",
-            fixed: "right",
+            title: 'Actions',
+            key: 'actions',
+            fixed: 'right',
             render: (record: User) => (
                 <div className="flex flex-column gap-2">
                     {/* View Tenant Complaints */}
@@ -160,17 +160,17 @@ interface ActionsDropdownProps {
 }
 
 function ActionMenu(props: ActionsDropdownProps) {
-    const items: MenuProps["items"] = [
+    const items: MenuProps['items'] = [
         {
-            key: "1",
+            key: '1',
             label: <TenantComplaintModal tenantClerkId={props.tenantClerkId} />,
         },
         {
-            key: "2",
+            key: '2',
             label: <TenantWorkOrderModal tenantClerkId={props.tenantClerkId} />,
         },
         {
-            key: "3",
+            key: '3',
             label: <TenantDeleteModal tenantClerkId={props.tenantClerkId} />,
         },
     ];
@@ -180,7 +180,7 @@ function ActionMenu(props: ActionsDropdownProps) {
             <Dropdown
                 menu={{ items }}
                 placement="bottomRight"
-                overlayClassName={"custom-dropdown"}>
+                overlayClassName={'custom-dropdown'}>
                 <Button>
                     <p className="fs-3 fw-bold">...</p>
                 </Button>
@@ -197,50 +197,50 @@ function InviteUserModal() {
 
     const [inviteStatus, setInviteStatus] = useState<InviteStatusNotification>({
         show: false,
-        message: "",
-        type: "default",
+        message: '',
+        type: 'default',
     });
     const { mutate: inviteTenant, isPending } = useMutation({
-        mutationKey: ["inviteTenant"],
+        mutationKey: ['inviteTenant'],
         mutationFn: async () => {
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_TABLE] Error unauthorized");
+                throw new Error('[TENANT_TABLE] Error unauthorized');
             }
 
-            if (!tenantInviteForm.getFieldValue("email")) {
-                throw new Error("[TENANT_TABLE] Error tenant email invalid");
+            if (!tenantInviteForm.getFieldValue('email')) {
+                throw new Error('[TENANT_TABLE] Error tenant email invalid');
             }
 
-            const res = await fetch(`http://localhost:8080/admin/tenants/invite`, {
-                method: "POST",
+            const res = await fetch('http://localhost:8080/admin/tenants/invite', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
                 body: JSON.stringify(tenantInviteForm.getFieldsValue()),
             });
             if (!res.ok) {
-                throw new Error("[TENANT_TABLE] Error request failed");
+                throw new Error('[TENANT_TABLE] Error request failed');
             }
             return;
         },
         onSuccess: () => {
             setInviteStatus({
                 show: true,
-                message: "Successfully invited tenant",
-                type: "success",
+                message: 'Successfully invited tenant',
+                type: 'success',
             });
             tenantInviteForm.resetFields();
             queryClient.invalidateQueries({
-                queryKey: ["tenants"],
+                queryKey: ['tenants'],
             });
         },
         onError: () => {
             setInviteStatus({
                 show: true,
-                message: "Oops try again another time",
-                type: "error",
+                message: 'Oops try again another time',
+                type: 'error',
             });
         },
     });
@@ -289,28 +289,28 @@ function InviteUserModal() {
                     onFinish={() => {
                         inviteTenant();
                     }}
-                    initialValues={{ email: "", unitNumber: 0 }}
+                    initialValues={{ email: '', unitNumber: 0 }}
                     className="">
                     <p>Tenant Email</p>
                     <Form.Item
                         name="email"
-                        rules={[{ required: true, message: "Please provide a valid email" }, { type: "email" }, { min: 5 }, { max: 255 }]}>
+                        rules={[{ required: true, message: 'Please provide a valid email' }, { type: 'email' }, { min: 5 }, { max: 255 }]}>
                         <Input
                             prefix={<MailOutlined />}
                             placeholder="Tenant Email"
-                            value={tenantInviteForm.getFieldValue("email")}
+                            value={tenantInviteForm.getFieldValue('email')}
                             onChange={(e) => {
-                                tenantInviteForm.setFieldValue("email", e.target.value);
+                                tenantInviteForm.setFieldValue('email', e.target.value);
                             }}
                         />
                     </Form.Item>
                     {inviteStatus.show ? (
                         <div className="d-flex align-items-center">
-                            {inviteStatus.type === "success" ? <CheckOutlined className="text-success fs-6 mb-3 mx-1" /> : <CloseCircleOutlined className="text-danger fs-6 mb-3 mx-1" />}
-                            <p className={`fs-6 ${inviteStatus.type === "success" ? "text-success" : "text-danger"}`}>{inviteStatus.message}</p>
+                            {inviteStatus.type === 'success' ? <CheckOutlined className="text-success fs-6 mb-3 mx-1" /> : <CloseCircleOutlined className="text-danger fs-6 mb-3 mx-1" />}
+                            <p className={`fs-6 ${inviteStatus.type === 'success' ? 'text-success' : 'text-danger'}`}>{inviteStatus.message}</p>
                         </div>
                     ) : (
-                        <p style={{ minHeight: "16px" }}></p>
+                        <p style={{ minHeight: '16px' }}></p>
                     )}
                 </Form>
             </Modal>
@@ -330,22 +330,22 @@ function TenantWorkOrderModal(props: TenantModalProps) {
         queryFn: async () => {
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_TABLE] Error unauthorized");
+                throw new Error('[TENANT_TABLE] Error unauthorized');
             }
 
             if (!props.tenantClerkId) {
-                throw new Error("[TENANT_TABLE] Invalid tenant Clerk Id");
+                throw new Error('[TENANT_TABLE] Invalid tenant Clerk Id');
             }
 
             const res = await fetch(`http://localhost:8080/admin/tenants/${props.tenantClerkId}/work_orders`, {
-                method: "GET",
+                method: 'GET',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
             });
             if (!res.ok) {
-                throw new Error("[TENANT_TABLE] Error request failed");
+                throw new Error('[TENANT_TABLE] Error request failed');
             }
 
             return (await res.json()) as WorkOrderData[];
@@ -379,7 +379,7 @@ function TenantWorkOrderModal(props: TenantModalProps) {
                     {data?.length ? (
                         <div
                             className="space-y-4 d-flex flex-column"
-                            style={{ maxHeight: "600px", overflowY: "auto" }}>
+                            style={{ maxHeight: '600px', overflowY: 'auto' }}>
                             {data.map((order, idx) => (
                                 <div
                                     key={idx}
@@ -419,22 +419,22 @@ function TenantComplaintModal(props: TenantModalProps) {
         queryFn: async () => {
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_TABLE] Error unauthorized");
+                throw new Error('[TENANT_TABLE] Error unauthorized');
             }
 
             if (!props.tenantClerkId) {
-                throw new Error("[TENANT_TABLE] Invalid tenant Clerk Id");
+                throw new Error('[TENANT_TABLE] Invalid tenant Clerk Id');
             }
 
             const res = await fetch(`http://localhost:8080/admin/tenants/${props.tenantClerkId}/complaints`, {
-                method: "GET",
+                method: 'GET',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
             });
             if (!res.ok) {
-                throw new Error("[TENANT_TABLE] Error request failed");
+                throw new Error('[TENANT_TABLE] Error request failed');
             }
 
             return (await res.json()) as ComplaintsData[];
@@ -468,7 +468,7 @@ function TenantComplaintModal(props: TenantModalProps) {
                     {data?.length ? (
                         <div
                             className="space-y-3 d-flex flex-column"
-                            style={{ maxHeight: "600px", overflowY: "auto" }}>
+                            style={{ maxHeight: '600px', overflowY: 'auto' }}>
                             {data.map((order, idx) => (
                                 <div
                                     key={idx}
@@ -513,29 +513,29 @@ function TenantDeleteModal(props: TenantModalProps) {
         mutationFn: async () => {
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_TABLE] Error unauthorized");
+                throw new Error('[TENANT_TABLE] Error unauthorized');
             }
 
             if (!props.tenantClerkId) {
-                throw new Error("[TENANT_TABLE] Invalid tenant Clerk Id");
+                throw new Error('[TENANT_TABLE] Invalid tenant Clerk Id');
             }
 
             const res = await fetch(`http://localhost:8080/admin/tenants/${props.tenantClerkId}`, {
-                method: "DELETE",
+                method: 'DELETE',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
             });
             if (!res.ok) {
-                throw new Error("[TENANT_TABLE] Error deleting tenant failed");
+                throw new Error('[TENANT_TABLE] Error deleting tenant failed');
             }
 
             return (await res.json()) as ComplaintsData[];
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["tenants"],
+                queryKey: ['tenants'],
             });
             handleCancel();
         },

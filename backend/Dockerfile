@@ -1,56 +1,51 @@
-FROM golang:1.24-alpine
+# Build stage
+FROM golang:1.25-alpine AS builder
 
 # Set working directory
 WORKDIR /app
 
-# Install necessary tools using a single RUN command to reduce layers
-RUN apk update && apk add --no-cache \
-    curl \
-    git \
-    postgresql-client \
-    nodejs \
-    npm \
-    && rm -rf /var/cache/apk/*
+# Copy go mod files
+COPY go.mod go.sum ./
 
-# Install Task CLI
-RUN curl -sL https://github.com/go-task/task/releases/download/v3.37.1/task_linux_amd64.tar.gz | tar -xz -C /usr/local/bin task \
-    && chmod +x /usr/local/bin/task
+# Download dependencies
+RUN go mod download
 
-# Install golang-migrate
-RUN wget -O migrate.tar.gz https://github.com/golang-migrate/migrate/releases/download/v4.18.2/migrate.linux-amd64.tar.gz \
-    && tar -xvf migrate.tar.gz \
-    && mv migrate /usr/local/bin/migrate \
-    && chmod +x /usr/local/bin/migrate \
-    && rm migrate.tar.gz
-
-# Copy application source files
+# Copy source code
 COPY . .
 
-# Go package dependencies
-RUN go mod tidy && go mod download
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
 
-# Install Air for development mode
-RUN go install github.com/air-verse/air@latest \
-    && mv /go/bin/air /usr/local/bin/air
+# Runtime stage
+FROM alpine:latest
 
+# Install runtime dependencies only
+RUN apk --no-cache add \
+    postgresql-client \
+    ca-certificates \
+    tzdata \
+    && rm -rf /var/cache/apk/*
+
+# Create app directory
+WORKDIR /app
+
+# Copy binary from builder stage
+COPY --from=builder /app/server .
+
+# Copy entrypoint script
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+# Copy cron job configuration
+COPY ./cmd/cron/leases-cron /etc/cron.d/leases-cron
+RUN chmod 0644 /etc/cron.d/leases-cron && crontab /etc/cron.d/leases-cron
 
 # Create necessary directories
 RUN mkdir -p /app/tmp /app/temp
 
-# Build the application
-RUN go build -o /app/tmp/server .
-
-# Set up cron job
-COPY ./cmd/cron/leases-cron /etc/cron.d/leases-cron
-RUN chmod 0644 /etc/cron.d/leases-cron \
-    && crontab /etc/cron.d/leases-cron
-
-# Copy entrypoint.sh and set correct permissions
-RUN chmod +x /app/entrypoint.sh
-
 EXPOSE 8080
 
-# Environment variable to control whether to use Air
+# Environment variable to control whether to use Air (not used in production)
 ENV USE_AIR=false
 
 ENTRYPOINT ["/app/entrypoint.sh"]

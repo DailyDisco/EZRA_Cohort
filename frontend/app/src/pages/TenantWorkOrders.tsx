@@ -1,59 +1,59 @@
-import { useAuth } from "@clerk/react-router";
-import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
-import Table, { ColumnsType } from "antd/es/table";
-import { useState } from "react";
-import { GetApartment, WorkOrderData, WorkOrderEntry, WorkStatus } from "../types/types";
-import PageTitleComponent from "../components/reusableComponents/PageTitleComponent";
-import { Button, Divider, Form, Input, Modal, Select } from "antd";
-import dayjs from "dayjs";
+import { useAuth } from '@clerk/react-router';
+import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
+import Table, { ColumnsType } from 'antd/es/table';
+import { useState } from 'react';
+import { GetApartment, WorkOrderData, WorkOrderEntry, WorkStatus } from '../types/types';
+import PageTitleComponent from '../components/reusableComponents/PageTitleComponent';
+import { Button, Divider, Form, Input, Modal, Select } from 'antd';
+import dayjs from 'dayjs';
 
 // Use VITE_API_URL for the server URL, ensuring no trailing slash
-const serverUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
-const absoluteServerUrl = serverUrl.replace(/\/$/, ""); // Remove trailing slash if present
+const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const absoluteServerUrl = serverUrl.replace(/\/$/, ''); // Remove trailing slash if present
 
 export default function WorkOrders() {
     const { getToken } = useAuth();
     const [workOrders, apartment] = useQueries({
         queries: [
             {
-                queryKey: [`work-orders-query`],
+                queryKey: ['work-orders-query'],
                 queryFn: async () => {
                     const authToken = await getToken();
                     if (!authToken) {
-                        throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+                        throw new Error('[TENANT_DASHBOARD] Error unauthorized');
                     }
                     const res = await fetch(`${absoluteServerUrl}/tenant/work_orders`, {
-                        method: "GET",
+                        method: 'GET',
                         headers: {
-                            "Content-Type": "application/json",
+                            'Content-Type': 'application/json',
                             Authorization: `Bearer ${authToken}`,
                         },
                     });
 
                     if (!res.ok) {
-                        throw new Error("[TENANT_DASHBOARD] Error tenant Work_orders request failed");
+                        throw new Error('[TENANT_DASHBOARD] Error tenant Work_orders request failed');
                     }
                     return (await res.json()) as WorkOrderData[];
                 },
             },
             {
-                queryKey: [`apartment`],
+                queryKey: ['apartment'],
                 staleTime: 0,
                 queryFn: async () => {
                     const authToken = await getToken();
                     if (!authToken) {
-                        throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+                        throw new Error('[TENANT_DASHBOARD] Error unauthorized');
                     }
                     const res = await fetch(`${absoluteServerUrl}/tenant/apartment`, {
-                        method: "GET",
+                        method: 'GET',
                         headers: {
-                            "Content-Type": "application/json",
+                            'Content-Type': 'application/json',
                             Authorization: `Bearer ${authToken}`,
                         },
                     });
 
                     if (!res.ok) {
-                        throw new Error("[TENANT_DASHBOARD] Error tenant Work_orders request failed");
+                        throw new Error('[TENANT_DASHBOARD] Error tenant Work_orders request failed');
                     }
                     return (await res.json()) as GetApartment;
                 },
@@ -62,31 +62,31 @@ export default function WorkOrders() {
     });
     const workOrderColumns: ColumnsType<WorkOrderData> = [
         {
-            title: "Id",
-            dataIndex: "id",
-            key: "id",
+            title: 'Id',
+            dataIndex: 'id',
+            key: 'id',
         },
         {
-            title: "Title",
-            dataIndex: "title",
-            key: "title",
+            title: 'Title',
+            dataIndex: 'title',
+            key: 'title',
         },
         {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
+            title: 'Description',
+            dataIndex: 'description',
+            key: 'description',
         },
         {
-            title: "Category",
-            dataIndex: "category",
-            key: "category",
+            title: 'Category',
+            dataIndex: 'category',
+            key: 'category',
         },
         {
-            title: "Status",
-            dataIndex: "status",
-            key: "status",
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
             render: (status: WorkStatus) => {
-                if (status !== "resolved") {
+                if (status !== 'resolved') {
                     return <p>{status}</p>;
                 }
 
@@ -94,10 +94,10 @@ export default function WorkOrders() {
             },
         },
         {
-            title: "Created At",
-            dataIndex: "createdAt",
-            key: "createdAt",
-            render: (date) => dayjs(date).format("MMM D, YYYY h:mm A"),
+            title: 'Created At',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            render: (date) => dayjs(date).format('MMM D, YYYY h:mm A'),
         },
     ];
     return (
@@ -142,33 +142,33 @@ function TenantCreateWorkOrderModal(props: CreateWorkOrderModalProps) {
     };
 
     const { mutate: createWorkOrder, isPending: isPendingWorkOrder } = useMutation({
-        mutationKey: [`work-orders-mutation`],
+        mutationKey: ['work-orders-mutation'],
         mutationFn: async () => {
-            workOrderForm.setFieldValue("UnitNumber", props.TenantUnitNumber);
+            workOrderForm.setFieldValue('UnitNumber', props.TenantUnitNumber);
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+                throw new Error('[TENANT_DASHBOARD] Error unauthorized');
             }
             console.log(`NEW WORK_ORDER ENTRY FORM VALUES: ${JSON.stringify(workOrderForm.getFieldsValue())}`);
             const res = await fetch(`${absoluteServerUrl}/tenant/work_orders`, {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
                 body: JSON.stringify(workOrderForm.getFieldsValue()),
             });
 
             if (!res.ok) {
-                console.log(`Endpoint failed work order`);
-                throw new Error("[TENANT_DASHBOARD] Error creating work_order");
+                console.log('Endpoint failed work order');
+                throw new Error('[TENANT_DASHBOARD] Error creating work_order');
             }
-            console.log(`Endpoint success work order`);
+            console.log('Endpoint success work order');
             return;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["work-orders-query"],
+                queryKey: ['work-orders-query'],
             });
             workOrderForm.resetFields();
             handleCancel();
@@ -189,7 +189,7 @@ function TenantCreateWorkOrderModal(props: CreateWorkOrderModalProps) {
                 onOk={() => {
                     createWorkOrder();
                 }}
-                okText={"Create"}
+                okText={'Create'}
                 onCancel={handleCancel}
                 okButtonProps={{ disabled: isPendingWorkOrder ? true : false }}
                 cancelButtonProps={{ disabled: isPendingWorkOrder ? true : false }}>
@@ -220,13 +220,13 @@ function TenantCreateWorkOrderModal(props: CreateWorkOrderModalProps) {
                     <Form.Item
                         name="category"
                         required={true}>
-                        <Select placeholder={"Select a category"}>
+                        <Select placeholder={'Select a category'}>
                             {Object.values({
-                                plumbing: "plumbing",
-                                electric: "electric",
-                                carpentry: "carpentry",
-                                hvac: "hvac",
-                                other: "other",
+                                plumbing: 'plumbing',
+                                electric: 'electric',
+                                carpentry: 'carpentry',
+                                hvac: 'hvac',
+                                other: 'other',
                             }).map((c) => (
                                 <Select.Option
                                     key={c}

@@ -1,16 +1,16 @@
-import { ToolOutlined, WarningOutlined, InboxOutlined, CarOutlined } from "@ant-design/icons";
-import { Modal, Button, Divider, Form, Input, Select } from "antd";
-import { useState, useEffect, useMemo } from "react";
-import { ComplaintsData, Parking, ParkingEntry, WorkOrderData } from "../types/types";
-import ModalComponent from "../components/ModalComponent";
-import AlertComponent from "../components/reusableComponents/AlertComponent";
-import ButtonComponent from "../components/reusableComponents/ButtonComponent";
-import { CardComponent } from "../components/reusableComponents/CardComponent";
-import { CardSkeletonLoader } from "../components/reusableComponents/CardSkeletonLoader";
-import PageTitleComponent from "../components/reusableComponents/PageTitleComponent";
-import MyChatBot from "../components/ChatBot";
-import { useAuth, useUser } from "@clerk/react-router";
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ToolOutlined, WarningOutlined, InboxOutlined, CarOutlined } from '@ant-design/icons';
+import { Modal, Button, Divider, Form, Input, Select } from 'antd';
+import { useState, useEffect, useMemo } from 'react';
+import { ComplaintsData, Parking, ParkingEntry, WorkOrderData } from '../types/types';
+import ModalComponent from '../components/ModalComponent';
+import AlertComponent from '../components/reusableComponents/AlertComponent';
+import ButtonComponent from '../components/reusableComponents/ButtonComponent';
+import { CardComponent } from '../components/reusableComponents/CardComponent';
+import { CardSkeletonLoader } from '../components/reusableComponents/CardSkeletonLoader';
+import PageTitleComponent from '../components/reusableComponents/PageTitleComponent';
+import MyChatBot from '../components/ChatBot';
+import { useAuth, useUser } from '@clerk/react-router';
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface LeaseStatus {
     lease_status: string;
@@ -18,13 +18,13 @@ interface LeaseStatus {
 }
 
 // Use VITE_API_URL for the server URL, ensuring no trailing slash
-const serverUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
-const absoluteServerUrl = serverUrl.replace(/\/$/, ""); // Remove trailing slash if present
+const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const absoluteServerUrl = serverUrl.replace(/\/$/, ''); // Remove trailing slash if present
 
 export const TenantDashBoard = () => {
     const [isSigningModalVisible, setSigningModalVisible] = useState(false);
     const { user } = useUser();
-    const userId = user?.publicMetadata["db_id"];
+    const userId = user?.publicMetadata['db_id'];
     const { getToken } = useAuth();
 
     // Removed excessive logging for performance
@@ -32,18 +32,18 @@ export const TenantDashBoard = () => {
     async function getParkingPermit() {
         const authToken = await getToken();
         if (!authToken) {
-            throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+            throw new Error('[TENANT_DASHBOARD] Error unauthorized');
         }
         const res = await fetch(`${absoluteServerUrl}/tenant/parking`, {
-            method: "GET",
+            method: 'GET',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${authToken}`,
             },
         });
 
         if (!res.ok) {
-            throw new Error("[TENANT_DASHBOARD] Error parking_permits request failed");
+            throw new Error('[TENANT_DASHBOARD] Error parking_permits request failed');
         }
         return (await res.json()) as Parking[];
     }
@@ -51,18 +51,18 @@ export const TenantDashBoard = () => {
     async function getComplaints() {
         const authToken = await getToken();
         if (!authToken) {
-            throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+            throw new Error('[TENANT_DASHBOARD] Error unauthorized');
         }
         const res = await fetch(`${absoluteServerUrl}/tenant/complaints`, {
-            method: "GET",
+            method: 'GET',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${authToken}`,
             },
         });
 
         if (!res.ok) {
-            throw new Error("[TENANT_DASHBOARD] Error complaints request failed");
+            throw new Error('[TENANT_DASHBOARD] Error complaints request failed');
         }
         const data = (await res.json()) as ComplaintsData[];
         return data;
@@ -71,18 +71,18 @@ export const TenantDashBoard = () => {
     async function getWorkOrders() {
         const authToken = await getToken();
         if (!authToken) {
-            throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+            throw new Error('[TENANT_DASHBOARD] Error unauthorized');
         }
         const res = await fetch(`${absoluteServerUrl}/tenant/work_orders`, {
-            method: "GET",
+            method: 'GET',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${authToken}`,
             },
         });
 
         if (!res.ok) {
-            throw new Error("[TENANT_DASHBOARD] Error work orders request failed");
+            throw new Error('[TENANT_DASHBOARD] Error work orders request failed');
         }
         const data = (await res.json()) as WorkOrderData[];
         return data;
@@ -91,18 +91,18 @@ export const TenantDashBoard = () => {
     async function getLockers() {
         const authToken = await getToken();
         if (!authToken) {
-            throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+            throw new Error('[TENANT_DASHBOARD] Error unauthorized');
         }
         const res = await fetch(`${absoluteServerUrl}/tenant/lockers`, {
-            method: "GET",
+            method: 'GET',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${authToken}`,
             },
         });
 
         if (!res.ok) {
-            throw new Error("[TENANT_DASHBOARD] Error complaints request failed");
+            throw new Error('[TENANT_DASHBOARD] Error complaints request failed');
         }
         return (await res.json()) as ComplaintsData[];
     }
@@ -142,23 +142,23 @@ export const TenantDashBoard = () => {
 
     // Fetch lease status using TanStack Query
     const { data: leaseStatus, error: leaseError } = useQuery<LeaseStatus>({
-        queryKey: ["leaseStatus", clerkUserId], // Unique key for the query
+        queryKey: ['leaseStatus', clerkUserId], // Unique key for the query
         queryFn: async () => {
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+                throw new Error('[TENANT_DASHBOARD] Error unauthorized');
             }
 
             const response = await fetch(`${absoluteServerUrl}/tenant/leases/${userId}/signing-url`, {
-                method: "GET",
+                method: 'GET',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
             });
 
             if (!response.ok) {
-                throw new Error("Failed to fetch lease status");
+                throw new Error('Failed to fetch lease status');
             }
             const data = await response.json();
             return data;
@@ -170,8 +170,8 @@ export const TenantDashBoard = () => {
 
     // This is the recommended approach in newer versions of TanStack Query. `onSuccess` is deprecated
     useEffect(() => {
-        if (leaseStatus && leaseStatus.lease_status && leaseStatus.lease_status !== "no_lease") {
-            if (["pending_approval", "terminated", "expired"].includes(leaseStatus.lease_status)) {
+        if (leaseStatus && leaseStatus.lease_status && leaseStatus.lease_status !== 'no_lease') {
+            if (['pending_approval', 'terminated', 'expired'].includes(leaseStatus.lease_status)) {
                 setSigningModalVisible(true);
             }
         }
@@ -182,7 +182,7 @@ export const TenantDashBoard = () => {
         if (leaseStatus?.url) {
             window.location.href = leaseStatus.url;
         } else {
-            console.error("No signing URL available");
+            console.error('No signing URL available');
         }
     };
 
@@ -190,11 +190,11 @@ export const TenantDashBoard = () => {
 
     // Check if any queries have errors and create specific error messages
     const errorDetails = [];
-    if (complaints.error) errorDetails.push("complaints");
-    if (workOrders.error) errorDetails.push("work orders");
-    if (lockers.error) errorDetails.push("package information");
-    if (parking.error) errorDetails.push("parking permits");
-    if (leaseError) errorDetails.push("lease status");
+    if (complaints.error) errorDetails.push('complaints');
+    if (workOrders.error) errorDetails.push('work orders');
+    if (lockers.error) errorDetails.push('package information');
+    if (parking.error) errorDetails.push('parking permits');
+    if (leaseError) errorDetails.push('lease status');
 
     const hasErrors = errorDetails.length > 0;
 
@@ -209,7 +209,7 @@ export const TenantDashBoard = () => {
             lockersCount: lockers.data?.length ?? 0,
             parkingCount: parking.data?.length ?? 0,
         }),
-        [complaints.data?.length, workOrders.data?.length, lockers.data?.length, parking.data?.length]
+        [complaints.data?.length, workOrders.data?.length, lockers.data?.length, parking.data?.length],
     );
 
     return (
@@ -221,7 +221,7 @@ export const TenantDashBoard = () => {
             {hasErrors && (
                 <AlertComponent
                     title="Data Loading Error"
-                    message={`Unable to load: ${errorDetails.join(", ")}`}
+                    message={`Unable to load: ${errorDetails.join(', ')}`}
                     description="Please refresh the page or contact support if the problem persists."
                     type="error"
                 />
@@ -258,7 +258,7 @@ export const TenantDashBoard = () => {
                         <CardComponent
                             title="Package info"
                             value={cardValues.lockersCount}
-                            description={`${cardValues.lockersCount ? "You have a package. Click the button at your locker to open it." : "When package arrives you will be notified here."}`}
+                            description={`${cardValues.lockersCount ? 'You have a package. Click the button at your locker to open it.' : 'When package arrives you will be notified here.'}`}
                             hoverable={true}
                             icon={<InboxOutlined className="icon" />}
                             button={<TenantOpenLockerModal numberOfPackages={cardValues.lockersCount} />}
@@ -298,14 +298,14 @@ export const TenantDashBoard = () => {
                 />
                 <CardComponent
                     title="Work Orders"
-                    description={"View your work orders here."}
+                    description={'View your work orders here.'}
                     hoverable={true}
                     value={cardValues.workOrdersCount}
                     button={<TenantViewWorkOrdersModal data={workOrders.data} />}
                 />
                 <CardComponent
                     title="Complaints"
-                    description={"View your complaints here."}
+                    description={'View your complaints here.'}
                     hoverable={true}
                     value={cardValues.complaintsCount}
                     button={<TenantViewComplaintsModal data={complaints.data} />}
@@ -331,14 +331,14 @@ export const TenantDashBoard = () => {
                         Sign Lease Now
                     </Button>,
                 ]}>
-                <div style={{ textAlign: "center" }}>
-                    <WarningOutlined style={{ fontSize: "4rem", color: "#faad14", marginBottom: "1rem" }} />
-                    <h3 style={{ marginBottom: "1rem" }}>Your Lease Requires Attention</h3>
+                <div style={{ textAlign: 'center' }}>
+                    <WarningOutlined style={{ fontSize: '4rem', color: '#faad14', marginBottom: '1rem' }} />
+                    <h3 style={{ marginBottom: '1rem' }}>Your Lease Requires Attention</h3>
                     <p>
-                        Your lease status is <strong>{leaseStatus?.lease_status === "pending_approval" ? "Pending Approval" : leaseStatus?.lease_status}</strong>.
+                        Your lease status is <strong>{leaseStatus?.lease_status === 'pending_approval' ? 'Pending Approval' : leaseStatus?.lease_status}</strong>.
                     </p>
                     <p>You must sign your lease to continue using the tenant portal.</p>
-                    <p style={{ marginTop: "1rem", fontStyle: "italic" }}>This action is required and cannot be dismissed.</p>
+                    <p style={{ marginTop: '1rem', fontStyle: 'italic' }}>This action is required and cannot be dismissed.</p>
                 </div>
             </Modal>
         </div>
@@ -359,21 +359,21 @@ function TenantParkingPeritModal(props: ParkingPermitModalProps) {
         mutationFn: async () => {
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+                throw new Error('[TENANT_DASHBOARD] Error unauthorized');
             }
 
             // console.log(`FORM VALUES: ${JSON.stringify(parkingPermitForm.getFieldsValue())}`);
             const res = await fetch(`${absoluteServerUrl}/tenant/parking`, {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
                 body: JSON.stringify(parkingPermitForm.getFieldsValue()),
             });
 
             if (!res.ok) {
-                throw new Error("[TENANT_DASHBOARD] Error creating parking_permit");
+                throw new Error('[TENANT_DASHBOARD] Error creating parking_permit');
             }
             return;
         },
@@ -406,7 +406,7 @@ function TenantParkingPeritModal(props: ParkingPermitModalProps) {
                 onOk={() => {
                     createParkingPermit();
                 }}
-                okText={"Create"}
+                okText={'Create'}
                 onCancel={handleCancel}
                 okButtonProps={{ disabled: isParkingPending ? true : false }}
                 cancelButtonProps={{ disabled: isParkingPending ? true : false }}>
@@ -415,19 +415,19 @@ function TenantParkingPeritModal(props: ParkingPermitModalProps) {
                     <p className="fs-6">Guest Name</p>
                     <Form.Item
                         name="name"
-                        rules={[{ required: true, message: "Please enter a guest name", type: "string" }]}>
+                        rules={[{ required: true, message: 'Please enter a guest name', type: 'string' }]}>
                         <Input placeholder="John Doe" />
                     </Form.Item>
                     <p className="fs-6">Car Color</p>
                     <Form.Item
                         name="car-color"
-                        rules={[{ required: true, message: "Enter guest's car color", type: "string" }]}>
+                        rules={[{ required: true, message: "Enter guest's car color", type: 'string' }]}>
                         <Input placeholder="Blue" />
                     </Form.Item>
                     <p className="fs-6">Car Model</p>
                     <Form.Item
                         name="car-model"
-                        rules={[{ required: true, message: "Enter guest's car model", type: "string" }]}>
+                        rules={[{ required: true, message: "Enter guest's car model", type: 'string' }]}>
                         <Input
                             placeholder="Car Make"
                             type="text"
@@ -436,7 +436,7 @@ function TenantParkingPeritModal(props: ParkingPermitModalProps) {
                     <p className="fs-6">License Plate</p>
                     <Form.Item
                         name="license-plate-number"
-                        rules={[{ required: true, message: "Enter guest's license plate", type: "string" }]}>
+                        rules={[{ required: true, message: "Enter guest's license plate", type: 'string' }]}>
                         <Input placeholder="3ha3-3213" />
                     </Form.Item>
                 </Form>
@@ -473,7 +473,7 @@ function TenantViewWorkOrdersModal(props: WorkOrderModalProps) {
                 okButtonProps={{ hidden: true, disabled: true }}
                 cancelButtonProps={{ hidden: true, disabled: true }}>
                 <Divider />
-                <div style={{ overflowY: "auto", height: "200px" }}>
+                <div style={{ overflowY: 'auto', height: '200px' }}>
                     {props.data ? (
                         <>
                             {props.data.map((order, idx) => (
@@ -482,10 +482,10 @@ function TenantViewWorkOrdersModal(props: WorkOrderModalProps) {
                                     className="flex gap-2 mb-2 mt-2 border-b-2 pb-2 border-gray-300">
                                     <p>{order.title}</p>
                                     <p>
-                                        Category: <span style={{ color: "green" }}>{order.category}</span>
+                                        Category: <span style={{ color: 'green' }}>{order.category}</span>
                                     </p>
                                     <p>
-                                        Status: <span style={{ color: "green" }}>{order.status}</span>
+                                        Status: <span style={{ color: 'green' }}>{order.status}</span>
                                     </p>
                                 </div>
                             ))}
@@ -526,7 +526,7 @@ function TenantViewComplaintsModal(props: ComplaintModalProps) {
                 okButtonProps={{ hidden: true, disabled: true }}
                 cancelButtonProps={{ hidden: true, disabled: true }}>
                 <Divider />
-                <div style={{ overflowY: "auto", height: "200px" }}>
+                <div style={{ overflowY: 'auto', height: '200px' }}>
                     {props.data ? (
                         <>
                             {props.data.map((order, idx) => (
@@ -535,10 +535,10 @@ function TenantViewComplaintsModal(props: ComplaintModalProps) {
                                     className="flex gap-2 mb-2 mt-2 border-b-2 pb-2 border-gray-300">
                                     <p>{order.title}</p>
                                     <p>
-                                        Category: <span style={{ color: "green" }}>{order.category}</span>
+                                        Category: <span style={{ color: 'green' }}>{order.category}</span>
                                     </p>
                                     <p>
-                                        Status: <span style={{ color: "green" }}>{order.status}</span>
+                                        Status: <span style={{ color: 'green' }}>{order.status}</span>
                                     </p>
                                 </div>
                             ))}
@@ -568,21 +568,21 @@ function TenantCreateComplaintsModal() {
         mutationFn: async () => {
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+                throw new Error('[TENANT_DASHBOARD] Error unauthorized');
             }
 
             // console.log(`COMPLAINT FORM: ${JSON.stringify(complaintForm.getFieldsValue())}`);
             const res = await fetch(`${absoluteServerUrl}/tenant/complaints`, {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
                 body: JSON.stringify(complaintForm.getFieldsValue()),
             });
 
             if (!res.ok) {
-                throw new Error("[TENANT_DASHBOARD] Error creating complaint");
+                throw new Error('[TENANT_DASHBOARD] Error creating complaint');
             }
             return;
         },
@@ -607,7 +607,7 @@ function TenantCreateComplaintsModal() {
                 onOk={() => {
                     createComplaint();
                 }}
-                okText={"Create"}
+                okText={'Create'}
                 onCancel={handleCancel}
                 okButtonProps={{ disabled: isPendingComplaint ? true : false }}
                 cancelButtonProps={{ disabled: isPendingComplaint ? true : false }}>
@@ -617,7 +617,7 @@ function TenantCreateComplaintsModal() {
                     <p className="fs-7">Title</p>
                     <Form.Item
                         name="title"
-                        rules={[{ required: true, type: "string", min: 3, max: 50 }]}>
+                        rules={[{ required: true, type: 'string', min: 3, max: 50 }]}>
                         <Input
                             placeholder="Enter a title"
                             type="text"
@@ -626,7 +626,7 @@ function TenantCreateComplaintsModal() {
                     <p className="fs-7">Description</p>
                     <Form.Item
                         name="description"
-                        rules={[{ required: true, type: "string", min: 5, max: 500 }]}>
+                        rules={[{ required: true, type: 'string', min: 5, max: 500 }]}>
                         <Input.TextArea
                             placeholder="Enter a brief description for complaint"
                             rows={4}
@@ -635,9 +635,9 @@ function TenantCreateComplaintsModal() {
                     <p className="fs-7">Category</p>
                     <Form.Item
                         name="category"
-                        rules={[{ required: true, type: "string" }]}>
-                        <Select placeholder={"Select a category"}>
-                            {["maintenance", "noise", "security", "parking", "neighbor", "trash", "internet", "lease", "natural_disaster", "other"].map((c) => (
+                        rules={[{ required: true, type: 'string' }]}>
+                        <Select placeholder={'Select a category'}>
+                            {['maintenance', 'noise', 'security', 'parking', 'neighbor', 'trash', 'internet', 'lease', 'natural_disaster', 'other'].map((c) => (
                                 <Select.Option key={c}>{c}</Select.Option>
                             ))}
                         </Select>
@@ -667,18 +667,18 @@ function TenantOpenLockerModal(props: LockerModalProps) {
         mutationFn: async () => {
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+                throw new Error('[TENANT_DASHBOARD] Error unauthorized');
             }
             const res = await fetch(`${absoluteServerUrl}/tenants/lockers/unlock`, {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
             });
 
             if (!res.ok) {
-                throw new Error("[TENANT_DASHBOARD] Error opening locker");
+                throw new Error('[TENANT_DASHBOARD] Error opening locker');
             }
             return;
         },

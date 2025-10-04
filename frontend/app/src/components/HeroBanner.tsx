@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { Button, Modal, Form, Input } from "antd";
+import React, { useState } from 'react';
+import { Button, Modal, Form, Input } from 'antd';
 
 const HeroBanner: React.FC = () => {
     const heroContent = {
-        title: "Welcome to EZRA Apartments",
-        subtitle: "Get ahead in life with your own place!",
-        buttonText: "Contact us for a tour!",
-        imageSrc: "https://felixwong.com/gallery/images/a/amsterdam0813-017.jpg",
+        title: 'Welcome to EZRA Apartments',
+        subtitle: 'Get ahead in life with your own place!',
+        buttonText: 'Contact us for a tour!',
+        imageSrc: 'https://felixwong.com/gallery/images/a/amsterdam0813-017.jpg',
     };
 
     const [open, setOpen] = useState(false);
@@ -22,7 +22,7 @@ const HeroBanner: React.FC = () => {
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
-            console.log("Prospective Tenant Info:", values);
+            console.log('Prospective Tenant Info:', values);
             setConfirmLoading(true);
             setSubmissionStatus('idle');
 
@@ -38,7 +38,7 @@ const HeroBanner: React.FC = () => {
                     form.resetFields();
                 }, 1500);
             }, 2000);
-        } catch (error) {
+        } catch {
             setSubmissionStatus('error');
             setConfirmLoading(false);
         }
@@ -53,13 +53,11 @@ const HeroBanner: React.FC = () => {
         <div
             className="hero-banner text-white img-fluid flex flex-column justify-content-center align-items-center text-center position-relative overflow-hidden"
             style={{
-                background: imageLoaded
-                    ? `url(${heroContent.imageSrc})`
-                    : "linear-gradient(135deg, #00674f 0%, #7789f4 50%, #00674f 100%)",
-                minHeight: "60vh",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                transition: "background-image 0.8s ease-in-out",
+                background: imageLoaded ? `url(${heroContent.imageSrc})` : 'linear-gradient(135deg, #00674f 0%, #7789f4 50%, #00674f 100%)',
+                minHeight: '60vh',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                transition: 'background-image 0.8s ease-in-out',
             }}>
             {/* Image preloader */}
             <img
@@ -75,22 +73,22 @@ const HeroBanner: React.FC = () => {
                 className="position-absolute top-0 start-0 w-100 h-100"
                 style={{
                     background: imageLoaded
-                        ? "linear-gradient(135deg, rgba(0, 103, 79, 0.85) 0%, rgba(119, 137, 244, 0.75) 100%)"
-                        : "linear-gradient(135deg, rgba(0, 103, 79, 0.9) 0%, rgba(119, 137, 244, 0.8) 100%)",
-                    backdropFilter: imageLoaded ? "blur(1px)" : "blur(2px)",
-                    transition: "all 0.8s ease-in-out",
+                        ? 'linear-gradient(135deg, rgba(0, 103, 79, 0.85) 0%, rgba(119, 137, 244, 0.75) 100%)'
+                        : 'linear-gradient(135deg, rgba(0, 103, 79, 0.9) 0%, rgba(119, 137, 244, 0.8) 100%)',
+                    backdropFilter: imageLoaded ? 'blur(1px)' : 'blur(2px)',
+                    transition: 'all 0.8s ease-in-out',
                 }}></div>
 
             {/* Content */}
             <div className="position-relative z-1 fade-in-up">
                 <h1
                     className="display-4 fw-bold mb-4 text-shadow-lg"
-                    style={{ letterSpacing: "-0.025em" }}>
+                    style={{ letterSpacing: '-0.025em' }}>
                     {heroContent.title}
                 </h1>
                 <p
                     className="lead mb-5 fs-5 text-shadow"
-                    style={{ maxWidth: "600px", margin: "0 auto" }}>
+                    style={{ maxWidth: '600px', margin: '0 auto' }}>
                     {heroContent.subtitle}
                 </p>
 
@@ -100,12 +98,12 @@ const HeroBanner: React.FC = () => {
                     className="modern-button pulse-on-hover glow-on-hover px-4 py-3"
                     onClick={showModal}
                     style={{
-                        background: "linear-gradient(135deg, #00674f 0%, #00a86b 100%)",
-                        border: "none",
-                        fontSize: "1.1rem",
-                        fontWeight: "600",
-                        minHeight: "48px",
-                        boxShadow: "0 4px 14px 0 rgba(0, 103, 79, 0.39)",
+                        background: 'linear-gradient(135deg, #00674f 0%, #00a86b 100%)',
+                        border: 'none',
+                        fontSize: '1.1rem',
+                        fontWeight: '600',
+                        minHeight: '48px',
+                        boxShadow: '0 4px 14px 0 rgba(0, 103, 79, 0.39)',
                     }}>
                     {heroContent.buttonText}
                 </Button>
@@ -131,14 +129,8 @@ const HeroBanner: React.FC = () => {
                         loading={confirmLoading}
                         onClick={handleOk}
                         disabled={submissionStatus === 'success' || confirmLoading}
-                        aria-label={
-                            confirmLoading
-                                ? "Submitting contact information"
-                                : submissionStatus === 'success'
-                                ? "Contact information submitted successfully"
-                                : "Submit contact information"
-                        }>
-                        {confirmLoading ? "Submitting..." : submissionStatus === 'success' ? "Submitted!" : "Submit"}
+                        aria-label={confirmLoading ? 'Submitting contact information' : submissionStatus === 'success' ? 'Contact information submitted successfully' : 'Submit contact information'}>
+                        {confirmLoading ? 'Submitting...' : submissionStatus === 'success' ? 'Submitted!' : 'Submit'}
                     </Button>,
                 ]}
                 aria-labelledby="contact-modal-title"
@@ -171,20 +163,21 @@ const HeroBanner: React.FC = () => {
                                 <Form.Item
                                     name="name"
                                     label="Name"
-                                    rules={[{ required: true, message: "Please enter your name" }]}
+                                    rules={[{ required: true, message: 'Please enter your name' }]}
                                     aria-required="true">
                                     <Input
                                         placeholder="Enter your full name"
                                         aria-label="Full name"
                                         aria-describedby="name-error"
-                                        disabled={confirmLoading} />
+                                        disabled={confirmLoading}
+                                    />
                                 </Form.Item>
                                 <Form.Item
                                     name="email"
                                     label="Email"
                                     rules={[
-                                        { required: true, message: "Please enter your email" },
-                                        { type: "email", message: "Enter a valid email" },
+                                        { required: true, message: 'Please enter your email' },
+                                        { type: 'email', message: 'Enter a valid email' },
                                     ]}
                                     aria-required="true">
                                     <Input
@@ -192,19 +185,21 @@ const HeroBanner: React.FC = () => {
                                         placeholder="Enter your email address"
                                         aria-label="Email address"
                                         aria-describedby="email-error"
-                                        disabled={confirmLoading} />
+                                        disabled={confirmLoading}
+                                    />
                                 </Form.Item>
                                 <Form.Item
                                     name="phone"
                                     label="Phone"
-                                    rules={[{ required: true, message: "Please enter your phone number" }]}
+                                    rules={[{ required: true, message: 'Please enter your phone number' }]}
                                     aria-required="true">
                                     <Input
                                         type="tel"
                                         placeholder="Enter your phone number"
                                         aria-label="Phone number"
                                         aria-describedby="phone-error"
-                                        disabled={confirmLoading} />
+                                        disabled={confirmLoading}
+                                    />
                                 </Form.Item>
                             </Form>
                         </>

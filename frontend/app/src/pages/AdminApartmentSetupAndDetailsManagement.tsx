@@ -1,15 +1,15 @@
-import { Button, Form, Input } from "antd";
-import React, { useState } from "react";
-import TableComponent from "../components/reusableComponents/TableComponent";
-import ButtonComponent from "../components/reusableComponents/ButtonComponent";
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import ModalComponent from "../components/ModalComponent";
-import { useMutation } from "@tanstack/react-query";
-import PageTitleComponent from "../components/reusableComponents/PageTitleComponent";
-import { useAuth } from "@clerk/clerk-react";
+import { Button, Form, Input } from 'antd';
+import React, { useState } from 'react';
+import TableComponent from '../components/reusableComponents/TableComponent';
+import ButtonComponent from '../components/reusableComponents/ButtonComponent';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import ModalComponent from '../components/ModalComponent';
+import { useMutation } from '@tanstack/react-query';
+import PageTitleComponent from '../components/reusableComponents/PageTitleComponent';
+import { useAuth } from '@clerk/clerk-react';
 
 // Use VITE_API_URL for the server URL, ensuring no trailing slash
-const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/$/, "");
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
 
 // Make the Add Locations a Modal that adds a building, floor, and room number
 // The user can add multiple locations
@@ -33,7 +33,7 @@ const AdminApartmentSetupAndDetailsManagement = () => {
     const [locations, setLocations] = React.useState<{ building: number; floors: number; rooms: number }[]>([]);
     const { getToken } = useAuth();
 
-    console.log("locations on load", locations);
+    console.log('locations on load', locations);
 
     const [editBuildingObj, setEditBuildingObj] = useState<Building>({} as Building);
 
@@ -44,21 +44,21 @@ const AdminApartmentSetupAndDetailsManagement = () => {
         buildings: [],
     });
 
-    console.log("adminSetupObject", adminSetupObject);
+    console.log('adminSetupObject', adminSetupObject);
 
     console.log(editBuildingObj);
 
     const { mutate: adminApartmentSetup } = useMutation({
         mutationFn: async (adminSetupObject: AdminSetup) => {
-            console.log("Starting admin apartment setup admin");
+            console.log('Starting admin apartment setup admin');
             const token = await getToken();
 
-            console.log("adminSetupObject", adminSetupObject);
+            console.log('adminSetupObject', adminSetupObject);
 
             const res = await fetch(`${API_URL}/admin/setup`, {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(adminSetupObject),
@@ -67,24 +67,24 @@ const AdminApartmentSetupAndDetailsManagement = () => {
             console.log(res);
 
             if (!res.ok) {
-                throw new Error("Failed to setup apartment");
+                throw new Error('Failed to setup apartment');
             }
 
             return res;
         },
         onSuccess: () => {
             // Invalidate and refetch
-            console.log("success");
+            console.log('success');
         },
         onError: (e: any) => {
-            console.log("error ", e);
+            console.log('error ', e);
         },
     });
 
     // console.log("Testing for Ryan, this is the adminApartmentSetup return from the Tanstack useMutation", adminApartmentSetup);
 
     const handleSendAdminSetup = () => {
-        console.log("starting admin setup");
+        console.log('starting admin setup');
         adminApartmentSetup(adminSetupObject);
 
         // Reset the state
@@ -95,46 +95,46 @@ const AdminApartmentSetupAndDetailsManagement = () => {
             buildings: [],
         });
 
-        console.log("adminSetupObject", adminSetupObject);
+        console.log('adminSetupObject', adminSetupObject);
     };
 
     // tanstack for editing locations that were put in
     const { mutate: editLocations } = useMutation({
         mutationFn: async (buildingData: Building) => {
-            console.log(editBuildingObj, "editBuildingObj in tanstack mutation");
+            console.log(editBuildingObj, 'editBuildingObj in tanstack mutation');
             // TODO: James, when you finish the backend route, change the variable endpoint to the right one.
             const res = await fetch(`${API_URL}/admins/buildings/{id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(buildingData),
             });
 
             if (!res.ok) {
-                throw new Error("Failed to update location");
+                throw new Error('Failed to update location');
             }
 
             return res;
         },
         onSuccess: () => {
             // Invalidate and refetch
-            console.log("success");
+            console.log('success');
         },
         onError: (e: any) => {
-            console.log("error ", e);
+            console.log('error ', e);
         },
     });
 
     const handleEditLocation = () => {
-        console.log("starting edit location");
+        console.log('starting edit location');
         editLocations(editBuildingObj);
     };
 
     const handleFormValuesChange = (_: any, allValues: any) => {
         setAdminSetupObject((prev) => ({
             ...prev,
-            parkingTotal: Number(allValues["parking-settings"][0]) || 0,
-            perUserParking: Number(allValues["parking-settings"][1]) || 0,
-            lockerCount: Number(allValues["mail-locker-settings"]) || 0,
+            parkingTotal: Number(allValues['parking-settings'][0]) || 0,
+            perUserParking: Number(allValues['parking-settings'][1]) || 0,
+            lockerCount: Number(allValues['mail-locker-settings']) || 0,
             buildings: prev.buildings,
         }));
     };
@@ -146,9 +146,9 @@ const AdminApartmentSetupAndDetailsManagement = () => {
         const roomsInput = document.querySelector('input[placeholder="# of Room"]') as HTMLInputElement;
 
         const newBuilding = {
-            building: parseInt(buildingInput?.value || "0"),
-            floors: parseInt(floorsInput?.value || "0"),
-            rooms: parseInt(roomsInput?.value || "0"),
+            building: parseInt(buildingInput?.value || '0'),
+            floors: parseInt(floorsInput?.value || '0'),
+            rooms: parseInt(roomsInput?.value || '0'),
         };
 
         // Update locations state
@@ -168,32 +168,32 @@ const AdminApartmentSetupAndDetailsManagement = () => {
         }));
 
         // Reset the inputs
-        if (buildingInput) buildingInput.value = "";
-        if (floorsInput) floorsInput.value = "";
-        if (roomsInput) roomsInput.value = "";
+        if (buildingInput) buildingInput.value = '';
+        if (floorsInput) floorsInput.value = '';
+        if (roomsInput) roomsInput.value = '';
     };
 
     const columns = [
         {
-            title: "Building",
-            dataIndex: "building",
-            key: "building",
+            title: 'Building',
+            dataIndex: 'building',
+            key: 'building',
         },
         {
-            title: "Floors",
-            dataIndex: "floors",
-            key: "floors",
+            title: 'Floors',
+            dataIndex: 'floors',
+            key: 'floors',
             render: (floors: number) => floors,
         },
         {
-            title: "Rooms",
-            dataIndex: "rooms",
-            key: "rooms",
+            title: 'Rooms',
+            dataIndex: 'rooms',
+            key: 'rooms',
             render: (rooms: number) => rooms,
         },
         {
-            title: "Action",
-            key: "action",
+            title: 'Action',
+            key: 'action',
             render: (text: string, record: { building: number; floors: number; rooms: number }) => (
                 <div className="flex gap-2">
                     <ButtonComponent
@@ -237,8 +237,8 @@ const AdminApartmentSetupAndDetailsManagement = () => {
                 className="admin-apartment-setup-form-container"
                 layout="vertical"
                 initialValues={{
-                    "parking-settings": [adminSetupObject.parkingTotal, adminSetupObject.perUserParking],
-                    "mail-locker-settings": adminSetupObject.lockerCount,
+                    'parking-settings': [adminSetupObject.parkingTotal, adminSetupObject.perUserParking],
+                    'mail-locker-settings': adminSetupObject.lockerCount,
                 }}>
                 {/* Table */}
                 {locations.length > 0 && (
@@ -254,7 +254,7 @@ const AdminApartmentSetupAndDetailsManagement = () => {
                     rules={[
                         {
                             required: true,
-                            message: "Please select a location",
+                            message: 'Please select a location',
                         },
                     ]}>
                     <div className="flex flex-row gap-3 mt-3">
@@ -294,9 +294,9 @@ const AdminApartmentSetupAndDetailsManagement = () => {
                     />
                 </div>
                 <Form.Item
-                    name={["parking-settings", 0]}
+                    name={['parking-settings', 0]}
                     label="Available Parking Spots"
-                    rules={[{ required: true, message: "Please enter available parking spots" }]}>
+                    rules={[{ required: true, message: 'Please enter available parking spots' }]}>
                     <Input
                         placeholder="Available Spots"
                         type="number"
@@ -304,9 +304,9 @@ const AdminApartmentSetupAndDetailsManagement = () => {
                     />
                 </Form.Item>
                 <Form.Item
-                    name={["parking-settings", 1]}
+                    name={['parking-settings', 1]}
                     label="Max Parking Spots Per User"
-                    rules={[{ required: true, message: "Please enter max spots per user" }]}>
+                    rules={[{ required: true, message: 'Please enter max spots per user' }]}>
                     <Input
                         placeholder="Max Spots Per User"
                         type="number"
@@ -316,7 +316,7 @@ const AdminApartmentSetupAndDetailsManagement = () => {
                 <Form.Item
                     name="mail-locker-settings"
                     label="Mail Locker Settings"
-                    rules={[{ required: true, message: "Please enter mail locker settings" }]}>
+                    rules={[{ required: true, message: 'Please enter mail locker settings' }]}>
                     <Input
                         placeholder="Available Lockers"
                         type="number"
@@ -343,7 +343,7 @@ const AdminApartmentSetupAndDetailsManagement = () => {
                         <Button
                             type="default"
                             onClick={() => {
-                                console.log("Cancel");
+                                console.log('Cancel');
                             }}>
                             Cancel
                         </Button>

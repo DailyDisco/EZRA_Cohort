@@ -1,63 +1,63 @@
-import { Avatar, Button, Card, Col, ConfigProvider, Divider, Input, Row } from "antd";
-import TableComponent from "../components/reusableComponents/TableComponent";
-import { LockOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
-import TextArea from "antd/es/input/TextArea";
-import { useState } from "react";
-import UniversalSidebar from "../components/UniversalSidebar";
-import { Link } from "react-router";
-import RegistrationFormExample from "../components/reusableComponents/FormExample";
-import TimeRelatedFormExample from "../components/reusableComponents/TimeRelatedFormExamples";
-import AlertComponent from "../components/reusableComponents/AlertComponent";
-import { CardComponent } from "../components/reusableComponents/CardComponent";
-import ButtonComponent from "../components/reusableComponents/ButtonComponent";
-import ModalComponent from "../components/ModalComponent";
-import type { ColumnsType, TableProps } from "antd/es/table";
-import type { DataType } from "../types/types";
+import { Avatar, Button, Card, Col, ConfigProvider, Divider, Input, Row } from 'antd';
+import TableComponent from '../components/reusableComponents/TableComponent';
+import { LockOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import TextArea from 'antd/es/input/TextArea';
+import { useState } from 'react';
+import UniversalSidebar from '../components/UniversalSidebar';
+import { Link } from 'react-router';
+import RegistrationFormExample from '../components/reusableComponents/FormExample';
+import TimeRelatedFormExample from '../components/reusableComponents/TimeRelatedFormExamples';
+import AlertComponent from '../components/reusableComponents/AlertComponent';
+import { CardComponent } from '../components/reusableComponents/CardComponent';
+import ButtonComponent from '../components/reusableComponents/ButtonComponent';
+import ModalComponent from '../components/ModalComponent';
+import type { ColumnsType, TableProps } from 'antd/es/table';
+import type { DataType } from '../types/types';
 
 const ReusableComponents = () => {
-    const [value, setValue] = useState("");
+    const [value, setValue] = useState('');
 
     const columns: ColumnsType<DataType> = [
         {
-            title: "Name",
-            dataIndex: "name",
+            title: 'Name',
+            dataIndex: 'name',
             filters: [
-                { text: "Joe", value: "Joe" },
-                { text: "Category 1", value: "Category 1" },
-                { text: "Category 2", value: "Category 2" },
+                { text: 'Joe', value: 'Joe' },
+                { text: 'Category 1', value: 'Category 1' },
+                { text: 'Category 2', value: 'Category 2' },
             ],
-            filterMode: "tree",
+            filterMode: 'tree',
             filterSearch: true,
             onFilter: (value, record) => record.name.startsWith(value as string),
-            width: "30%",
+            width: '30%',
         },
         {
-            title: "Age",
-            dataIndex: "age",
+            title: 'Age',
+            dataIndex: 'age',
             sorter: (a, b) => a.age - b.age,
         },
         {
-            title: "Address",
-            dataIndex: "address",
+            title: 'Address',
+            dataIndex: 'address',
             filters: [
-                { text: "London", value: "London" },
-                { text: "New York", value: "New York" },
+                { text: 'London', value: 'London' },
+                { text: 'New York', value: 'New York' },
             ],
             onFilter: (value, record) => record.address.startsWith(value as string),
             filterSearch: true,
-            width: "40%",
+            width: '40%',
         },
     ];
 
     const data: DataType[] = [
-        { key: "1", name: "John Brown", age: 32, address: "New York No. 1 Lake Park" },
-        { key: "2", name: "Jim Green", age: 42, address: "London No. 1 Lake Park" },
-        { key: "3", name: "Joe Black", age: 32, address: "Sydney No. 1 Lake Park" },
-        { key: "4", name: "Jim Red", age: 32, address: "London No. 2 Lake Park" },
+        { key: '1', name: 'John Brown', age: 32, address: 'New York No. 1 Lake Park' },
+        { key: '2', name: 'Jim Green', age: 42, address: 'London No. 1 Lake Park' },
+        { key: '3', name: 'Joe Black', age: 32, address: 'Sydney No. 1 Lake Park' },
+        { key: '4', name: 'Jim Red', age: 32, address: 'London No. 2 Lake Park' },
     ];
 
-    const onChange: TableProps<DataType>["onChange"] = (pagination, filters, sorter, extra) => {
-        console.log("params", pagination, filters, sorter, extra);
+    const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
+        console.log('params', pagination, filters, sorter, extra);
     };
 
     return (
@@ -128,19 +128,19 @@ const ReusableComponents = () => {
 
                 {/* alerts */}
                 <AlertComponent
-                    title={"Success Example"}
-                    description={"Success Description"}
-                    type={"success"}
+                    title={'Success Example'}
+                    description={'Success Description'}
+                    type={'success'}
                 />
                 <AlertComponent
-                    title={"Error Example"}
-                    description={"Error Description"}
-                    type={"error"}
+                    title={'Error Example'}
+                    description={'Error Description'}
+                    type={'error'}
                 />
                 <AlertComponent
-                    title={"Warning Example"}
-                    description={"Warning Description"}
-                    type={"warning"}
+                    title={'Warning Example'}
+                    description={'Warning Description'}
+                    type={'warning'}
                 />
 
                 {/* Sider (Sidebar) */}

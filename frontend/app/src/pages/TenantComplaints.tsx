@@ -1,59 +1,59 @@
-import { Button, Divider, Form, Input, Modal, Select } from "antd";
-import { useState } from "react";
-import PageTitleComponent from "../components/reusableComponents/PageTitleComponent";
-import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@clerk/react-router";
-import { ComplaintStatus, ComplaintEntry, ComplaintsData, GetApartment } from "../types/types";
-import Table, { ColumnsType } from "antd/es/table";
-import dayjs from "dayjs";
+import { Button, Divider, Form, Input, Modal, Select } from 'antd';
+import { useState } from 'react';
+import PageTitleComponent from '../components/reusableComponents/PageTitleComponent';
+import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@clerk/react-router';
+import { ComplaintStatus, ComplaintEntry, ComplaintsData, GetApartment } from '../types/types';
+import Table, { ColumnsType } from 'antd/es/table';
+import dayjs from 'dayjs';
 
 // Use VITE_API_URL for the server URL, ensuring no trailing slash
-const serverUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
-const absoluteServerUrl = serverUrl.replace(/\/$/, ""); // Remove trailing slash if present
+const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const absoluteServerUrl = serverUrl.replace(/\/$/, ''); // Remove trailing slash if present
 
 const TenantComplaintsAndWorkOrders = () => {
     const { getToken } = useAuth();
     const [complaints, apartment] = useQueries({
         queries: [
             {
-                queryKey: [`complaints`],
+                queryKey: ['complaints'],
                 queryFn: async () => {
                     const authToken = await getToken();
                     if (!authToken) {
-                        throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+                        throw new Error('[TENANT_DASHBOARD] Error unauthorized');
                     }
                     const res = await fetch(`${absoluteServerUrl}/tenant/complaints`, {
-                        method: "GET",
+                        method: 'GET',
                         headers: {
-                            "Content-Type": "application/json",
+                            'Content-Type': 'application/json',
                             Authorization: `Bearer ${authToken}`,
                         },
                     });
 
                     if (!res.ok) {
-                        throw new Error("[TENANT_DASHBOARD] Error complaints request failed");
+                        throw new Error('[TENANT_DASHBOARD] Error complaints request failed');
                     }
                     return (await res.json()) as ComplaintsData[];
                 },
             },
             {
-                queryKey: [`apartment`],
+                queryKey: ['apartment'],
                 staleTime: 0,
                 queryFn: async () => {
                     const authToken = await getToken();
                     if (!authToken) {
-                        throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+                        throw new Error('[TENANT_DASHBOARD] Error unauthorized');
                     }
                     const res = await fetch(`${absoluteServerUrl}/tenant/apartment`, {
-                        method: "GET",
+                        method: 'GET',
                         headers: {
-                            "Content-Type": "application/json",
+                            'Content-Type': 'application/json',
                             Authorization: `Bearer ${authToken}`,
                         },
                     });
 
                     if (!res.ok) {
-                        throw new Error("[TENANT_DASHBOARD] Error tenant Work_orders request failed");
+                        throw new Error('[TENANT_DASHBOARD] Error tenant Work_orders request failed');
                     }
                     return (await res.json()) as GetApartment;
                 },
@@ -66,31 +66,31 @@ const TenantComplaintsAndWorkOrders = () => {
 
     const complaintColumns: ColumnsType<ComplaintsData> = [
         {
-            title: "Id",
-            dataIndex: "id",
-            key: "id",
+            title: 'Id',
+            dataIndex: 'id',
+            key: 'id',
         },
         {
-            title: "Title",
-            dataIndex: "title",
-            key: "title",
+            title: 'Title',
+            dataIndex: 'title',
+            key: 'title',
         },
         {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
+            title: 'Description',
+            dataIndex: 'description',
+            key: 'description',
         },
         {
-            title: "Category",
-            dataIndex: "category",
-            key: "category",
+            title: 'Category',
+            dataIndex: 'category',
+            key: 'category',
         },
         {
-            title: "Status",
-            dataIndex: "status",
-            key: "status",
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
             render: (status: ComplaintStatus) => {
-                if (status !== "resolved") {
+                if (status !== 'resolved') {
                     return <p>{status}</p>;
                 }
 
@@ -98,10 +98,10 @@ const TenantComplaintsAndWorkOrders = () => {
             },
         },
         {
-            title: "Created At",
-            dataIndex: "createdAt",
-            key: "createdAt",
-            render: (date) => dayjs(date).format("MMM D, YYYY h:mm A"),
+            title: 'Created At',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            render: (date) => dayjs(date).format('MMM D, YYYY h:mm A'),
         },
     ];
 
@@ -151,31 +151,31 @@ function TenantCreateComplaintsModal(props: CreateComplaintModalProps) {
 
     // console.log(`SERVER_URL ${absoluteServerUrl}/tenant/complaints`);
     const { mutate: createComplaint, isPending: isPendingComplaint } = useMutation({
-        mutationKey: [`tenant-complaints`],
+        mutationKey: ['tenant-complaints'],
         mutationFn: async () => {
-            complaintForm.setFieldValue("unit_number", props.TenantUnitNumber);
+            complaintForm.setFieldValue('unit_number', props.TenantUnitNumber);
             const authToken = await getToken();
             if (!authToken) {
-                throw new Error("[TENANT_DASHBOARD] Error unauthorized");
+                throw new Error('[TENANT_DASHBOARD] Error unauthorized');
             }
             console.log(`NEW COMPLAINT ENTRY FORM VALUES: ${JSON.stringify(complaintForm.getFieldsValue())}`);
             const res = await fetch(`${absoluteServerUrl}/tenant/complaints`, {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,
                 },
                 body: JSON.stringify(complaintForm.getFieldsValue()),
             });
 
             if (!res.ok) {
-                throw new Error("[TENANT_DASHBOARD] Error creating parking_permit");
+                throw new Error('[TENANT_DASHBOARD] Error creating parking_permit');
             }
             return;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: [`complaints`],
+                queryKey: ['complaints'],
             });
             complaintForm.resetFields();
             handleCancel();
@@ -196,7 +196,7 @@ function TenantCreateComplaintsModal(props: CreateComplaintModalProps) {
                 onOk={() => {
                     createComplaint();
                 }}
-                okText={"Create"}
+                okText={'Create'}
                 onCancel={handleCancel}
                 okButtonProps={{ disabled: isPendingComplaint ? true : false }}
                 cancelButtonProps={{ disabled: isPendingComplaint ? true : false }}>
@@ -227,18 +227,18 @@ function TenantCreateComplaintsModal(props: CreateComplaintModalProps) {
                     <Form.Item
                         name="category"
                         required={true}>
-                        <Select placeholder={"Select a category"}>
+                        <Select placeholder={'Select a category'}>
                             {Object.values({
-                                maintenance: "maintenance",
-                                noise: "noise",
-                                security: "security",
-                                parking: "parking",
-                                neighbor: "neighbor",
-                                trash: "trash",
-                                internet: "internet",
-                                lease: "lease",
-                                natural_disaster: "natural_disaster",
-                                other: "other",
+                                maintenance: 'maintenance',
+                                noise: 'noise',
+                                security: 'security',
+                                parking: 'parking',
+                                neighbor: 'neighbor',
+                                trash: 'trash',
+                                internet: 'internet',
+                                lease: 'lease',
+                                natural_disaster: 'natural_disaster',
+                                other: 'other',
                             }).map((c) => (
                                 <Select.Option key={c}>{c}</Select.Option>
                             ))}

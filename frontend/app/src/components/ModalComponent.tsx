@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Button, Divider, Form, FormProps, Input, Modal, Select } from "antd";
-import { EditOutlined } from "@ant-design/icons";
-import ButtonComponent from "./reusableComponents/ButtonComponent";
+import { useState } from 'react';
+import { Button, Divider, Form, FormProps, Input, Modal, Select } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
+import ButtonComponent from './reusableComponents/ButtonComponent';
 
 type InviteTenant = {
     email: string;
@@ -9,7 +9,7 @@ type InviteTenant = {
     management_id: string;
 };
 
-import { useUser } from "@clerk/react-router";
+import { useUser } from '@clerk/react-router';
 
 interface Lease {
     id: string | number;
@@ -37,23 +37,23 @@ type Building = {
 
 interface ModalComponentProps {
     buttonTitle: string;
-    buttonType: "default" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "danger";
+    buttonType: 'default' | 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
     content: string | React.ReactNode;
     type:
-        | "default"
-        | "Smart Locker"
-        | "Guest Parking"
-        | "Invite Tenant"
-        | "Edit Tenant"
-        | "View Tenant Complaints"
-        | "View Tenant Work Orders"
-        | "Send Tenant Lease"
-        | "Edit Apartment Building"
-        | "Update Password Locker"
-        | "Edit Tenant"
-        | "Admin Unlock Locker"
-        | "Update Password Locker"
-        | "Unlock Locker";
+        | 'default'
+        | 'Smart Locker'
+        | 'Guest Parking'
+        | 'Invite Tenant'
+        | 'Edit Tenant'
+        | 'View Tenant Complaints'
+        | 'View Tenant Work Orders'
+        | 'Send Tenant Lease'
+        | 'Edit Apartment Building'
+        | 'Update Password Locker'
+        | 'Edit Tenant'
+        | 'Admin Unlock Locker'
+        | 'Update Password Locker'
+        | 'Unlock Locker';
     handleOkay: (data?: any) => Promise<void>;
     modalTitle?: string;
     apartmentBuildingEditProps?: Building;
@@ -78,12 +78,12 @@ const ModalComponent = (props: ModalComponentProps) => {
 
     const isModalOpen = props.isModalOpen !== undefined ? props.isModalOpen : internalModalOpen;
 
-    const onFinish: FormProps<any>["onFinish"] = (values: any) => {
-        console.log("Success:", values);
+    const onFinish: FormProps<any>['onFinish'] = (values: any) => {
+        console.log('Success:', values);
     };
 
-    if (props.userRole === "") {
-        props.userRole = "admin";
+    if (props.userRole === '') {
+        props.userRole = 'admin';
     }
 
     const showModal = () => {
@@ -102,14 +102,14 @@ const ModalComponent = (props: ModalComponentProps) => {
     };
 
     const titles: Record<string, string> = {
-        default: "Default Modal",
-        "Smart Locker": "Smart Locker Modal",
-        "Guest Parking": "Create a parking pass",
-        "Invite Tenant": "Invite Tenant",
-        "Edit Tenant": "Edit Tenant",
-        "View Tenant Complaints": "View Tenant Complaints",
-        "View Tenant Work Orders": "View Tenant Work Orders",
-        "Send Tenant Lease": "Send Tenant Lease",
+        default: 'Default Modal',
+        'Smart Locker': 'Smart Locker Modal',
+        'Guest Parking': 'Create a parking pass',
+        'Invite Tenant': 'Invite Tenant',
+        'Edit Tenant': 'Edit Tenant',
+        'View Tenant Complaints': 'View Tenant Complaints',
+        'View Tenant Work Orders': 'View Tenant Work Orders',
+        'Send Tenant Lease': 'Send Tenant Lease',
     };
 
     const getAdminSmartLocker = () => {
@@ -132,10 +132,10 @@ const ModalComponent = (props: ModalComponentProps) => {
                                 await props.handleOkay({ userId: props.selectedUserId, accessCode: props.accessCode });
                                 setInternalModalOpen(false);
                             } else {
-                                console.error("Missing required fields");
+                                console.error('Missing required fields');
                             }
                         } catch (error) {
-                            console.error("Error in modal onOk:", error);
+                            console.error('Error in modal onOk:', error);
                             // Keep modal open if there's an error
                         }
                     }}
@@ -145,11 +145,11 @@ const ModalComponent = (props: ModalComponentProps) => {
                         <Form.Item
                             name="userId"
                             label="Tenant"
-                            rules={[{ required: true, message: "Please pick a tenant" }]}>
+                            rules={[{ required: true, message: 'Please pick a tenant' }]}>
                             <Select
                                 placeholder="Please pick a tenant"
                                 onChange={(value: string) => {
-                                    console.log("Selected value:", value);
+                                    console.log('Selected value:', value);
                                     props.setUserId(value);
                                 }}
                                 options={props.tenant?.map((tenant) => ({
@@ -161,7 +161,7 @@ const ModalComponent = (props: ModalComponentProps) => {
                         <Form.Item
                             name="accessCode"
                             label="Access Code"
-                            rules={[{ required: true, message: "Please enter an access code" }]}>
+                            rules={[{ required: true, message: 'Please enter an access code' }]}>
                             <Input.Password
                                 placeholder="Enter access code"
                                 maxLength={8}
@@ -245,7 +245,7 @@ const ModalComponent = (props: ModalComponentProps) => {
 
     return (
         <>
-            {props.type === "default" && (
+            {props.type === 'default' && (
                 <>
                     <ButtonComponent
                         title={props.buttonTitle}
@@ -277,8 +277,8 @@ const ModalComponent = (props: ModalComponentProps) => {
                     </Modal>
                 </>
             )}
-            {props.type === "Smart Locker" && <>{user?.publicMetadata.role === "admin" ? getAdminSmartLocker() : getTenantSmartLocker()}</>}
-            {props.type === "Guest Parking" && (
+            {props.type === 'Smart Locker' && <>{user?.publicMetadata.role === 'admin' ? getAdminSmartLocker() : getTenantSmartLocker()}</>}
+            {props.type === 'Guest Parking' && (
                 <>
                     <Button
                         type="primary"
@@ -342,7 +342,7 @@ const ModalComponent = (props: ModalComponentProps) => {
                     </Modal>
                 </>
             )}
-            {props.type === "Edit Apartment Building" && (
+            {props.type === 'Edit Apartment Building' && (
                 <>
                     <Button
                         type="primary"
@@ -367,21 +367,21 @@ const ModalComponent = (props: ModalComponentProps) => {
                         <Form>
                             <Form.Item name="Building #">
                                 <Input
-                                    placeholder={props.apartmentBuildingEditProps?.buildingNumber.toString() || ""}
+                                    placeholder={props.apartmentBuildingEditProps?.buildingNumber.toString() || ''}
                                     type="number"
                                     onChange={handleBuildingNumberChange}
                                 />
                             </Form.Item>
                             <Form.Item name="Amount of Floors">
                                 <Input
-                                    placeholder={props.apartmentBuildingEditProps?.floorNumbers.toString() || ""}
+                                    placeholder={props.apartmentBuildingEditProps?.floorNumbers.toString() || ''}
                                     type="number"
                                     onChange={handleFloorNumbersChange}
                                 />
                             </Form.Item>
                             <Form.Item name="# of Rooms/Floor">
                                 <Input
-                                    placeholder={props.apartmentBuildingEditProps?.numberOfRooms.toString() || ""}
+                                    placeholder={props.apartmentBuildingEditProps?.numberOfRooms.toString() || ''}
                                     type="number"
                                     onChange={handleRoomsChange}
                                 />
@@ -392,7 +392,7 @@ const ModalComponent = (props: ModalComponentProps) => {
                 </>
             )}
 
-            {props.type === "Edit Tenant" && (
+            {props.type === 'Edit Tenant' && (
                 <>
                     <Button
                         type="primary"
@@ -460,7 +460,7 @@ const ModalComponent = (props: ModalComponentProps) => {
                 </>
             )}
             {/* View Recent (3) Tenant Complaints */}
-            {props.type === "View Tenant Complaints" && (
+            {props.type === 'View Tenant Complaints' && (
                 <>
                     <ButtonComponent
                         type="primary"
@@ -494,7 +494,7 @@ const ModalComponent = (props: ModalComponentProps) => {
                 </>
             )}
             {/* View Recent (3) Tenant Work Orders */}
-            {props.type === "View Tenant Work Orders" && (
+            {props.type === 'View Tenant Work Orders' && (
                 <>
                     <ButtonComponent
                         type="primary"
@@ -527,7 +527,7 @@ const ModalComponent = (props: ModalComponentProps) => {
                     </Modal>
                 </>
             )}
-            {props.type === "Send Tenant Lease" && (
+            {props.type === 'Send Tenant Lease' && (
                 <>
                     <ButtonComponent
                         type="primary"
@@ -562,7 +562,7 @@ const ModalComponent = (props: ModalComponentProps) => {
                     </Modal>
                 </>
             )}
-            {props.type === "Admin Unlock Locker" && (
+            {props.type === 'Admin Unlock Locker' && (
                 <>
                     <ButtonComponent
                         type="primary"
@@ -584,7 +584,7 @@ const ModalComponent = (props: ModalComponentProps) => {
                     </Modal>
                 </>
             )}
-            {props.type === "Update Password Locker" && (
+            {props.type === 'Update Password Locker' && (
                 <>
                     <ButtonComponent
                         type="primary"
@@ -614,7 +614,7 @@ const ModalComponent = (props: ModalComponentProps) => {
                     </Modal>
                 </>
             )}
-            {props.type === "Unlock Locker" && (
+            {props.type === 'Unlock Locker' && (
                 <>
                     <ButtonComponent
                         type="primary"
@@ -636,7 +636,7 @@ const ModalComponent = (props: ModalComponentProps) => {
                     </Modal>
                 </>
             )}
-            {props.type === "Update Password Locker" && (
+            {props.type === 'Update Password Locker' && (
                 <>
                     <ButtonComponent
                         type="primary"

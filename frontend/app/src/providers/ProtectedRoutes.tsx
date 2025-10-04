@@ -2,9 +2,9 @@
 // It also checks the user's role and redirects to the correct route based on the role
 // The ProtectedRoutes component is used in the Main.tsx file as a Route element that wraps the Tenant and Admin routes
 
-import { useUser } from "@clerk/react-router";
-import { Spin } from "antd";
-import { Navigate, Outlet, useLocation } from "react-router";
+import { useUser } from '@clerk/react-router';
+import { Spin } from 'antd';
+import { Navigate, Outlet, useLocation } from 'react-router';
 
 const ProtectedRoutes = () => {
     // Get Clerk User to get the user's role
@@ -20,26 +20,26 @@ const ProtectedRoutes = () => {
         return (
             <div
                 style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "100vh",
-                    backgroundColor: "#f0f8ff",
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh',
+                    backgroundColor: '#f0f8ff',
                     fontFamily: "'Poppins', sans-serif",
                 }}>
                 <div
                     style={{
-                        fontSize: "2rem",
-                        color: "#00674f",
-                        marginBottom: "1rem",
-                        fontWeight: "bold",
+                        fontSize: '2rem',
+                        color: '#00674f',
+                        marginBottom: '1rem',
+                        fontWeight: 'bold',
                     }}>
                     Loading
                     <span
                         style={{
-                            animation: "ellipsis 1.5s infinite",
-                            color: "#00674f",
+                            animation: 'ellipsis 1.5s infinite',
+                            color: '#00674f',
                         }}>
                         ...
                     </span>
@@ -62,14 +62,14 @@ const ProtectedRoutes = () => {
     const userRole = user?.publicMetadata?.role as string;
 
     // More strict role-based access control
-    if (userRole === "tenant") {
+    if (userRole === 'tenant') {
         // Tenants can ONLY access tenant routes
-        if (!currentPath.startsWith("/tenant")) {
+        if (!currentPath.startsWith('/tenant')) {
             return <Navigate to="/tenant" />;
         }
-    } else if (userRole === "admin") {
+    } else if (userRole === 'admin') {
         // Admins can ONLY access admin routes
-        if (!currentPath.startsWith("/admin")) {
+        if (!currentPath.startsWith('/admin')) {
             return <Navigate to="/admin" />;
         }
     } else {

@@ -1794,7 +1794,7 @@ func (h *LeaseHandler) GetTenantLeaseStatusAndURLByUserID(w http.ResponseWriter,
 	// If no leases exist, return empty response
 	if len(leases) == 0 {
 		if err := json.NewEncoder(w).Encode(map[string]string{
-			"url":           "",
+			"url":          "",
 			"lease_status": "no_lease",
 		}); err != nil {
 			http.Error(w, "Failed to encode response: "+err.Error(), http.StatusInternalServerError)
@@ -1813,7 +1813,7 @@ func (h *LeaseHandler) GetTenantLeaseStatusAndURLByUserID(w http.ResponseWriter,
 	}
 
 	if err := json.NewEncoder(w).Encode(map[string]string{
-		"url":           mostRecentLease.TenantSigningUrl.String,
+		"url":          mostRecentLease.TenantSigningUrl.String,
 		"lease_status": string(mostRecentLease.Status),
 	}); err != nil {
 		http.Error(w, "Failed to encode response: "+err.Error(), http.StatusInternalServerError)

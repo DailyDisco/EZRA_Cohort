@@ -1,10 +1,10 @@
-import { Button, ConfigProvider } from "antd";
-import { SizeType } from "antd/es/config-provider/SizeContext";
+import { Button, ConfigProvider } from 'antd';
+import { SizeType } from 'antd/es/config-provider/SizeContext';
 
 // Props
 export interface ButtonComponentProps {
     title: string;
-    type: "default" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "danger";
+    type: 'default' | 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
     disabled?: boolean;
     icon?: React.ReactNode;
     size?: string; // default, small, large
@@ -17,12 +17,12 @@ const ButtonComponent = (props: ButtonComponentProps) => {
         <ConfigProvider
             theme={{
                 token: {
-                    colorPrimaryHover: "#000000",
+                    colorPrimaryHover: '#000000',
                 },
                 components: {
                     Button: {
-                        colorInfoBg: "#00674f",
-                        colorInfoText: "#fff",
+                        colorInfoBg: '#00674f',
+                        colorInfoText: '#fff',
                     },
                 },
             }}>

@@ -1,6 +1,6 @@
-import { SignedIn, UserButton, SignOutButton, SignedOut, SignInButton, useUser } from "@clerk/react-router";
-import { Button } from "antd";
-import { Link } from "react-router";
+import { SignedIn, UserButton, SignOutButton, SignedOut, SignInButton, useUser } from '@clerk/react-router';
+import { Button } from 'antd';
+import { Link } from 'react-router';
 
 const ClerkAuthDemo = () => {
     const { user } = useUser();

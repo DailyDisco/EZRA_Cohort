@@ -566,11 +566,11 @@ func (u UserHandler) TenantCreateComplaint(w http.ResponseWriter, r *http.Reques
 	log.Printf("NEW COMPLAINT CATEGORY: %s", createComplaintReq.Category)
 
 	res, err := u.queries.CreateComplaint(r.Context(), db.CreateComplaintParams{
-	CreatedBy:   int64(tenantMetadata.DbId),
-	Category:    createComplaintReq.Category,
-	Title:       createComplaintReq.Title,
-	Description: createComplaintReq.Description,
-	UnitNumber:  pgtype.Int8{Int64: createComplaintReq.UnitNumber.Int64, Valid: true},
+		CreatedBy:   int64(tenantMetadata.DbId),
+		Category:    createComplaintReq.Category,
+		Title:       createComplaintReq.Title,
+		Description: createComplaintReq.Description,
+		UnitNumber:  pgtype.Int8{Int64: createComplaintReq.UnitNumber.Int64, Valid: true},
 	})
 	if err != nil {
 		log.Printf("[USER_HANDLER] Failed creating tenant complaint: %v", err)

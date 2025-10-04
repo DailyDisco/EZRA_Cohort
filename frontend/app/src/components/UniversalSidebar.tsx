@@ -3,27 +3,27 @@
 // THIS COMPONENT IS USED FOR THE LAYOUT AND INCLUDES THE SIDEBAR AND FOOTER.
 // IT IS CURRENTLY BOILERPLATE CODE AND NEEDS TO BE REPLACED WITH THE ACTUAL CONTENT. (3/2/2025 @ 1:40PM)
 
-import React from "react";
-import Icon, { AppstoreOutlined, BarChartOutlined, CloudOutlined, ShopOutlined, TeamOutlined, UploadOutlined, UserOutlined, VideoCameraOutlined } from "@ant-design/icons";
-import type { MenuProps } from "antd";
-import { Avatar, Divider, Layout, Menu, theme } from "antd";
-import { Link } from "react-router";
+import React from 'react';
+import Icon, { AppstoreOutlined, BarChartOutlined, CloudOutlined, ShopOutlined, TeamOutlined, UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { Avatar, Divider, Layout, Menu, theme } from 'antd';
+import { Link } from 'react-router';
 
 const { Header, Content, Footer, Sider } = Layout;
 
 const siderStyle: React.CSSProperties = {
-    overflow: "auto",
-    height: "100vh",
-    position: "sticky",
+    overflow: 'auto',
+    height: '100vh',
+    position: 'sticky',
     insetInlineStart: 0,
     top: 0,
     bottom: 0,
-    scrollbarWidth: "thin",
-    scrollbarGutter: "stable",
+    scrollbarWidth: 'thin',
+    scrollbarGutter: 'stable',
 };
 
 // TODO: Add the actual menu items.
-const items: MenuProps["items"] = [UserOutlined, VideoCameraOutlined, UploadOutlined, BarChartOutlined, CloudOutlined, AppstoreOutlined, TeamOutlined, ShopOutlined].map((icon, index) => ({
+const items: MenuProps['items'] = [UserOutlined, VideoCameraOutlined, UploadOutlined, BarChartOutlined, CloudOutlined, AppstoreOutlined, TeamOutlined, ShopOutlined].map((icon, index) => ({
     key: String(index + 1),
     icon: React.createElement(icon),
     label: `nav ${index + 1}`,
@@ -48,8 +48,8 @@ const UniversalSidebar: React.FC = () => {
                             width={64}
                             height={64}
                             style={{
-                                display: "flex",
-                                margin: "0 auto",
+                                display: 'flex',
+                                margin: '0 auto',
                             }}
                         />
                         <p className="fs-2 logo-text text-white">EZRA</p>
@@ -61,14 +61,14 @@ const UniversalSidebar: React.FC = () => {
                 <Menu
                     theme="dark"
                     mode="inline"
-                    defaultSelectedKeys={["4"]}
+                    defaultSelectedKeys={['4']}
                     items={items}
                 />
 
                 {/* Avatar and Login Container */}
                 <div
                     className="avatar-container d-flex flex-column position-absolute bottom-0"
-                    style={{ width: "100%" }}>
+                    style={{ width: '100%' }}>
                     <Divider className="divider-text border-white" />
 
                     <Link to="/authentication/login">
@@ -88,11 +88,11 @@ const UniversalSidebar: React.FC = () => {
             <Layout>
                 {/* No Header Post Login */}
                 {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
-                <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
+                <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
                     <div
                         style={{
                             padding: 24,
-                            textAlign: "center",
+                            textAlign: 'center',
                             borderRadius: borderRadiusLG,
                         }}>
                         <p>long content</p>
@@ -100,7 +100,7 @@ const UniversalSidebar: React.FC = () => {
                 </Content>
 
                 {/* Footer Container */}
-                <Footer style={{ textAlign: "center" }}>
+                <Footer style={{ textAlign: 'center' }}>
                     <Divider className="divider-text border-black" />
                     <p>EZRA ©{new Date().getFullYear()} Created by EZRA</p>
                 </Footer>

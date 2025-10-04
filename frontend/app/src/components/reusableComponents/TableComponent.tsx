@@ -1,22 +1,22 @@
-import { Table } from "antd";
-import type { ColumnsType, TablePaginationConfig } from "antd/es/table/interface";
-import type { TableProps } from "antd";
-import { createStyles } from "antd-style";
+import { Table } from 'antd';
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table/interface';
+import type { TableProps } from 'antd';
+import { createStyles } from 'antd-style';
 
 interface TableComponentProps<T> {
     columns: ColumnsType<T>;
     dataSource?: T[];
-    onChange?: TableProps<T>["onChange"];
+    onChange?: TableProps<T>['onChange'];
     icon?: React.ReactNode;
     style?: string;
     pagination?: TablePaginationConfig | false;
     onRow?: (record: T) => { onClick: () => void };
     disabled?: boolean | undefined;
     loading?: boolean | undefined;
-    scroll?: TableProps<T>["scroll"];
+    scroll?: TableProps<T>['scroll'];
 }
 const useStyle = createStyles(({ css, token }) => {
-    const antCls = token.antCls || ""; // Ensure compatibility if antCls is undefined
+    const antCls = token.antCls || ''; // Ensure compatibility if antCls is undefined
     return {
         customTable: css`
             ${antCls}-table {
@@ -37,7 +37,6 @@ const useStyle = createStyles(({ css, token }) => {
 });
 
 const TableComponent = <T,>({ columns, dataSource = [], onChange, icon, pagination, onRow, style, loading, scroll: scrollProp }: TableComponentProps<T>) => {
-
     const { styles } = useStyle();
 
     return (
@@ -51,7 +50,7 @@ const TableComponent = <T,>({ columns, dataSource = [], onChange, icon, paginati
                 onChange={onChange}
                 onRow={onRow}
                 loading={loading}
-                scroll={scrollProp ?? { x: "max-content" }}
+                scroll={scrollProp ?? { x: 'max-content' }}
                 rowKey={(record) => (record as any).key || JSON.stringify(record)}
             />
         </>

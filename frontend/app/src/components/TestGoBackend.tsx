@@ -1,34 +1,34 @@
-import { useAuth } from "@clerk/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useAuth } from '@clerk/react-router';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 const TestGoBackend = () => {
-    const [username, setUsername] = useState("");
+    const [username, setUsername] = useState('');
 
     const userId = useAuth().userId;
 
     const { mutate: updateUsernameGoBackend } = useMutation({
         mutationFn: async () => {
-            const res = await fetch("http://localhost:3069/test/clerk/update-username", {
-                method: "PUT",
-                body: JSON.stringify({ username: username, id: userId }),
-                headers: { "Content-Type": "application/json" },
+            const res = await fetch('http://localhost:3069/test/clerk/update-username', {
+                method: 'PUT',
+                body: JSON.stringify({ username, id: userId }),
+                headers: { 'Content-Type': 'application/json' },
             });
-            console.log(res, "res");
+            console.log(res, 'res');
             return res;
         },
         onSuccess: () => {
             // Invalidate and refetch
-            console.log("success");
+            console.log('success');
         },
         onError: (e: any) => {
-            console.log("error ", e);
+            console.log('error ', e);
         },
     });
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(username, "username");
+        console.log(username, 'username');
         updateUsernameGoBackend();
     };
 

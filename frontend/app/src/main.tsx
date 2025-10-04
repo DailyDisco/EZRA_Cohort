@@ -1,73 +1,73 @@
 // React and ReactDOM imports
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 
 // Styles
-import "./styles/styles.scss";
-import "@fontsource/poppins/400.css";
+import './styles/styles.scss';
+import '@fontsource/poppins/400.css';
 
 // Routing
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from 'react-router';
 
 // Authentication and Layout
-import ProtectedRoutes from "./providers/ProtectedRoutes.tsx";
-import PreAuthedLayout from "./providers/layout/PreAuthedLayout.tsx";
-import AuthenticatedLayout from "./providers/layout/AuthenticatedLayout.tsx";
+import ProtectedRoutes from './providers/ProtectedRoutes.tsx';
+import PreAuthedLayout from './providers/layout/PreAuthedLayout.tsx';
+import AuthenticatedLayout from './providers/layout/AuthenticatedLayout.tsx';
 
 // Tanstack Query Client
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import ErrorNotFound from "./pages/Error404.tsx";
-import { ConfigProvider } from "antd";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import ErrorNotFound from './pages/Error404.tsx';
+import { ConfigProvider } from 'antd';
 
 // Clerk
-import { ClerkProvider, SignIn } from "@clerk/react-router";
-import TestGoBackend from "./components/TestGoBackend.tsx";
+import { ClerkProvider, SignIn } from '@clerk/react-router';
+import TestGoBackend from './components/TestGoBackend.tsx';
 
 // Pages
-import App from "./App.tsx";
-import AdminDashboard from "./pages/AdminDashboard.tsx";
-import AddTenant from "./pages/AddTenant.tsx";
-import AdminViewEditLeases from "./pages/AdminViewEditLeases.tsx";
-import AdminWorkOrder from "./pages/AdminWorkOrder.tsx";
-import ReusableComponents from "./pages/ReusableComponents.tsx";
+import App from './App.tsx';
+import AdminDashboard from './pages/AdminDashboard.tsx';
+import AddTenant from './pages/AddTenant.tsx';
+import AdminViewEditLeases from './pages/AdminViewEditLeases.tsx';
+import AdminWorkOrder from './pages/AdminWorkOrder.tsx';
+import ReusableComponents from './pages/ReusableComponents.tsx';
 
-import { TenantDashBoard } from "./pages/TenantDashBoard.tsx";
-import AdminApartmentSetupAndDetailsManagement from "./pages/AdminApartmentSetupAndDetailsManagement.tsx";
-import TenantComplaints from "./pages/TenantComplaints.tsx";
-import TenantWorkOrders from "./pages/TenantWorkOrders.tsx";
-import AdminViewEditSmartLockers from "./pages/AdminViewEditSmartLockers.tsx";
+import { TenantDashBoard } from './pages/TenantDashBoard.tsx';
+import AdminApartmentSetupAndDetailsManagement from './pages/AdminApartmentSetupAndDetailsManagement.tsx';
+import TenantComplaints from './pages/TenantComplaints.tsx';
+import TenantWorkOrders from './pages/TenantWorkOrders.tsx';
+import AdminViewEditSmartLockers from './pages/AdminViewEditSmartLockers.tsx';
 
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 if (!CLERK_PUBLISHABLE_KEY) {
-    throw new Error("Missing Publishable Clerk Key (ENV VARIABLE)");
+    throw new Error('Missing Publishable Clerk Key (ENV VARIABLE)');
 }
 
 const queryClient = new QueryClient();
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <ConfigProvider
             theme={{
                 cssVar: true,
                 hashed: false,
                 token: {
-                    colorPrimary: "#00674f",
-                    colorLink: "#00674f",
-                    colorFillSecondary: "#7789f4",
-                    colorFillTertiary: "#d86364",
-                    fontFamily: `"Poppins"`,
+                    colorPrimary: '#00674f',
+                    colorLink: '#00674f',
+                    colorFillSecondary: '#7789f4',
+                    colorFillTertiary: '#d86364',
+                    fontFamily: '"Poppins"',
                 },
                 components: {
                     Card: {
-                        colorBgBase: "hsl(166, 100%, 20%, 5%)",
+                        colorBgBase: 'hsl(166, 100%, 20%, 5%)',
                     },
                     Modal: {
-                        colorBgElevated: "white",
+                        colorBgElevated: 'white',
                     },
                     Menu: {
-                        colorBgContainer: "#00674f",
-                        itemSelectedColor: "white",
+                        colorBgContainer: '#00674f',
+                        itemSelectedColor: 'white',
                     },
                 },
             }}>
@@ -205,5 +205,5 @@ createRoot(document.getElementById("root")!).render(
                 </BrowserRouter>
             </QueryClientProvider>
         </ConfigProvider>
-    </StrictMode>
+    </StrictMode>,
 );

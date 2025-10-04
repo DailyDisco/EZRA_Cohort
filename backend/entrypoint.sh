@@ -79,14 +79,8 @@ fi
 # Start cron in background
 crond
 
-# Make sure the pre-built binary has proper permissions
-if [ ! -f /app/tmp/server ]; then
-  echo "Binary not found, building application..."
-  mkdir -p /app/tmp
-  go build -o /app/tmp/server .
-fi
-
-chmod +x /app/tmp/server || echo "Could not set executable permission, continuing anyway"
+# Make sure the binary has proper permissions
+chmod +x /app/server || echo "Could not set executable permission, continuing anyway"
 
 # Choose whether to use Air for development or direct execution
 # Default to false for Railway production, true for local development
@@ -95,5 +89,5 @@ if [ "${USE_AIR:-false}" = "true" ] && [ -f /app/.air.toml ]; then
   exec air -c /app/.air.toml
 else
   echo "Starting the server directly..."
-  exec /app/tmp/server
+  exec /app/server
 fi

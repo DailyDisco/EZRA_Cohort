@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Alert } from "antd";
+import { useState } from 'react';
+import { Alert } from 'antd';
 
 interface AlertProps {
     title: string;
     message?: string;
     description: string;
-    type: "success" | "info" | "warning" | "error";
+    type: 'success' | 'info' | 'warning' | 'error';
 }
 
 const AlertComponent = (props: AlertProps) => {

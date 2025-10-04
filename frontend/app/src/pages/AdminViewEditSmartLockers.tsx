@@ -1,17 +1,17 @@
 // TODO: I was last working on setting up the tanstack mutations for updatePassword and unlockLocker between the action menu and the modals. I need to make sure I am passing the right states that are needed. For the Unlock, I need to unlock the locker using the access code, that belongs to a user. For the update locker, I need to update the access code, that belongs to a user
-import { useMutation, useQuery, UseMutateFunction } from "@tanstack/react-query";
-import PageTitleComponent from "../components/reusableComponents/PageTitleComponent";
-import TableComponent from "../components/reusableComponents/TableComponent";
-import { useAuth } from "@clerk/react-router";
-import { ColumnsType } from "antd/es/table";
-import ModalComponent, { Tenant } from "../components/ModalComponent";
-import { useState } from "react";
-import ButtonComponent from "../components/reusableComponents/ButtonComponent";
-import { ArrowRightOutlined } from "@ant-design/icons";
-import { Button, Dropdown, MenuProps, Modal } from "antd";
+import { useMutation, useQuery, UseMutateFunction } from '@tanstack/react-query';
+import PageTitleComponent from '../components/reusableComponents/PageTitleComponent';
+import TableComponent from '../components/reusableComponents/TableComponent';
+import { useAuth } from '@clerk/react-router';
+import { ColumnsType } from 'antd/es/table';
+import ModalComponent, { Tenant } from '../components/ModalComponent';
+import { useState } from 'react';
+import ButtonComponent from '../components/reusableComponents/ButtonComponent';
+import { ArrowRightOutlined } from '@ant-design/icons';
+import { Button, Dropdown, MenuProps, Modal } from 'antd';
 
 // Use VITE_API_URL for the server URL, ensuring no trailing slash
-const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/$/, "");
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
 
 type Locker = {
     id: number;
@@ -44,19 +44,19 @@ const AdminViewEditSmartLockers = () => {
 
     // Update the type to match clerk_id which is a string
     const [selectedUserId, setSelectedUserId] = useState<string>();
-    const [accessCode, setAccessCode] = useState<string>("");
+    const [accessCode, setAccessCode] = useState<string>('');
 
     const { mutate: updatePassword } = useMutation({
         mutationFn: async () => {
             const token = await getToken();
             if (!token) {
-                throw new Error("No authentication token available");
+                throw new Error('No authentication token available');
             }
 
             const res = await fetch(`${API_URL}/admin/lockers/${selectedUserId}`, {
-                method: "PUT",
+                method: 'PUT',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
@@ -77,13 +77,13 @@ const AdminViewEditSmartLockers = () => {
             const token = await getToken();
 
             if (!token) {
-                throw new Error("No authentication token available");
+                throw new Error('No authentication token available');
             }
 
             const res = await fetch(`${API_URL}/admin/lockers/${selectedUserId}`, {
-                method: "PUT",
+                method: 'PUT',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
@@ -136,9 +136,9 @@ const AdminViewEditSmartLockers = () => {
     };
 
     function ActionMenu(props: ActionsDropdownProps) {
-        const items: MenuProps["items"] = [
+        const items: MenuProps['items'] = [
             {
-                key: "1",
+                key: '1',
                 label: (
                     <UpdatePasswordLockerModal
                         lockerId={props.lockerId}
@@ -150,7 +150,7 @@ const AdminViewEditSmartLockers = () => {
                 ),
             },
             {
-                key: "2",
+                key: '2',
                 label: (
                     <UnlockLockerModal
                         lockerId={props.lockerId}
@@ -167,7 +167,7 @@ const AdminViewEditSmartLockers = () => {
                 <Dropdown
                     menu={{ items }}
                     placement="bottomRight"
-                    overlayClassName={"custom-dropdown"}>
+                    overlayClassName={'custom-dropdown'}>
                     <Button>
                         <p className="fs-3 fw-bold">...</p>
                     </Button>
@@ -178,17 +178,17 @@ const AdminViewEditSmartLockers = () => {
 
     // Query for getting all tenants clerk_id
     const { data: tenants } = useQuery<Tenant[]>({
-        queryKey: ["tenants"],
+        queryKey: ['tenants'],
         queryFn: async () => {
             const token = await getToken();
             if (!token) {
-                throw new Error("No authentication token available");
+                throw new Error('No authentication token available');
             }
 
             const res = await fetch(`${API_URL}/admin/tenants`, {
-                method: "GET",
+                method: 'GET',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             });
@@ -198,7 +198,7 @@ const AdminViewEditSmartLockers = () => {
             }
 
             const data = await res.json();
-            console.log("Response data for tenants query:", data);
+            console.log('Response data for tenants query:', data);
             return data;
         },
     });
@@ -209,34 +209,34 @@ const AdminViewEditSmartLockers = () => {
         isLoading: isLoadingLockers,
         isError: isErrorLockers,
     } = useQuery<Locker[]>({
-        queryKey: ["lockers"],
+        queryKey: ['lockers'],
         queryFn: async () => {
-            console.log("Fetching lockers...");
+            console.log('Fetching lockers...');
             try {
                 const token = await getToken();
                 if (!token) {
-                    throw new Error("No authentication token available");
+                    throw new Error('No authentication token available');
                 }
 
                 const res = await fetch(`${API_URL}/admin/lockers`, {
-                    method: "GET",
+                    method: 'GET',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
                     },
                 });
 
-                console.log("Locker response status:", res.status);
+                console.log('Locker response status:', res.status);
 
                 if (!res.ok) {
                     throw new Error(`Failed to fetch lockers: ${res.status}`);
                 }
 
                 const data = await res.json();
-                console.log("Locker response data:", data);
+                console.log('Locker response data:', data);
                 return data;
             } catch (error) {
-                console.error("Error fetching lockers:", error);
+                console.error('Error fetching lockers:', error);
                 throw error;
             }
         },
@@ -247,19 +247,19 @@ const AdminViewEditSmartLockers = () => {
     // Mutation for updating locker
     const updateLockerMutation = useMutation({
         mutationFn: async ({ lockerId, updates }: { lockerId: number; updates: { user_id?: string; in_use?: boolean; access_code?: string } }) => {
-            console.log("Original updates:", updates);
-            console.log("lockerId:", lockerId);
-            console.log("API URL:", `${API_URL}/admin/lockers/${lockerId}`);
+            console.log('Original updates:', updates);
+            console.log('lockerId:', lockerId);
+            console.log('API URL:', `${API_URL}/admin/lockers/${lockerId}`);
 
             const token = await getToken();
             if (!token) {
-                throw new Error("No authentication token available");
+                throw new Error('No authentication token available');
             }
 
             const response = await fetch(`${API_URL}/admin/lockers/${lockerId}`, {
-                method: "PATCH",
+                method: 'PATCH',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(updates),
@@ -267,7 +267,7 @@ const AdminViewEditSmartLockers = () => {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error("Error response:", errorText);
+                console.error('Error response:', errorText);
                 throw new Error(`Failed to update locker: ${errorText}`);
             }
 
@@ -276,54 +276,54 @@ const AdminViewEditSmartLockers = () => {
         },
         onSuccess: () => {
             // Invalidate and refetch queries
-            console.log("Locker updated successfully");
+            console.log('Locker updated successfully');
         },
         onError: (error) => {
-            console.error("Error updating locker:", error);
+            console.error('Error updating locker:', error);
         },
     });
 
     // Update the handleAddPackage function
     const handleAddPackage = async () => {
         try {
-            console.log("handleAddPackage called");
-            console.log("selectedUserId:", selectedUserId);
-            console.log("accessCode:", accessCode);
-            console.log("lockers:", lockers);
+            console.log('handleAddPackage called');
+            console.log('selectedUserId:', selectedUserId);
+            console.log('accessCode:', accessCode);
+            console.log('lockers:', lockers);
 
             if (isLoadingLockers) {
-                console.error("Please wait while lockers are being loaded...");
+                console.error('Please wait while lockers are being loaded...');
                 return;
             }
 
             if (isErrorLockers) {
-                console.error("Failed to load lockers. Please try again.");
+                console.error('Failed to load lockers. Please try again.');
                 return;
             }
 
             if (!lockers || lockers.length === 0) {
-                console.error("No lockers available in the system");
+                console.error('No lockers available in the system');
                 return;
             }
 
             if (!selectedUserId) {
-                console.error("Please select a tenant");
+                console.error('Please select a tenant');
                 return;
             }
 
             if (!accessCode) {
-                console.error("Please enter an access code");
+                console.error('Please enter an access code');
                 return;
             }
 
             const availableLocker = lockers.find((locker) => !locker.in_use);
             if (!availableLocker) {
-                console.error("No available lockers");
+                console.error('No available lockers');
                 return;
             }
 
-            console.log("Available locker:", availableLocker);
-            console.log("Starting update locker mutation");
+            console.log('Available locker:', availableLocker);
+            console.log('Starting update locker mutation');
 
             await updateLockerMutation.mutateAsync({
                 lockerId: availableLocker.id,
@@ -336,9 +336,9 @@ const AdminViewEditSmartLockers = () => {
 
             // Reset form values after successful addition
             setSelectedUserId(undefined);
-            setAccessCode("");
+            setAccessCode('');
         } catch (error) {
-            console.error("Error adding package:", error);
+            console.error('Error adding package:', error);
             throw error; // Re-throw to be caught by modal error handler
         }
     };
@@ -350,39 +350,39 @@ const AdminViewEditSmartLockers = () => {
         //     key: "id",
         // },
         {
-            title: "User ID",
-            dataIndex: "user_id",
-            key: "user_id",
-            render: (userId: string | null) => <span>{userId ?? "N/A"}</span>,
+            title: 'User ID',
+            dataIndex: 'user_id',
+            key: 'user_id',
+            render: (userId: string | null) => <span>{userId ?? 'N/A'}</span>,
         },
         {
-            title: "Access Code",
-            dataIndex: "access_code",
-            key: "access_code",
-            render: (accessCode: string | null) => <span>{accessCode ?? "N/A"}</span>,
+            title: 'Access Code',
+            dataIndex: 'access_code',
+            key: 'access_code',
+            render: (accessCode: string | null) => <span>{accessCode ?? 'N/A'}</span>,
         },
         {
-            title: "In Use",
-            dataIndex: "in_use",
-            key: "in_use",
+            title: 'In Use',
+            dataIndex: 'in_use',
+            key: 'in_use',
             render: (inUse: boolean) => (
                 <span>
                     {inUse ? (
                         <>
-                            <span style={{ color: "green" }}>●</span> Yes
+                            <span style={{ color: 'green' }}>●</span> Yes
                         </>
                     ) : (
                         <>
-                            <span style={{ color: "red" }}>●</span> No
+                            <span style={{ color: 'red' }}>●</span> No
                         </>
                     )}
                 </span>
             ),
         },
         {
-            title: "Actions",
-            key: "actions",
-            fixed: "right",
+            title: 'Actions',
+            key: 'actions',
+            fixed: 'right',
             render: (record: Locker) => (
                 <div className="flex flex-column gap-2">
                     {/* View Tenant Complaints */}
@@ -390,7 +390,7 @@ const AdminViewEditSmartLockers = () => {
                     <ActionMenu
                         key={record.id}
                         lockerId={record.id}
-                        password={record.access_code ?? ""}
+                        password={record.access_code ?? ''}
                     />
                     {/* Leaving these here because I think we might need them. */}
                     {/* Edit Tenant */}
@@ -404,7 +404,7 @@ const AdminViewEditSmartLockers = () => {
 
     const dataSource = lockers || [];
 
-    console.log("Lockers data:", lockers);
+    console.log('Lockers data:', lockers);
 
     return (
         <div className="container">

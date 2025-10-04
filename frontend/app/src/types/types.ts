@@ -20,8 +20,8 @@ export interface LeaseData {
     status: string;
 }
 
-export type WorkCategory = "plumbing" | "electric" | "carpentry" | "hvac" | "other";
-export type WorkStatus = "open" | "in_progress" | "resolved" | "closed";
+export type WorkCategory = 'plumbing' | 'electric' | 'carpentry' | 'hvac' | 'other';
+export type WorkStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
 
 export type WorkOrderEntry = {
     category: WorkCategory;
@@ -43,8 +43,8 @@ export interface WorkOrderData {
     updatedAt: Date;
 }
 
-export type ComplaintCategory = "maintenance" | "noise" | "security" | "parking" | "neighbor" | "trash" | "internet" | "lease" | "natural_disaster" | "other";
-export type ComplaintStatus = "open" | "in_progress" | "resolved" | "closed";
+export type ComplaintCategory = 'maintenance' | 'noise' | 'security' | 'parking' | 'neighbor' | 'trash' | 'internet' | 'lease' | 'natural_disaster' | 'other';
+export type ComplaintStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
 
 export interface ComplaintData {
     id: number;
@@ -70,11 +70,11 @@ export interface ComplaintsData {
     key: number;
     complaintNumber: number;
     createdBy: number;
-    category: "maintenance" | "noise" | "security" | "parking" | "neighbor" | "trash" | "internet" | "lease" | "natural_disaster" | "other";
+    category: 'maintenance' | 'noise' | 'security' | 'parking' | 'neighbor' | 'trash' | 'internet' | 'lease' | 'natural_disaster' | 'other';
     title: string;
     description: string;
     unitNumber: string;
-    status: "open" | "in_progress" | "resolved" | "closed";
+    status: 'open' | 'in_progress' | 'resolved' | 'closed';
     createdAt: Date;
     updatedAt: Date;
 }
@@ -84,10 +84,10 @@ export interface UserData {
     key: React.Key;
     name: string;
     email: string;
-    role: "admin" | "user";
+    role: 'admin' | 'user';
 }
-export type Role = "admin" | "tenant";
-export type AccountStatus = "active" | "inactive" | "suspended";
+export type Role = 'admin' | 'tenant';
+export type AccountStatus = 'active' | 'inactive' | 'suspended';
 
 export type User = {
     id: number;

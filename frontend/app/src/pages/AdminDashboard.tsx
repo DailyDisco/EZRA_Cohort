@@ -1,20 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from "react";
-import { CalendarOutlined, InboxOutlined, ToolOutlined, WarningOutlined } from "@ant-design/icons";
-import AlertComponent from "../components/reusableComponents/AlertComponent";
-import { CardComponent } from "../components/reusableComponents/CardComponent";
-import TableComponent from "../components/reusableComponents/TableComponent";
-import { Tag, Spin } from "antd";
-import type { ColumnsType } from "antd/es/table/interface";
-import ModalComponent from "../components/ModalComponent";
-import ButtonComponent from "../components/reusableComponents/ButtonComponent";
-import { Link } from "react-router";
-import PageTitleComponent from "../components/reusableComponents/PageTitleComponent";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@clerk/clerk-react";
+import { useState } from 'react';
+import { CalendarOutlined, InboxOutlined, ToolOutlined, WarningOutlined } from '@ant-design/icons';
+import AlertComponent from '../components/reusableComponents/AlertComponent';
+import { CardComponent } from '../components/reusableComponents/CardComponent';
+import TableComponent from '../components/reusableComponents/TableComponent';
+import { Tag, Spin } from 'antd';
+import type { ColumnsType } from 'antd/es/table/interface';
+import ModalComponent from '../components/ModalComponent';
+import ButtonComponent from '../components/reusableComponents/ButtonComponent';
+import { Link } from 'react-router';
+import PageTitleComponent from '../components/reusableComponents/PageTitleComponent';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@clerk/clerk-react';
 
 // Use VITE_API_URL for the server URL, ensuring no trailing slash
-const serverUrl = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/$/, "");
+const serverUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
 
 interface Locker {
     id: number;
@@ -34,7 +33,7 @@ interface WorkOrder {
     status: string;
     updated_at: string;
     created_at: string;
-    type: "work_order";
+    type: 'work_order';
 }
 
 interface Complaint {
@@ -46,7 +45,7 @@ interface Complaint {
     status: string;
     updated_at: string;
     created_at: string;
-    type: "complaint";
+    type: 'complaint';
 }
 
 type WorkOrderOrComplaint = WorkOrder | Complaint;
@@ -69,21 +68,21 @@ const AdminDashboard = () => {
     const queryClient = useQueryClient();
 
     const [selectedUserId, setSelectedUserId] = useState<string>();
-    const [accessCode, setAccessCode] = useState<string>("");
+    const [accessCode, setAccessCode] = useState<string>('');
 
     // Query for fetching tenants
     const { data: tenants, isLoading: isLoadingTenants } = useQuery<Tenant[]>({
-        queryKey: ["tenants"],
+        queryKey: ['tenants'],
         queryFn: async () => {
             const token = await getToken();
             if (!token) {
-                throw new Error("No authentication token available");
+                throw new Error('No authentication token available');
             }
 
             const res = await fetch(`${serverUrl}/admin/tenants`, {
-                method: "GET",
+                method: 'GET',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             });
@@ -93,57 +92,57 @@ const AdminDashboard = () => {
             }
 
             const data = await res.json();
-            console.log("Response data for tenants query:", data);
+            console.log('Response data for tenants query:', data);
             return data;
         },
     });
 
     // Query for fetching work orders
     const { data: workOrders, isLoading: isLoadingWorkOrders } = useQuery({
-        queryKey: ["workOrders"],
+        queryKey: ['workOrders'],
         queryFn: async () => {
             const token = await getToken();
             if (!token) {
-                throw new Error("No authentication token available");
+                throw new Error('No authentication token available');
             }
-            console.log("Fetching work orders...");
-            console.log("API URL:", `${serverUrl}/admin/work_orders`);
+            console.log('Fetching work orders...');
+            console.log('API URL:', `${serverUrl}/admin/work_orders`);
 
             const res = await fetch(`${serverUrl}/admin/work_orders`, {
-                method: "GET",
+                method: 'GET',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             });
 
-            console.log("Response status:", res.status);
+            console.log('Response status:', res.status);
 
             if (!res.ok) {
                 throw new Error(`Failed to fetch work orders: ${res.status}`);
             }
 
             const data = await res.json();
-            console.log("Response data:", data);
+            console.log('Response data:', data);
             return data;
         },
     });
 
-    console.log("Query state:", { isLoading: isLoadingWorkOrders, data: workOrders });
+    console.log('Query state:', { isLoading: isLoadingWorkOrders, data: workOrders });
 
     // Query for fetching complaints
     const { data: complaints, isLoading: isLoadingComplaints } = useQuery({
-        queryKey: ["complaints"],
+        queryKey: ['complaints'],
         queryFn: async () => {
             const token = await getToken();
             if (!token) {
-                throw new Error("No authentication token available");
+                throw new Error('No authentication token available');
             }
-            console.log("Fetching complaints...");
-            console.log("API URL:", `${serverUrl}/admin/complaints`);
+            console.log('Fetching complaints...');
+            console.log('API URL:', `${serverUrl}/admin/complaints`);
             const res = await fetch(`${serverUrl}/admin/complaints`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             });
 
             if (!res.ok) {
@@ -155,7 +154,7 @@ const AdminDashboard = () => {
         },
     });
 
-    console.log("Query state for complaints:", { isLoading: isLoadingComplaints, data: complaints });
+    console.log('Query state for complaints:', { isLoading: isLoadingComplaints, data: complaints });
 
     // Query for fetching lockers
     const {
@@ -163,34 +162,34 @@ const AdminDashboard = () => {
         isLoading: isLoadingLockers,
         isError: isErrorLockers,
     } = useQuery({
-        queryKey: ["lockers"],
+        queryKey: ['lockers'],
         queryFn: async () => {
-            console.log("Fetching lockers...");
+            console.log('Fetching lockers...');
             try {
                 const token = await getToken();
                 if (!token) {
-                    throw new Error("No authentication token available");
+                    throw new Error('No authentication token available');
                 }
 
                 const res = await fetch(`${serverUrl}/admin/lockers`, {
-                    method: "GET",
+                    method: 'GET',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
                     },
                 });
 
-                console.log("Locker response status:", res.status);
+                console.log('Locker response status:', res.status);
 
                 if (!res.ok) {
                     throw new Error(`Failed to fetch lockers: ${res.status}`);
                 }
 
                 const data = await res.json();
-                console.log("Locker response data:", data);
+                console.log('Locker response data:', data);
                 return data as Locker[];
             } catch (error) {
-                console.error("Error fetching lockers:", error);
+                console.error('Error fetching lockers:', error);
                 throw error;
             }
         },
@@ -198,20 +197,20 @@ const AdminDashboard = () => {
         staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     });
 
-    console.log("Lockers query state:", { isLoadingLockers, isErrorLockers, lockers });
+    console.log('Lockers query state:', { isLoadingLockers, isErrorLockers, lockers });
 
     const { data: numberOfLockersInUse } = useQuery({
-        queryKey: ["numberOfLockersInUse"],
+        queryKey: ['numberOfLockersInUse'],
         queryFn: async () => {
             const token = await getToken();
             if (!token) {
-                throw new Error("No authentication token available");
+                throw new Error('No authentication token available');
             }
 
             const res = await fetch(`${serverUrl}/admin/lockers/in-use/count`, {
-                method: "GET",
+                method: 'GET',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             });
@@ -226,19 +225,19 @@ const AdminDashboard = () => {
     // Mutation for updating locker
     const updateLockerMutation = useMutation({
         mutationFn: async ({ lockerId, updates }: { lockerId: number; updates: { user_id?: string; in_use?: boolean; access_code?: string } }) => {
-            console.log("Original updates:", updates);
-            console.log("lockerId:", lockerId);
-            console.log("API URL:", `${serverUrl}/admin/lockers/${lockerId}`);
+            console.log('Original updates:', updates);
+            console.log('lockerId:', lockerId);
+            console.log('API URL:', `${serverUrl}/admin/lockers/${lockerId}`);
 
             const token = await getToken();
             if (!token) {
-                throw new Error("No authentication token available");
+                throw new Error('No authentication token available');
             }
 
             const response = await fetch(`${serverUrl}/admin/lockers/${lockerId}`, {
-                method: "PATCH",
+                method: 'PATCH',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(updates),
@@ -246,7 +245,7 @@ const AdminDashboard = () => {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error("Error response:", errorText);
+                console.error('Error response:', errorText);
                 throw new Error(`Failed to update locker: ${errorText}`);
             }
 
@@ -255,56 +254,56 @@ const AdminDashboard = () => {
         },
         onSuccess: () => {
             // Invalidate and refetch queries
-            queryClient.invalidateQueries({ queryKey: ["lockers"] });
-            queryClient.invalidateQueries({ queryKey: ["numberOfLockersInUse"] });
-            console.log("Locker updated successfully");
+            queryClient.invalidateQueries({ queryKey: ['lockers'] });
+            queryClient.invalidateQueries({ queryKey: ['numberOfLockersInUse'] });
+            console.log('Locker updated successfully');
         },
         onError: (error) => {
-            console.error("Error updating locker:", error);
+            console.error('Error updating locker:', error);
         },
     });
 
     // Update the handleAddPackage function
     const handleAddPackage = async () => {
         try {
-            console.log("handleAddPackage called");
-            console.log("selectedUserId:", selectedUserId);
-            console.log("accessCode:", accessCode);
-            console.log("lockers:", lockers);
+            console.log('handleAddPackage called');
+            console.log('selectedUserId:', selectedUserId);
+            console.log('accessCode:', accessCode);
+            console.log('lockers:', lockers);
 
             if (isLoadingLockers) {
-                console.error("Please wait while lockers are being loaded...");
+                console.error('Please wait while lockers are being loaded...');
                 return;
             }
 
             if (isErrorLockers) {
-                console.error("Failed to load lockers. Please try again.");
+                console.error('Failed to load lockers. Please try again.');
                 return;
             }
 
             if (!lockers || lockers.length === 0) {
-                console.error("No lockers available in the system");
+                console.error('No lockers available in the system');
                 return;
             }
 
             if (!selectedUserId) {
-                console.error("Please select a tenant");
+                console.error('Please select a tenant');
                 return;
             }
 
             if (!accessCode) {
-                console.error("Please enter an access code");
+                console.error('Please enter an access code');
                 return;
             }
 
             const availableLocker = lockers.find((locker) => !locker.in_use);
             if (!availableLocker) {
-                console.error("No available lockers");
+                console.error('No available lockers');
                 return;
             }
 
-            console.log("Available locker:", availableLocker);
-            console.log("Starting update locker mutation");
+            console.log('Available locker:', availableLocker);
+            console.log('Starting update locker mutation');
 
             await updateLockerMutation.mutateAsync({
                 lockerId: availableLocker.id,
@@ -317,43 +316,43 @@ const AdminDashboard = () => {
 
             // Reset form values after successful addition
             setSelectedUserId(undefined);
-            setAccessCode("");
+            setAccessCode('');
         } catch (error) {
-            console.error("Error adding package:", error);
+            console.error('Error adding package:', error);
             throw error;
         }
     };
 
     const columnsLeases: ColumnsType<Tenant> = [
         {
-            title: "Name",
+            title: 'Name',
             render: (_, record) => `${record.first_name} ${record.last_name}`,
         },
         {
-            title: "Email",
-            dataIndex: "email",
+            title: 'Email',
+            dataIndex: 'email',
             ellipsis: true,
-            render: (email: string) => (email.length > 30 ? email.slice(0, 30) + "..." : email || "Not Assigned"),
+            render: (email: string) => (email.length > 30 ? `${email.slice(0, 30)}...` : email || 'Not Assigned'),
         },
         {
-            title: "Lease Start",
-            dataIndex: "lease_start",
-            render: (lease_start: string) => (lease_start ? new Date(lease_start).toLocaleDateString() : "N/A"),
+            title: 'Lease Start',
+            dataIndex: 'lease_start',
+            render: (lease_start: string) => (lease_start ? new Date(lease_start).toLocaleDateString() : 'N/A'),
         },
         {
-            title: "Lease End",
-            dataIndex: "lease_end",
-            render: (lease_end: string) => (lease_end ? new Date(lease_end).toLocaleDateString() : "N/A"),
+            title: 'Lease End',
+            dataIndex: 'lease_end',
+            render: (lease_end: string) => (lease_end ? new Date(lease_end).toLocaleDateString() : 'N/A'),
         },
         {
-            title: "Unit",
-            dataIndex: "unit_number",
-            render: (unit: number) => unit || "N/A",
+            title: 'Unit',
+            dataIndex: 'unit_number',
+            render: (unit: number) => unit || 'N/A',
         },
         {
-            title: "Status",
-            dataIndex: "status",
-            render: (status: string) => <Tag color={status.toLowerCase() === "active" ? "green" : "red"}>{status.charAt(0).toUpperCase() + status.slice(1)}</Tag>,
+            title: 'Status',
+            dataIndex: 'status',
+            render: (status: string) => <Tag color={status.toLowerCase() === 'active' ? 'green' : 'red'}>{status.charAt(0).toUpperCase() + status.slice(1)}</Tag>,
         },
     ];
 
@@ -366,22 +365,22 @@ const AdminDashboard = () => {
 
     const columnsComplaints: ColumnsType<WorkOrderOrComplaint> = [
         {
-            title: "Type",
-            dataIndex: "type",
-            render: (type: string) => <Tag color={type === "work_order" ? "blue" : "purple"}>{type.replace("_", " ").toUpperCase()}</Tag>,
+            title: 'Type',
+            dataIndex: 'type',
+            render: (type: string) => <Tag color={type === 'work_order' ? 'blue' : 'purple'}>{type.replace('_', ' ').toUpperCase()}</Tag>,
         },
         {
-            title: "Title",
-            dataIndex: "title",
+            title: 'Title',
+            dataIndex: 'title',
         },
         {
-            title: "Unit",
-            dataIndex: "unit_number",
+            title: 'Unit',
+            dataIndex: 'unit_number',
         },
         {
-            title: "Status",
-            dataIndex: "status",
-            render: (status: string) => <Tag color={status.toLowerCase() === "open" ? "orange" : "green"}>{status}</Tag>,
+            title: 'Status',
+            dataIndex: 'status',
+            render: (status: string) => <Tag color={status.toLowerCase() === 'open' ? 'orange' : 'green'}>{status}</Tag>,
         },
         // {
         //     title: "Created",
@@ -394,27 +393,27 @@ const AdminDashboard = () => {
 
     const columnsWorkOrders: ColumnsType<WorkOrderOrComplaint> = [
         {
-            title: "Type",
-            dataIndex: "type",
-            render: (type: string) => <Tag color={type === "work_order" ? "blue" : "purple"}>{type.replace("_", " ").toUpperCase()}</Tag>,
+            title: 'Type',
+            dataIndex: 'type',
+            render: (type: string) => <Tag color={type === 'work_order' ? 'blue' : 'purple'}>{type.replace('_', ' ').toUpperCase()}</Tag>,
         },
         {
-            title: "Title",
-            dataIndex: "title",
+            title: 'Title',
+            dataIndex: 'title',
         },
         {
-            title: "Unit",
-            dataIndex: "unit_number",
+            title: 'Unit',
+            dataIndex: 'unit_number',
         },
         {
-            title: "Category",
-            dataIndex: "category",
-            render: (category: string, record: WorkOrderOrComplaint) => (record.type === "work_order" ? <Tag color="blue">{category}</Tag> : null),
+            title: 'Category',
+            dataIndex: 'category',
+            render: (category: string, record: WorkOrderOrComplaint) => (record.type === 'work_order' ? <Tag color="blue">{category}</Tag> : null),
         },
         {
-            title: "Status",
-            dataIndex: "status",
-            render: (status: string) => <Tag color={status.toLowerCase() === "open" ? "orange" : "green"}>{status}</Tag>,
+            title: 'Status',
+            dataIndex: 'status',
+            render: (status: string) => <Tag color={status.toLowerCase() === 'open' ? 'orange' : 'green'}>{status}</Tag>,
         },
         // {
         //     title: "Created",
@@ -430,14 +429,14 @@ const AdminDashboard = () => {
         workOrders?.map((order: WorkOrder) => ({
             ...order,
             key: `wo-${order.id}`,
-            type: "work_order" as const,
+            type: 'work_order' as const,
         })) ?? [];
 
     const complaintsWithKeys =
         complaints?.map((complaint: Complaint) => ({
             ...complaint,
             key: `c-${complaint.id}`,
-            type: "complaint" as const,
+            type: 'complaint' as const,
         })) ?? [];
 
     // Combine and sort both types by creation date
@@ -462,7 +461,7 @@ const AdminDashboard = () => {
                     value={isLoadingWorkOrders ? <Spin size="small" /> : WORK_ORDERS_COUNT}
                     description="Active maintenance requests"
                     hoverable={true}
-                    icon={<ToolOutlined style={{ fontSize: "24px", color: "#1890ff", marginBottom: "16px" }} />}
+                    icon={<ToolOutlined style={{ fontSize: '24px', color: '#1890ff', marginBottom: '16px' }} />}
                     button={
                         <Link to="/admin/admin-view-and-edit-work-orders-and-complaints">
                             <ButtonComponent
@@ -477,7 +476,7 @@ const AdminDashboard = () => {
                     value={isLoadingComplaints ? <Spin size="small" /> : COMPLAINTS_COUNT}
                     description="Pending tenant issues"
                     hoverable={true}
-                    icon={<WarningOutlined style={{ fontSize: "24px", color: "#faad14", marginBottom: "16px" }} />}
+                    icon={<WarningOutlined style={{ fontSize: '24px', color: '#faad14', marginBottom: '16px' }} />}
                     button={
                         <Link to="/admin/admin-view-and-edit-work-orders-and-complaints">
                             <ButtonComponent
@@ -492,7 +491,7 @@ const AdminDashboard = () => {
                     value={isLoadingLockers ? <Spin size="small" /> : numberOfLockersInUse}
                     description="Awaiting delivery"
                     hoverable={true}
-                    icon={<InboxOutlined style={{ fontSize: "24px", color: "#52c41a", marginBottom: "16px" }} />}
+                    icon={<InboxOutlined style={{ fontSize: '24px', color: '#52c41a', marginBottom: '16px' }} />}
                     button={
                         <div className="d-flex gap-2">
                             <Link to="/admin/admin-view-and-edit-smart-lockers">
@@ -510,8 +509,8 @@ const AdminDashboard = () => {
                                 type="Smart Locker"
                                 setUserId={setSelectedUserId}
                                 setAccessCode={setAccessCode}
-                                selectedUserId={selectedUserId ?? ""}
-                                accessCode={accessCode ?? ""}
+                                selectedUserId={selectedUserId ?? ''}
+                                accessCode={accessCode ?? ''}
                                 handleOkay={async (formData?: { userId: string; accessCode: string }) => {
                                     if (formData) {
                                         setSelectedUserId(formData.userId);
@@ -528,7 +527,7 @@ const AdminDashboard = () => {
                     value={10}
                     description="Scheduled this month"
                     hoverable={true}
-                    icon={<CalendarOutlined style={{ fontSize: "24px", color: "#722ed1", marginBottom: "16px" }} />}
+                    icon={<CalendarOutlined style={{ fontSize: '24px', color: '#722ed1', marginBottom: '16px' }} />}
                     button={
                         <ButtonComponent
                             title="View All"
@@ -549,7 +548,7 @@ const AdminDashboard = () => {
                     </div>
                     <TableComponent
                         columns={columnsComplaints}
-                        dataSource={combinedItems.filter((item) => item.type === "complaint").slice(0, 5)}
+                        dataSource={combinedItems.filter((item) => item.type === 'complaint').slice(0, 5)}
                         loading={isLoadingComplaints}
                         onChange={() => {}}
                         pagination={false}
@@ -564,7 +563,7 @@ const AdminDashboard = () => {
                     </div>
                     <TableComponent
                         columns={columnsWorkOrders}
-                        dataSource={combinedItems.filter((item) => item.type === "work_order").slice(0, 5)}
+                        dataSource={combinedItems.filter((item) => item.type === 'work_order').slice(0, 5)}
                         loading={isLoadingWorkOrders}
                         onChange={() => {}}
                         pagination={false}

@@ -1,7 +1,7 @@
-import React from "react";
-import { Layout, Menu, theme } from "antd";
-import { Link, Outlet } from "react-router";
-import { SignOutButton, useUser } from "@clerk/react-router";
+import React from 'react';
+import { Layout, Menu, theme } from 'antd';
+import { Link, Outlet } from 'react-router';
+import { SignOutButton, useUser } from '@clerk/react-router';
 
 const { Header, Content, Footer } = Layout;
 
@@ -13,16 +13,16 @@ const PreAuthedLayout: React.FC = () => {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
-    console.log(user, "user");
+    console.log(user, 'user');
 
     // Right Hand Sidebar Items
     const items = [
         {
-            key: "1",
+            key: '1',
             label: user ? (
                 <Link
                     className="text-white"
-                    to={user.publicMetadata.role === "admin" ? "/admin" : "/tenant"}>
+                    to={user.publicMetadata.role === 'admin' ? '/admin' : '/tenant'}>
                     Dashboard
                 </Link>
             ) : (
@@ -34,7 +34,7 @@ const PreAuthedLayout: React.FC = () => {
             ),
         },
         {
-            key: "2",
+            key: '2',
             label: user ? (
                 <SignOutButton>
                     <div className="text-white">Logout</div>

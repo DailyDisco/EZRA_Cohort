@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
 interface CardSkeletonLoaderProps {
     className?: string;
 }
 
-export const CardSkeletonLoader: React.FC<CardSkeletonLoaderProps> = ({ className = "" }) => {
+export const CardSkeletonLoader: React.FC<CardSkeletonLoaderProps> = ({ className = '' }) => {
     return (
         <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse ${className}`}>
             {/* Header skeleton */}
@@ -28,11 +28,11 @@ export const CardSkeletonLoader: React.FC<CardSkeletonLoaderProps> = ({ classNam
     );
 };
 
-export const InlineLoader: React.FC<{ size?: "sm" | "md" | "lg"; className?: string }> = ({ size = "md", className = "" }) => {
+export const InlineLoader: React.FC<{ size?: 'sm' | 'md' | 'lg'; className?: string }> = ({ size = 'md', className = '' }) => {
     const sizeClasses = {
-        sm: "w-4 h-4",
-        md: "w-6 h-6",
-        lg: "w-8 h-8",
+        sm: 'w-4 h-4',
+        md: 'w-6 h-6',
+        lg: 'w-8 h-8',
     };
 
     return (
@@ -48,21 +48,21 @@ export const InlineLoader: React.FC<{ size?: "sm" | "md" | "lg"; className?: str
 interface PageLoaderProps {
     message?: string;
     className?: string;
-    size?: "sm" | "md" | "lg";
+    size?: 'sm' | 'md' | 'lg';
     showDots?: boolean;
 }
 
-export const PageLoader: React.FC<PageLoaderProps> = ({ message = "Loading...", className = "", size = "lg", showDots = true }) => {
+export const PageLoader: React.FC<PageLoaderProps> = ({ message = 'Loading...', className = '', size = 'lg', showDots = true }) => {
     const sizeClasses = {
-        sm: "w-8 h-8",
-        md: "w-12 h-12",
-        lg: "w-16 h-16",
+        sm: 'w-8 h-8',
+        md: 'w-12 h-12',
+        lg: 'w-16 h-16',
     };
 
     const containerClasses = {
-        sm: "min-h-[30vh]",
-        md: "min-h-[40vh]",
-        lg: "min-h-[50vh]",
+        sm: 'min-h-[30vh]',
+        md: 'min-h-[40vh]',
+        lg: 'min-h-[50vh]',
     };
 
     return (
@@ -74,8 +74,8 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ message = "Loading...", 
 
                 {/* Inner ring for depth */}
                 <div
-                    className={`absolute inset-2 border-2 border-primary/20 border-t-transparent rounded-full animate-spin`}
-                    style={{ animationDirection: "reverse", animationDuration: "1.5s" }}></div>
+                    className={'absolute inset-2 border-2 border-primary/20 border-t-transparent rounded-full animate-spin'}
+                    style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
 
                 {/* Center dot */}
                 <div className="absolute inset-1/2 w-2 h-2 bg-primary rounded-full transform -translate-x-1/2 -translate-y-1/2 opacity-60"></div>
@@ -91,10 +91,10 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ message = "Loading...", 
                         <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
                         <div
                             className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                            style={{ animationDelay: "0.1s" }}></div>
+                            style={{ animationDelay: '0.1s' }}></div>
                         <div
                             className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                            style={{ animationDelay: "0.2s" }}></div>
+                            style={{ animationDelay: '0.2s' }}></div>
                     </div>
                 )}
             </div>
@@ -106,7 +106,7 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ message = "Loading...", 
                     style={{
                         backgroundImage: `radial-gradient(circle at 25% 25%, #000 1px, transparent 1px),
                                     radial-gradient(circle at 75% 75%, #000 1px, transparent 1px)`,
-                        backgroundSize: "20px 20px",
+                        backgroundSize: '20px 20px',
                     }}></div>
             </div>
         </div>
@@ -114,22 +114,22 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ message = "Loading...", 
 };
 
 // Enhanced version with progress indication
-interface ProgressLoaderProps extends Omit<PageLoaderProps, "showDots"> {
+interface ProgressLoaderProps extends Omit<PageLoaderProps, 'showDots'> {
     progress?: number; // 0-100
     showProgress?: boolean;
 }
 
-export const ProgressLoader: React.FC<ProgressLoaderProps> = ({ message = "Loading...", className = "", size = "lg", progress, showProgress = false }) => {
+export const ProgressLoader: React.FC<ProgressLoaderProps> = ({ message = 'Loading...', className = '', size = 'lg', progress, showProgress = false }) => {
     const sizeClasses = {
-        sm: "w-8 h-8",
-        md: "w-12 h-12",
-        lg: "w-16 h-16",
+        sm: 'w-8 h-8',
+        md: 'w-12 h-12',
+        lg: 'w-16 h-16',
     };
 
     const containerClasses = {
-        sm: "min-h-[30vh]",
-        md: "min-h-[40vh]",
-        lg: "min-h-[50vh]",
+        sm: 'min-h-[30vh]',
+        md: 'min-h-[40vh]',
+        lg: 'min-h-[50vh]',
     };
 
     return (
@@ -189,10 +189,10 @@ export const ProgressLoader: React.FC<ProgressLoaderProps> = ({ message = "Loadi
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
                     <div
                         className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}></div>
+                        style={{ animationDelay: '0.1s' }}></div>
                     <div
                         className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}></div>
+                        style={{ animationDelay: '0.2s' }}></div>
                 </div>
             </div>
         </div>

@@ -17,6 +17,24 @@ tasks:
     cmds:
       - go build -v -i server.go
 
+  lint:
+    desc: 'Run comprehensive code quality checks (vet, fmt, mod tidy)'
+    cmds:
+      - go vet ./...
+      - go fmt ./...
+      - go mod tidy
+      - echo "✅ Code quality checks completed!"
+
+  clean:
+    desc: 'Clean build artifacts and temporary files'
+    cmds:
+      - rm -rf tmp/ temp/ RentDaddy
+      - find . -name "*.out" -type f -delete
+      - find . -name "*.test" -type f -delete
+      - find . -name "*.prof" -type f -delete
+      - go clean -cache -testcache -modcache
+      - echo "✅ Clean completed!"
+
   run:
     desc: 'Run Go app with Air reloading'
     cmds:
