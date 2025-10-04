@@ -3,25 +3,36 @@ set -e
 
 echo "Waiting for PostgreSQL to be ready..."
 
+# Variables for database connection
+DB_HOST=""
+DB_USER=""
+DB_PASSWORD=""
+DB_NAME=""
+
 # Check if we're running in a Railway environment (PGHOST is set by Railway)
 if [ -n "$PGHOST" ]; then
   DB_HOST="$PGHOST"
   DB_USER="$PGUSER"
   DB_PASSWORD="$PGPASSWORD"
   DB_NAME="$PGDATABASE"
+  PG_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}?sslmode=disable"
   
-  # Railway does not need ~/.pgpass or PGPASSFILE
+  # Railway does not need ~/.pgpass or PGPASSFILE for psql or migrate tools
 else
   # Local docker-compose environment
   DB_HOST="postgres"
-  DB_USER="$POSTGRES_USER"
-  DB_PASSWORD="$POSTGRES_PASSWORD"
-  DB_NAME="$POSTGRES_DB"
+  DB_USER="${POSTGRES_USER:-appuser}"
+  DB_PASSWORD="${POSTGRES_PASSWORD:-apppassword}"
+  DB_NAME="${POSTGRES_DB:-appdb}"
+  PG_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}?sslmode=disable"
 
-  echo "postgres:5432:${DB_NAME}:${DB_USER}:${DB_PASSWORD}" >~/.pgpass
+  echo "${DB_HOST}:5432:${DB_NAME}:${DB_USER}:${DB_PASSWORD}" >~/.pgpass
   chmod 600 ~/.pgpass
   export PGPASSFILE=~/.pgpass
 fi
+
+# Export PG_URL for the Go application
+export PG_URL
 
 until PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c '\q'; do
   echo "PostgreSQL is unavailable - sleeping"
@@ -29,7 +40,8 @@ until PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -
 done
 
 echo "Running database migrations..."
-task migrate:up || echo "Migration failed!"
+# Pass the dynamically generated PG_URL to the task command
+task migrate:up -- -database "$PG_URL" || echo "Migration failed!"
 echo "Database migrations complete."
 
 # Start cron in background
