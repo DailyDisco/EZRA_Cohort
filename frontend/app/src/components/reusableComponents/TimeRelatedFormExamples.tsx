@@ -33,7 +33,10 @@ const onFinish = (fieldsValue: any) => {
         'date-time-picker': fieldsValue['date-time-picker'].format('YYYY-MM-DD HH:mm:ss'),
         'month-picker': fieldsValue['month-picker'].format('YYYY-MM'),
         'range-picker': [rangeValue[0].format('YYYY-MM-DD'), rangeValue[1].format('YYYY-MM-DD')],
-        'range-time-picker': [rangeTimeValue[0].format('YYYY-MM-DD HH:mm:ss'), rangeTimeValue[1].format('YYYY-MM-DD HH:mm:ss')],
+        'range-time-picker': [
+            rangeTimeValue[0].format('YYYY-MM-DD HH:mm:ss'),
+            rangeTimeValue[1].format('YYYY-MM-DD HH:mm:ss'),
+        ],
         'time-picker': fieldsValue['time-picker'].format('HH:mm:ss'),
     };
     console.log('Received values of form: ', values);
@@ -44,53 +47,28 @@ const TimeRelatedFormExample: React.FC = () => (
         name="time_related_controls"
         {...formItemLayout}
         onFinish={onFinish}
-        style={{ maxWidth: 600, margin: '0 auto' }}>
-        <Form.Item
-            name="date-picker"
-            label="DatePicker"
-            {...config}>
+        style={{ maxWidth: 600, margin: '0 auto' }}
+    >
+        <Form.Item name="date-picker" label="DatePicker" {...config}>
             <DatePicker />
         </Form.Item>
-        <Form.Item
-            name="date-time-picker"
-            label="DatePicker[showTime]"
-            {...config}>
-            <DatePicker
-                showTime
-                format="YYYY-MM-DD HH:mm:ss"
-            />
+        <Form.Item name="date-time-picker" label="DatePicker[showTime]" {...config}>
+            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />
         </Form.Item>
-        <Form.Item
-            name="month-picker"
-            label="MonthPicker"
-            {...config}>
+        <Form.Item name="month-picker" label="MonthPicker" {...config}>
             <DatePicker picker="month" />
         </Form.Item>
-        <Form.Item
-            name="range-picker"
-            label="RangePicker"
-            {...rangeConfig}>
+        <Form.Item name="range-picker" label="RangePicker" {...rangeConfig}>
             <RangePicker />
         </Form.Item>
-        <Form.Item
-            name="range-time-picker"
-            label="RangePicker[showTime]"
-            {...rangeConfig}>
-            <RangePicker
-                showTime
-                format="YYYY-MM-DD HH:mm:ss"
-            />
+        <Form.Item name="range-time-picker" label="RangePicker[showTime]" {...rangeConfig}>
+            <RangePicker showTime format="YYYY-MM-DD HH:mm:ss" />
         </Form.Item>
-        <Form.Item
-            name="time-picker"
-            label="TimePicker"
-            {...config}>
+        <Form.Item name="time-picker" label="TimePicker" {...config}>
             <TimePicker />
         </Form.Item>
         <Form.Item label={null}>
-            <Button
-                type="primary"
-                htmlType="submit">
+            <Button type="primary" htmlType="submit">
                 Submit
             </Button>
         </Form.Item>

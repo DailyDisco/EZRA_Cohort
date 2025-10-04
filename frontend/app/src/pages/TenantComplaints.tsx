@@ -183,10 +183,7 @@ function TenantCreateComplaintsModal(props: CreateComplaintModalProps) {
     });
     return (
         <>
-            <Button
-                type="primary"
-                className="mb-3"
-                onClick={showModal}>
+            <Button type="primary" className="mb-3" onClick={showModal}>
                 Create Complaint
             </Button>
             <Modal
@@ -199,34 +196,21 @@ function TenantCreateComplaintsModal(props: CreateComplaintModalProps) {
                 okText={'Create'}
                 onCancel={handleCancel}
                 okButtonProps={{ disabled: isPendingComplaint ? true : false }}
-                cancelButtonProps={{ disabled: isPendingComplaint ? true : false }}>
+                cancelButtonProps={{ disabled: isPendingComplaint ? true : false }}
+            >
                 <p>Enter information about a complaint that you're having here.</p>
                 <Divider />
                 <Form form={complaintForm}>
                     <p className="fs-7">Title</p>
-                    <Form.Item
-                        name="title"
-                        required={true}>
-                        <Input
-                            placeholder="Enter a title"
-                            type="text"
-                            minLength={3}
-                            maxLength={50}
-                        />
+                    <Form.Item name="title" required={true}>
+                        <Input placeholder="Enter a title" type="text" minLength={3} maxLength={50} />
                     </Form.Item>
                     <p className="fs-7">Description</p>
-                    <Form.Item
-                        name="description"
-                        required={true}>
-                        <Input.TextArea
-                            placeholder="Enter a breif description for complaint"
-                            rows={4}
-                        />
+                    <Form.Item name="description" required={true}>
+                        <Input.TextArea placeholder="Enter a breif description for complaint" rows={4} />
                     </Form.Item>
                     <p className="fs-7">Category</p>
-                    <Form.Item
-                        name="category"
-                        required={true}>
+                    <Form.Item name="category" required={true}>
                         <Select placeholder={'Select a category'}>
                             {Object.values({
                                 maintenance: 'maintenance',

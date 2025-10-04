@@ -540,13 +540,12 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
         switch (mode) {
             case 'add':
                 return (
-                    <Form
-                        form={form}
-                        layout="vertical">
+                    <Form form={form} layout="vertical">
                         <Form.Item
                             label="Tenant"
                             name="tenant_id"
-                            rules={[{ required: true, message: 'Please select a tenant' }]}>
+                            rules={[{ required: true, message: 'Please select a tenant' }]}
+                        >
                             <Select
                                 placeholder="Select a tenant"
                                 loading={loadingTenants}
@@ -561,12 +560,11 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                                 listHeight={256}
                                 virtual={true}
                                 popupMatchSelectWidth={false}
-                                style={{ width: '100%' }}>
+                                style={{ width: '100%' }}
+                            >
                                 {tenants && tenants.length > 0
                                     ? tenants.map((tenant: Tenant) => (
-                                          <Option
-                                              key={tenant.id}
-                                              value={tenant.id}>
+                                          <Option key={tenant.id} value={tenant.id}>
                                               {`${tenant.firstName} ${tenant.lastName}`}
                                               {tenant.unitNumber ? ` (Unit: ${tenant.unitNumber})` : ''}
                                           </Option>
@@ -578,7 +576,8 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                         <Form.Item
                             label="Apartment"
                             name="apartment_id"
-                            rules={[{ required: true, message: 'Please select an apartment' }]}>
+                            rules={[{ required: true, message: 'Please select an apartment' }]}
+                        >
                             <Select
                                 placeholder="Select an apartment"
                                 loading={loadingApartments}
@@ -594,12 +593,11 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                                 listHeight={256}
                                 virtual={true}
                                 popupMatchSelectWidth={false}
-                                style={{ width: '100%' }}>
+                                style={{ width: '100%' }}
+                            >
                                 {apartments && apartments.length > 0
                                     ? apartments.map((apartment: Apartment) => (
-                                          <Option
-                                              key={apartment.id}
-                                              value={apartment.id}>
+                                          <Option key={apartment.id} value={apartment.id}>
                                               {`Unit ${apartment.unit_number} - $${apartment.price}/month`}
                                               {apartment.size ? ` (${apartment.size} sq ft)` : ''}
                                           </Option>
@@ -611,14 +609,16 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                         <Form.Item
                             label="Property Address"
                             name="property_address"
-                            rules={[{ required: true, message: 'Please enter property address' }]}>
+                            rules={[{ required: true, message: 'Please enter property address' }]}
+                        >
                             <Input />
                         </Form.Item>
 
                         <Form.Item
                             label="Monthly Rent ($)"
                             name="rent_amount"
-                            rules={[{ required: true, message: 'Please enter rent amount' }]}>
+                            rules={[{ required: true, message: 'Please enter rent amount' }]}
+                        >
                             <Input type="number" />
                         </Form.Item>
 
@@ -626,7 +626,8 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                             label="Lease Start Date"
                             name="start_date"
                             initialValue={dayjs()}
-                            rules={[{ required: true, message: 'Please select lease start date' }]}>
+                            rules={[{ required: true, message: 'Please select lease start date' }]}
+                        >
                             <DatePicker style={{ width: '100%' }} />
                         </Form.Item>
 
@@ -634,7 +635,11 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                             label="Lease End Date"
                             name="end_date"
                             initialValue={dayjs().add(1, 'year')}
-                            rules={[{ required: true, message: 'Please select lease end date' }, { validator: validateEndDate }]}>
+                            rules={[
+                                { required: true, message: 'Please select lease end date' },
+                                { validator: validateEndDate },
+                            ]}
+                        >
                             <DatePicker style={{ width: '100%' }} />
                         </Form.Item>
                     </Form>
@@ -642,115 +647,114 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
 
             case 'send':
                 return (
-                    <Form
-                        form={form}
-                        layout="vertical">
+                    <Form form={form} layout="vertical">
                         <Form.Item
                             label="Tenant Name"
                             name="tenant_name"
-                            rules={[{ required: true, message: 'Please enter tenant name' }]}>
+                            rules={[{ required: true, message: 'Please enter tenant name' }]}
+                        >
                             <Input disabled />
                         </Form.Item>
 
                         <Form.Item
                             label="Property Address/Apartment"
                             name="property_address"
-                            rules={[{ required: true, message: 'Please enter property address' }]}>
+                            rules={[{ required: true, message: 'Please enter property address' }]}
+                        >
                             <Input disabled />
                         </Form.Item>
 
                         <Form.Item
                             label="Monthly Rent ($)"
                             name="rent_amount"
-                            rules={[{ required: true, message: 'Please enter rent amount' }]}>
+                            rules={[{ required: true, message: 'Please enter rent amount' }]}
+                        >
                             <Input type="number" />
                         </Form.Item>
 
                         <Form.Item
                             label="Lease Start Date"
                             name="start_date"
-                            rules={[{ required: true, message: 'Please select lease start date' }]}>
-                            <DatePicker
-                                style={{ width: '100%' }}
-                                disabled
-                            />
+                            rules={[{ required: true, message: 'Please select lease start date' }]}
+                        >
+                            <DatePicker style={{ width: '100%' }} disabled />
                         </Form.Item>
 
                         <Form.Item
                             label="Lease End Date"
                             name="end_date"
-                            rules={[{ required: true, message: 'Please select lease end date' }, { validator: validateEndDate }]}>
-                            <DatePicker
-                                style={{ width: '100%' }}
-                                disabled
-                            />
+                            rules={[
+                                { required: true, message: 'Please select lease end date' },
+                                { validator: validateEndDate },
+                            ]}
+                        >
+                            <DatePicker style={{ width: '100%' }} disabled />
                         </Form.Item>
 
                         <div className="text-gray-500 text-sm mb-2">
-                            <p>Note: The lease will be sent with the original start and end dates. These dates cannot be modified.</p>
+                            <p>
+                                Note: The lease will be sent with the original start and end dates. These dates cannot
+                                be modified.
+                            </p>
                         </div>
                     </Form>
                 );
 
             case 'renew':
                 return (
-                    <Form
-                        form={form}
-                        layout="vertical">
-                        <Form.Item
-                            label="Tenant Name"
-                            name="tenant_name">
+                    <Form form={form} layout="vertical">
+                        <Form.Item label="Tenant Name" name="tenant_name">
                             <Input disabled />
                         </Form.Item>
 
-                        <Form.Item
-                            label="Property Address/Apartment"
-                            name="property_address">
+                        <Form.Item label="Property Address/Apartment" name="property_address">
                             <Input disabled />
                         </Form.Item>
 
                         <Form.Item
                             label="Monthly Rent ($)"
                             name="rent_amount"
-                            rules={[{ required: true, message: 'Please enter rent amount' }]}>
+                            rules={[{ required: true, message: 'Please enter rent amount' }]}
+                        >
                             <Input type="number" />
                         </Form.Item>
 
                         <Form.Item
                             label="Lease Start Date"
                             name="start_date"
-                            rules={[{ required: true, message: 'Please select lease start date' }]}>
+                            rules={[{ required: true, message: 'Please select lease start date' }]}
+                        >
                             <DatePicker style={{ width: '100%' }} />
                         </Form.Item>
 
                         <Form.Item
                             label="Lease End Date"
                             name="end_date"
-                            rules={[{ required: true, message: 'Please select lease end date' }, { validator: validateEndDate }]}>
+                            rules={[
+                                { required: true, message: 'Please select lease end date' },
+                                { validator: validateEndDate },
+                            ]}
+                        >
                             <DatePicker style={{ width: '100%' }} />
                         </Form.Item>
 
                         <div className="text-gray-500 text-sm mb-2">
-                            <p>Note: Renewing this lease will create a new document linked to the existing agreement.</p>
+                            <p>
+                                Note: Renewing this lease will create a new document linked to the existing agreement.
+                            </p>
                         </div>
                     </Form>
                 );
 
             case 'amend':
                 return (
-                    <Form
-                        form={form}
-                        layout="vertical">
-                        <Form.Item
-                            label="Tenant Name"
-                            name="tenant_name">
+                    <Form form={form} layout="vertical">
+                        <Form.Item label="Tenant Name" name="tenant_name">
                             <Input disabled />
                         </Form.Item>
 
                         {/* Current Apartment (read-only) */}
-                        <Form.Item
-                            label="Current Property/Apartment"
-                            name="property_address">
+                        <Form.Item label="Current Property/Apartment" name="property_address">
                             <Input disabled />
                         </Form.Item>
 
@@ -758,7 +762,8 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                         <Form.Item
                             label="New Apartment (Optional)"
                             name="new_apartment_id"
-                            help="Select only if changing apartments. Leave blank to keep current apartment.">
+                            help="Select only if changing apartments. Leave blank to keep current apartment."
+                        >
                             <Select
                                 placeholder="Select a new apartment"
                                 loading={loadingApartments}
@@ -790,12 +795,11 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                                             new_property_address: undefined,
                                         });
                                     }
-                                }}>
+                                }}
+                            >
                                 {apartments && apartments.length > 0
                                     ? apartments.map((apartment: Apartment) => (
-                                          <Option
-                                              key={apartment.id}
-                                              value={apartment.id}>
+                                          <Option key={apartment.id} value={apartment.id}>
                                               {`Unit ${apartment.unit_number} - $${apartment.price}/month`}
                                               {apartment.size ? ` (${apartment.size} sq ft)` : ''}
                                           </Option>
@@ -808,35 +812,43 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                         <Form.Item
                             label="New Property Address"
                             name="new_property_address"
-                            hidden={!form.getFieldValue('new_apartment_id')}>
+                            hidden={!form.getFieldValue('new_apartment_id')}
+                        >
                             <Input disabled />
                         </Form.Item>
 
                         <Form.Item
                             label="Monthly Rent ($)"
                             name="rent_amount"
-                            rules={[{ required: true, message: 'Please enter rent amount' }]}>
+                            rules={[{ required: true, message: 'Please enter rent amount' }]}
+                        >
                             <Input type="number" />
                         </Form.Item>
 
                         <Form.Item
                             label="Lease Start Date"
                             name="start_date"
-                            rules={[{ required: true, message: 'Please select lease start date' }]}>
+                            rules={[{ required: true, message: 'Please select lease start date' }]}
+                        >
                             <DatePicker style={{ width: '100%' }} />
                         </Form.Item>
 
                         <Form.Item
                             label="Lease End Date"
                             name="end_date"
-                            rules={[{ required: true, message: 'Please select lease end date' }, { validator: validateEndDate }]}>
+                            rules={[
+                                { required: true, message: 'Please select lease end date' },
+                                { validator: validateEndDate },
+                            ]}
+                        >
                             <DatePicker style={{ width: '100%' }} />
                         </Form.Item>
 
                         <Form.Item
                             label="Reason for Amendment"
                             name="amendment_reason"
-                            rules={[{ required: true, message: 'Please provide a reason for the amendment' }]}>
+                            rules={[{ required: true, message: 'Please provide a reason for the amendment' }]}
+                        >
                             <Input.TextArea
                                 rows={4}
                                 placeholder="Describe the changes being made to the lease agreement"
@@ -844,7 +856,10 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                         </Form.Item>
 
                         <div className="text-gray-500 text-sm mb-2">
-                            <p>Note: Amending this lease will create a new version that requires tenant approval. The original lease remains active until the amendment is approved.</p>
+                            <p>
+                                Note: Amending this lease will create a new version that requires tenant approval. The
+                                original lease remains active until the amendment is approved.
+                            </p>
                         </div>
                     </Form>
                 );
@@ -892,7 +907,13 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                     <div style={{ textAlign: 'center', padding: '20px' }}>
                         <Spin size="large" />
                         <p style={{ marginTop: '10px' }}>
-                            {mode === 'add' ? 'Creating lease...' : mode === 'send' ? 'Sending lease for signing...' : mode === 'renew' ? 'Renewing lease...' : 'Creating lease amendment...'}
+                            {mode === 'add'
+                                ? 'Creating lease...'
+                                : mode === 'send'
+                                  ? 'Sending lease for signing...'
+                                  : mode === 'renew'
+                                    ? 'Renewing lease...'
+                                    : 'Creating lease amendment...'}
                         </p>
                     </div>
                 );
@@ -923,11 +944,7 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                                     ? 'The lease has been renewed and sent for signing.'
                                     : 'The lease amendment has been created and sent for tenant approval.'}
                         </p>
-                        <ButtonComponent
-                            type="primary"
-                            title="Close"
-                            onClick={onClose}
-                        />
+                        <ButtonComponent type="primary" title="Close" onClick={onClose} />
                     </div>
                 );
 
@@ -940,20 +957,20 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
                             </div>
                         </div>
                         <h3 className="text-lg font-semibold mb-2">
-                            {mode === 'add' ? 'Failed to Create Lease' : mode === 'send' ? 'Failed to Send Lease' : mode === 'renew' ? 'Failed to Renew Lease' : 'Failed to Create Amendment'}
+                            {mode === 'add'
+                                ? 'Failed to Create Lease'
+                                : mode === 'send'
+                                  ? 'Failed to Send Lease'
+                                  : mode === 'renew'
+                                    ? 'Failed to Renew Lease'
+                                    : 'Failed to Create Amendment'}
                         </h3>
-                        <p className="text-gray-500 mb-4">{errorMessage || 'There was an error processing your request.'}</p>
+                        <p className="text-gray-500 mb-4">
+                            {errorMessage || 'There was an error processing your request.'}
+                        </p>
                         <div className="flex justify-center gap-2">
-                            <ButtonComponent
-                                type="primary"
-                                title="Try Again"
-                                onClick={handleReset}
-                            />
-                            <ButtonComponent
-                                type="default"
-                                title="Close"
-                                onClick={onClose}
-                            />
+                            <ButtonComponent type="primary" title="Try Again" onClick={handleReset} />
+                            <ButtonComponent type="default" title="Close" onClick={onClose} />
                         </div>
                     </div>
                 );
@@ -970,20 +987,26 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
             return null; // No footer for success/error states as actions are in the content
         }
 
-        const isLoading = addLeaseMutation.isPending || sendLeaseMutation.isPending || renewLeaseMutation.isPending || amendLeaseMutation.isPending;
+        const isLoading =
+            addLeaseMutation.isPending ||
+            sendLeaseMutation.isPending ||
+            renewLeaseMutation.isPending ||
+            amendLeaseMutation.isPending;
 
         return [
-            <ButtonComponent
-                key="cancel"
-                type="default"
-                title="Cancel"
-                onClick={onClose}
-                disabled={isLoading}
-            />,
+            <ButtonComponent key="cancel" type="default" title="Cancel" onClick={onClose} disabled={isLoading} />,
             <ButtonComponent
                 key="submit"
                 type="primary"
-                title={mode === 'add' ? 'Create Draft Lease' : mode === 'send' ? 'Send for Signing' : mode === 'renew' ? 'Renew Lease' : 'Create Amendment'}
+                title={
+                    mode === 'add'
+                        ? 'Create Draft Lease'
+                        : mode === 'send'
+                          ? 'Send for Signing'
+                          : mode === 'renew'
+                            ? 'Renew Lease'
+                            : 'Create Amendment'
+                }
                 onClick={handleSubmit}
                 loading={isLoading}
                 disabled={isLoading}
@@ -999,7 +1022,8 @@ export const LeaseModalComponent = ({ visible, onClose, mode, selectedLease }: L
             footer={renderFooter()}
             closable={status !== 'loading'}
             maskClosable={status !== 'loading'}
-            width={700}>
+            width={700}
+        >
             {renderModalContent()}
         </Modal>
     );

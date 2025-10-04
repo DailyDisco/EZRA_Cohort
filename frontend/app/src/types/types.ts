@@ -43,7 +43,17 @@ export interface WorkOrderData {
     updatedAt: Date;
 }
 
-export type ComplaintCategory = 'maintenance' | 'noise' | 'security' | 'parking' | 'neighbor' | 'trash' | 'internet' | 'lease' | 'natural_disaster' | 'other';
+export type ComplaintCategory =
+    | 'maintenance'
+    | 'noise'
+    | 'security'
+    | 'parking'
+    | 'neighbor'
+    | 'trash'
+    | 'internet'
+    | 'lease'
+    | 'natural_disaster'
+    | 'other';
 export type ComplaintStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
 
 export interface ComplaintData {
@@ -70,7 +80,17 @@ export interface ComplaintsData {
     key: number;
     complaintNumber: number;
     createdBy: number;
-    category: 'maintenance' | 'noise' | 'security' | 'parking' | 'neighbor' | 'trash' | 'internet' | 'lease' | 'natural_disaster' | 'other';
+    category:
+        | 'maintenance'
+        | 'noise'
+        | 'security'
+        | 'parking'
+        | 'neighbor'
+        | 'trash'
+        | 'internet'
+        | 'lease'
+        | 'natural_disaster'
+        | 'other';
     title: string;
     description: string;
     unitNumber: string;

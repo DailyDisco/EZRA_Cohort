@@ -239,14 +239,10 @@ const AdminApartmentSetupAndDetailsManagement = () => {
                 initialValues={{
                     'parking-settings': [adminSetupObject.parkingTotal, adminSetupObject.perUserParking],
                     'mail-locker-settings': adminSetupObject.lockerCount,
-                }}>
+                }}
+            >
                 {/* Table */}
-                {locations.length > 0 && (
-                    <TableComponent
-                        dataSource={locations}
-                        columns={columns}
-                    />
-                )}
+                {locations.length > 0 && <TableComponent dataSource={locations} columns={columns} />}
                 {/* Add Location */}
                 <Form.Item
                     name="location"
@@ -256,23 +252,12 @@ const AdminApartmentSetupAndDetailsManagement = () => {
                             required: true,
                             message: 'Please select a location',
                         },
-                    ]}>
+                    ]}
+                >
                     <div className="flex flex-row gap-3 mt-3">
-                        <Input
-                            placeholder="Building #"
-                            type="number"
-                            min={0}
-                        />
-                        <Input
-                            placeholder="# of Floors"
-                            type="number"
-                            min={0}
-                        />
-                        <Input
-                            placeholder="# of Room"
-                            type="number"
-                            min={0}
-                        />
+                        <Input placeholder="Building #" type="number" min={0} />
+                        <Input placeholder="# of Floors" type="number" min={0} />
+                        <Input placeholder="# of Room" type="number" min={0} />
                     </div>
                 </Form.Item>
                 {/* Clear Button */}
@@ -296,32 +281,23 @@ const AdminApartmentSetupAndDetailsManagement = () => {
                 <Form.Item
                     name={['parking-settings', 0]}
                     label="Available Parking Spots"
-                    rules={[{ required: true, message: 'Please enter available parking spots' }]}>
-                    <Input
-                        placeholder="Available Spots"
-                        type="number"
-                        min={0}
-                    />
+                    rules={[{ required: true, message: 'Please enter available parking spots' }]}
+                >
+                    <Input placeholder="Available Spots" type="number" min={0} />
                 </Form.Item>
                 <Form.Item
                     name={['parking-settings', 1]}
                     label="Max Parking Spots Per User"
-                    rules={[{ required: true, message: 'Please enter max spots per user' }]}>
-                    <Input
-                        placeholder="Max Spots Per User"
-                        type="number"
-                        min={0}
-                    />
+                    rules={[{ required: true, message: 'Please enter max spots per user' }]}
+                >
+                    <Input placeholder="Max Spots Per User" type="number" min={0} />
                 </Form.Item>
                 <Form.Item
                     name="mail-locker-settings"
                     label="Mail Locker Settings"
-                    rules={[{ required: true, message: 'Please enter mail locker settings' }]}>
-                    <Input
-                        placeholder="Available Lockers"
-                        type="number"
-                        min={0}
-                    />
+                    rules={[{ required: true, message: 'Please enter mail locker settings' }]}
+                >
+                    <Input placeholder="Available Lockers" type="number" min={0} />
                 </Form.Item>
                 {/* <Form.Item
                     name="smtp-settings"
@@ -344,15 +320,14 @@ const AdminApartmentSetupAndDetailsManagement = () => {
                             type="default"
                             onClick={() => {
                                 console.log('Cancel');
-                            }}>
+                            }}
+                        >
                             Cancel
                         </Button>
                     </Form.Item>
                     {/* Submit Button */}
                     <Form.Item name="submit">
-                        <Button
-                            type="primary"
-                            htmlType="submit">
+                        <Button type="primary" htmlType="submit">
                             Submit
                         </Button>
                     </Form.Item>

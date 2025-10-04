@@ -176,10 +176,7 @@ function TenantCreateWorkOrderModal(props: CreateWorkOrderModalProps) {
     });
     return (
         <>
-            <Button
-                type="primary"
-                className="mb-3"
-                onClick={showModal}>
+            <Button type="primary" className="mb-3" onClick={showModal}>
                 Create Work Order
             </Button>
             <Modal
@@ -192,34 +189,21 @@ function TenantCreateWorkOrderModal(props: CreateWorkOrderModalProps) {
                 okText={'Create'}
                 onCancel={handleCancel}
                 okButtonProps={{ disabled: isPendingWorkOrder ? true : false }}
-                cancelButtonProps={{ disabled: isPendingWorkOrder ? true : false }}>
+                cancelButtonProps={{ disabled: isPendingWorkOrder ? true : false }}
+            >
                 <p>Fill out your request for a work order here.</p>
                 <Divider />
                 <Form form={workOrderForm}>
                     <p className="fs-7">Title</p>
-                    <Form.Item
-                        name="title"
-                        required={true}>
-                        <Input
-                            placeholder="Enter a title"
-                            type="text"
-                            minLength={3}
-                            maxLength={50}
-                        />
+                    <Form.Item name="title" required={true}>
+                        <Input placeholder="Enter a title" type="text" minLength={3} maxLength={50} />
                     </Form.Item>
                     <p className="fs-7">Description</p>
-                    <Form.Item
-                        name="description"
-                        required={true}>
-                        <Input.TextArea
-                            placeholder="Enter a breif description for complaint"
-                            rows={4}
-                        />
+                    <Form.Item name="description" required={true}>
+                        <Input.TextArea placeholder="Enter a breif description for complaint" rows={4} />
                     </Form.Item>
                     <p className="fs-7">Category</p>
-                    <Form.Item
-                        name="category"
-                        required={true}>
+                    <Form.Item name="category" required={true}>
                         <Select placeholder={'Select a category'}>
                             {Object.values({
                                 plumbing: 'plumbing',
@@ -228,9 +212,7 @@ function TenantCreateWorkOrderModal(props: CreateWorkOrderModalProps) {
                                 hvac: 'hvac',
                                 other: 'other',
                             }).map((c) => (
-                                <Select.Option
-                                    key={c}
-                                    value={c}>
+                                <Select.Option key={c} value={c}>
                                     {c}
                                 </Select.Option>
                             ))}

@@ -1,4 +1,35 @@
 import React from 'react';
+import { Spin } from 'antd';
+
+// Type definitions
+type LoaderSize = 'sm' | 'md' | 'lg';
+type SpinSize = 'small' | 'default' | 'large';
+
+// Utility functions for consistent size mappings
+const getSpinSize = (size: LoaderSize): SpinSize => {
+    const sizeMap: Record<LoaderSize, SpinSize> = {
+        sm: 'small',
+        md: 'default',
+        lg: 'large',
+    };
+    return sizeMap[size];
+};
+
+const getContainerHeight = (size: LoaderSize): string => {
+    const heightMap: Record<LoaderSize, string> = {
+        sm: 'min-vh-30',
+        md: 'min-vh-40',
+        lg: 'min-vh-50',
+    };
+    return heightMap[size];
+};
+
+// Base loader props shared across components
+interface BaseLoaderProps {
+    message?: string;
+    className?: string;
+    size?: LoaderSize;
+}
 
 interface CardSkeletonLoaderProps {
     className?: string;
@@ -6,193 +37,231 @@ interface CardSkeletonLoaderProps {
 
 export const CardSkeletonLoader: React.FC<CardSkeletonLoaderProps> = ({ className = '' }) => {
     return (
-        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse ${className}`}>
+        <div className={`card p-4 ${className}`} style={{ border: 'none', boxShadow: 'var(--shadow-sm)' }}>
             {/* Header skeleton */}
-            <div className="flex items-center justify-between mb-4">
-                <div className="h-6 bg-gray-200 rounded w-24"></div>
-                <div className="h-5 w-5 bg-gray-200 rounded"></div>
+            <div className="d-flex align-items-center justify-content-between mb-3">
+                <div
+                    className="skeleton-placeholder"
+                    style={{ height: '24px', width: '96px', backgroundColor: '#e2e8f0', borderRadius: '4px' }}
+                ></div>
+                <div
+                    className="skeleton-placeholder"
+                    style={{ height: '20px', width: '20px', backgroundColor: '#e2e8f0', borderRadius: '4px' }}
+                ></div>
             </div>
 
             {/* Value skeleton */}
-            <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
+            <div
+                className="skeleton-placeholder mb-2"
+                style={{ height: '32px', width: '64px', backgroundColor: '#e2e8f0', borderRadius: '4px' }}
+            ></div>
 
             {/* Description skeleton */}
-            <div className="space-y-2 mb-4">
-                <div className="h-4 bg-gray-200 rounded w-full"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="mb-3">
+                <div
+                    className="skeleton-placeholder mb-2"
+                    style={{ height: '16px', width: '100%', backgroundColor: '#e2e8f0', borderRadius: '4px' }}
+                ></div>
+                <div
+                    className="skeleton-placeholder"
+                    style={{ height: '16px', width: '75%', backgroundColor: '#e2e8f0', borderRadius: '4px' }}
+                ></div>
             </div>
 
             {/* Button skeleton */}
-            <div className="h-8 bg-gray-200 rounded w-full"></div>
-        </div>
-    );
-};
-
-export const InlineLoader: React.FC<{ size?: 'sm' | 'md' | 'lg'; className?: string }> = ({ size = 'md', className = '' }) => {
-    const sizeClasses = {
-        sm: 'w-4 h-4',
-        md: 'w-6 h-6',
-        lg: 'w-8 h-8',
-    };
-
-    return (
-        <div className={`inline-flex items-center justify-center ${className}`}>
             <div
-                className={`${sizeClasses[size]} border-2 border-gray-300 border-t-primary rounded-full animate-spin`}
-                aria-label="Loading"
-            />
+                className="skeleton-placeholder"
+                style={{ height: '32px', width: '100%', backgroundColor: '#e2e8f0', borderRadius: '4px' }}
+            ></div>
         </div>
     );
 };
 
-interface PageLoaderProps {
-    message?: string;
+interface InlineLoaderProps {
+    size?: LoaderSize;
     className?: string;
-    size?: 'sm' | 'md' | 'lg';
+}
+
+export const InlineLoader: React.FC<InlineLoaderProps> = ({ size = 'md', className = '' }) => {
+    return (
+        <div className={`d-inline-flex align-items-center justify-content-center ${className}`}>
+            <Spin size={getSpinSize(size)} />
+        </div>
+    );
+};
+
+interface PageLoaderProps extends BaseLoaderProps {
     showDots?: boolean;
 }
 
-export const PageLoader: React.FC<PageLoaderProps> = ({ message = 'Loading...', className = '', size = 'lg', showDots = true }) => {
-    const sizeClasses = {
-        sm: 'w-8 h-8',
-        md: 'w-12 h-12',
-        lg: 'w-16 h-16',
-    };
-
-    const containerClasses = {
-        sm: 'min-h-[30vh]',
-        md: 'min-h-[40vh]',
-        lg: 'min-h-[50vh]',
-    };
-
+export const PageLoader: React.FC<PageLoaderProps> = ({
+    message = 'Loading...',
+    className = '',
+    size = 'lg',
+    showDots = true,
+}) => {
     return (
-        <div className={`flex flex-col items-center justify-center ${containerClasses[size]} ${className}`}>
-            {/* Modern spinner with gradient */}
-            <div className="relative mb-6">
-                {/* Outer ring */}
-                <div className={`${sizeClasses[size]} border-4 border-gray-200 border-t-transparent rounded-full animate-spin`}></div>
-
-                {/* Inner ring for depth */}
-                <div
-                    className={'absolute inset-2 border-2 border-primary/20 border-t-transparent rounded-full animate-spin'}
-                    style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
-
-                {/* Center dot */}
-                <div className="absolute inset-1/2 w-2 h-2 bg-primary rounded-full transform -translate-x-1/2 -translate-y-1/2 opacity-60"></div>
+        <div
+            className={`d-flex flex-column align-items-center justify-content-center ${getContainerHeight(
+                size
+            )} ${className}`}
+        >
+            {/* Ant Design spinner with custom styling */}
+            <div className="mb-4">
+                <Spin size={getSpinSize(size)} style={{ color: '#00674f' }} />
             </div>
 
             {/* Loading message */}
             <div className="text-center">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">{message}</h3>
+                <h3 className="h5 font-weight-semibold mb-3" style={{ color: '#1e293b' }}>
+                    {message}
+                </h3>
 
                 {/* Animated dots */}
                 {showDots && (
-                    <div className="flex justify-center space-x-1">
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                    <div className="d-flex justify-content-center">
                         <div
-                            className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                            style={{ animationDelay: '0.1s' }}></div>
+                            className="mx-1"
+                            style={{
+                                width: '8px',
+                                height: '8px',
+                                backgroundColor: '#00674f',
+                                borderRadius: '50%',
+                                animation: 'bounce 1.4s infinite ease-in-out both',
+                            }}
+                        ></div>
                         <div
-                            className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                            style={{ animationDelay: '0.2s' }}></div>
+                            className="mx-1"
+                            style={{
+                                width: '8px',
+                                height: '8px',
+                                backgroundColor: '#00674f',
+                                borderRadius: '50%',
+                                animation: 'bounce 1.4s infinite ease-in-out both 0.1s',
+                            }}
+                        ></div>
+                        <div
+                            className="mx-1"
+                            style={{
+                                width: '8px',
+                                height: '8px',
+                                backgroundColor: '#00674f',
+                                borderRadius: '50%',
+                                animation: 'bounce 1.4s infinite ease-in-out both 0.2s',
+                            }}
+                        ></div>
                     </div>
                 )}
-            </div>
-
-            {/* Subtle background pattern */}
-            <div className="absolute inset-0 opacity-5 pointer-events-none">
-                <div
-                    className="absolute inset-0"
-                    style={{
-                        backgroundImage: `radial-gradient(circle at 25% 25%, #000 1px, transparent 1px),
-                                    radial-gradient(circle at 75% 75%, #000 1px, transparent 1px)`,
-                        backgroundSize: '20px 20px',
-                    }}></div>
             </div>
         </div>
     );
 };
 
 // Enhanced version with progress indication
-interface ProgressLoaderProps extends Omit<PageLoaderProps, 'showDots'> {
-    progress?: number; // 0-100
+interface ProgressLoaderProps extends BaseLoaderProps {
+    progress?: number; // 0-100, clamped internally
     showProgress?: boolean;
 }
 
-export const ProgressLoader: React.FC<ProgressLoaderProps> = ({ message = 'Loading...', className = '', size = 'lg', progress, showProgress = false }) => {
-    const sizeClasses = {
-        sm: 'w-8 h-8',
-        md: 'w-12 h-12',
-        lg: 'w-16 h-16',
-    };
-
-    const containerClasses = {
-        sm: 'min-h-[30vh]',
-        md: 'min-h-[40vh]',
-        lg: 'min-h-[50vh]',
-    };
-
+export const ProgressLoader: React.FC<ProgressLoaderProps> = ({
+    message = 'Loading...',
+    className = '',
+    size = 'lg',
+    progress,
+    showProgress = false,
+}) => {
+    // Clamp progress to valid range
+    const clampedProgress = progress !== undefined ? Math.max(0, Math.min(100, progress)) : undefined;
     return (
-        <div className={`flex flex-col items-center justify-center ${containerClasses[size]} ${className}`}>
-            {/* Enhanced spinner */}
-            <div className="relative mb-6">
-                <div className={`${sizeClasses[size]} border-4 border-gray-200 rounded-full`}></div>
-                <div className={`${sizeClasses[size]} border-4 border-transparent border-t-primary rounded-full animate-spin absolute inset-0`}></div>
+        <div
+            className={`d-flex flex-column align-items-center justify-content-center ${getContainerHeight(
+                size
+            )} ${className}`}
+        >
+            {/* Enhanced spinner with progress ring */}
+            <div className="position-relative mb-4">
+                <Spin size={getSpinSize(size)} style={{ color: '#00674f' }} />
 
-                {/* Progress ring */}
-                {showProgress && progress !== undefined && (
-                    <svg
-                        className={`absolute inset-0 ${sizeClasses[size]}`}
-                        viewBox="0 0 64 64">
-                        <circle
-                            cx="32"
-                            cy="32"
-                            r="28"
-                            fill="none"
-                            stroke="#e5e7eb"
-                            strokeWidth="4"
-                        />
-                        <circle
-                            cx="32"
-                            cy="32"
-                            r="28"
-                            fill="none"
-                            stroke="#1890ff"
-                            strokeWidth="4"
-                            strokeDasharray={`${2 * Math.PI * 28}`}
-                            strokeDashoffset={`${2 * Math.PI * 28 * (1 - progress / 100)}`}
-                            strokeLinecap="round"
-                            className="transition-all duration-300 ease-out"
-                            transform="rotate(-90 32 32)"
-                        />
-                    </svg>
+                {/* Progress ring overlay */}
+                {showProgress && clampedProgress !== undefined && (
+                    <div className="position-absolute top-50 start-50 translate-middle">
+                        <svg width="80" height="80" viewBox="0 0 80 80" style={{ transform: 'rotate(-90deg)' }}>
+                            <circle cx="40" cy="40" r="35" fill="none" stroke="#e2e8f0" strokeWidth="6" />
+                            <circle
+                                cx="40"
+                                cy="40"
+                                r="35"
+                                fill="none"
+                                stroke="#00674f"
+                                strokeWidth="6"
+                                strokeDasharray={`${2 * Math.PI * 35}`}
+                                strokeDashoffset={`${2 * Math.PI * 35 * (1 - clampedProgress / 100)}`}
+                                strokeLinecap="round"
+                                style={{ transition: 'stroke-dashoffset 0.3s ease-out' }}
+                            />
+                        </svg>
+                    </div>
                 )}
             </div>
 
             {/* Loading content */}
-            <div className="text-center max-w-xs">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">{message}</h3>
+            <div className="text-center">
+                <h3 className="h5 font-weight-semibold mb-3" style={{ color: '#1e293b' }}>
+                    {message}
+                </h3>
 
-                {showProgress && progress !== undefined && (
+                {showProgress && clampedProgress !== undefined && (
                     <div className="mb-4">
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div className="progress mb-2" style={{ height: '8px' }}>
                             <div
-                                className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
-                                style={{ width: `${progress}%` }}></div>
+                                className="progress-bar"
+                                role="progressbar"
+                                style={{
+                                    width: `${clampedProgress}%`,
+                                    backgroundColor: '#00674f',
+                                    transition: 'width 0.3s ease-out',
+                                }}
+                                aria-valuenow={clampedProgress}
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                            ></div>
                         </div>
-                        <span className="text-sm text-gray-600">{progress}%</span>
+                        <small style={{ color: '#64748b' }}>{clampedProgress}%</small>
                     </div>
                 )}
 
                 {/* Animated dots */}
-                <div className="flex justify-center space-x-1">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                <div className="d-flex justify-content-center">
                     <div
-                        className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                        style={{ animationDelay: '0.1s' }}></div>
+                        className="mx-1"
+                        style={{
+                            width: '8px',
+                            height: '8px',
+                            backgroundColor: '#00674f',
+                            borderRadius: '50%',
+                            animation: 'bounce 1.4s infinite ease-in-out both',
+                        }}
+                    ></div>
                     <div
-                        className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                        style={{ animationDelay: '0.2s' }}></div>
+                        className="mx-1"
+                        style={{
+                            width: '8px',
+                            height: '8px',
+                            backgroundColor: '#00674f',
+                            borderRadius: '50%',
+                            animation: 'bounce 1.4s infinite ease-in-out both 0.1s',
+                        }}
+                    ></div>
+                    <div
+                        className="mx-1"
+                        style={{
+                            width: '8px',
+                            height: '8px',
+                            backgroundColor: '#00674f',
+                            borderRadius: '50%',
+                            animation: 'bounce 1.4s infinite ease-in-out both 0.2s',
+                        }}
+                    ></div>
                 </div>
             </div>
         </div>

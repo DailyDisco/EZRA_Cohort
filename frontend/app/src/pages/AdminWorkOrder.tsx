@@ -443,7 +443,11 @@ const AdminWorkOrder = () => {
 
                     queryClient.setQueryData(['workOrders'], (oldData: WorkOrderData[] | undefined) => {
                         if (!oldData) return oldData;
-                        return oldData.map((item) => (item.key === selectedItem.key ? { ...item, status: currentStatus, updatedAt: new Date() } : item));
+                        return oldData.map((item) =>
+                            item.key === selectedItem.key
+                                ? { ...item, status: currentStatus, updatedAt: new Date() }
+                                : item
+                        );
                     });
                 } else {
                     const response = await fetch(`${API_URL}/admin/complaints/${selectedItem.key}/status`, {
@@ -463,7 +467,11 @@ const AdminWorkOrder = () => {
 
                     queryClient.setQueryData(['complaints'], (oldData: ComplaintsData[] | undefined) => {
                         if (!oldData) return oldData;
-                        return oldData.map((item) => (item.key === selectedItem.key ? { ...item, status: currentStatus, updatedAt: new Date() } : item));
+                        return oldData.map((item) =>
+                            item.key === selectedItem.key
+                                ? { ...item, status: currentStatus, updatedAt: new Date() }
+                                : item
+                        );
                     });
                 }
                 setIsModalVisible(false);
@@ -541,10 +549,7 @@ const AdminWorkOrder = () => {
             </div>
             <div>
                 <strong>Status:</strong>
-                <Select
-                    value={currentStatus}
-                    style={{ width: 200, marginLeft: 10 }}
-                    onChange={handleStatusChange}>
+                <Select value={currentStatus} style={{ width: 200, marginLeft: 10 }} onChange={handleStatusChange}>
                     {itemType === 'workOrder' ? (
                         <>
                             <Select.Option value="open">Open</Select.Option>
@@ -571,7 +576,9 @@ const AdminWorkOrder = () => {
             <PageTitleComponent title="Work Order & Complaints" />
 
             {/* Alerts headers */}
-            <div className="w-100 justify-content-between mb-4 left-text text-start">{alertDescription ? <AlertComponent description={alertDescription} /> : null}</div>
+            <div className="w-100 justify-content-between mb-4 left-text text-start">
+                {alertDescription ? <AlertComponent description={alertDescription} /> : null}
+            </div>
 
             {/* Work Order Table */}
             <div className="mb-5">

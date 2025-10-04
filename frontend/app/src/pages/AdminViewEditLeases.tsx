@@ -281,7 +281,9 @@ export default function AdminViewEditLeases() {
                         <Input
                             placeholder={`Search ${title}`}
                             value={filterDropdownProps.selectedKeys[0]}
-                            onChange={(e) => filterDropdownProps.setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                            onChange={(e) =>
+                                filterDropdownProps.setSelectedKeys(e.target.value ? [e.target.value] : [])
+                            }
                             style={{ width: 188, marginBottom: 8, display: 'block' }}
                         />
                         <ButtonComponent
@@ -510,11 +512,7 @@ export default function AdminViewEditLeases() {
             dataIndex: 'status',
             key: 'status',
             render: (status) => (
-                <AlertComponent
-                    title={status}
-                    description=""
-                    type={status === 'active' ? 'success' : 'warning'}
-                />
+                <AlertComponent title={status} description="" type={status === 'active' ? 'success' : 'warning'} />
             ),
             filters: statusFilters,
             onFilter: (value, record) => record.status === value,
@@ -529,7 +527,8 @@ export default function AdminViewEditLeases() {
                         <button
                             className="btn btn-view"
                             onClick={() => window.open(record.adminDocUrl, '_blank')}
-                            title="View Lease Document">
+                            title="View Lease Document"
+                        >
                             <FileTextOutlined />
                             <span>View</span>
                         </button>
@@ -537,10 +536,7 @@ export default function AdminViewEditLeases() {
 
                     {/* Primary actions based on status */}
                     {record.status === 'draft' && (
-                        <button
-                            className="btn btn-send"
-                            onClick={() => showSendModal(record)}
-                            title="Send Lease">
+                        <button className="btn btn-send" onClick={() => showSendModal(record)} title="Send Lease">
                             <SendOutlined />
                             <span>Send</span>
                         </button>
@@ -548,10 +544,7 @@ export default function AdminViewEditLeases() {
 
                     {/* Renewal for expired/expiring leases */}
                     {(record.status === 'expired' || record.status === 'expires_soon') && (
-                        <button
-                            className="btn btn-renew"
-                            onClick={() => handleRenew(record)}
-                            title="Renew Lease">
+                        <button className="btn btn-renew" onClick={() => handleRenew(record)} title="Renew Lease">
                             <SyncOutlined />
                             <span>Renew</span>
                         </button>
@@ -559,21 +552,21 @@ export default function AdminViewEditLeases() {
 
                     {/* Amendment for active/pending leases */}
                     {(record.status === 'active' || record.status === 'expires_soon' || record.status === 'draft') && (
-                        <button
-                            className="btn btn-amend"
-                            onClick={() => handleAmend(record)}
-                            title="Amend Lease">
+                        <button className="btn btn-amend" onClick={() => handleAmend(record)} title="Amend Lease">
                             <EditOutlined />
                             <span>Amend</span>
                         </button>
                     )}
 
                     {/* Termination - always last as it's destructive */}
-                    {(record.status === 'active' || record.status === 'pending_approval' || record.status === 'expires_soon') && (
+                    {(record.status === 'active' ||
+                        record.status === 'pending_approval' ||
+                        record.status === 'expires_soon') && (
                         <button
                             className="btn btn-terminate"
                             onClick={() => handleTerminate(record.id)}
-                            title="Terminate Lease">
+                            title="Terminate Lease"
+                        >
                             <StopOutlined />
                             <span>Terminate</span>
                         </button>
@@ -588,10 +581,7 @@ export default function AdminViewEditLeases() {
         return (
             <div className="container overflow-hidden">
                 <h1 className="p-3 text-primary">Admin View & Edit Leases</h1>
-                <Spin
-                    size="large"
-                    tip="Loading authentication..."
-                />
+                <Spin size="large" tip="Loading authentication..." />
             </div>
         );
     }
@@ -614,12 +604,7 @@ export default function AdminViewEditLeases() {
         return (
             <div className="container overflow-hidden">
                 <h1 className="p-3 text-primary">Admin View & Edit Leases</h1>
-                <Alert
-                    message="Authentication Error"
-                    description={authError}
-                    type="error"
-                    showIcon
-                />
+                <Alert message="Authentication Error" description={authError} type="error" showIcon />
             </div>
         );
     }
@@ -630,11 +615,7 @@ export default function AdminViewEditLeases() {
             <h1 className="p-3 text-primary">Admin View & Edit Leases</h1>
 
             <div className="mb-3">
-                <ButtonComponent
-                    type="primary"
-                    title="Add New Lease"
-                    onClick={handleAddLease}
-                />
+                <ButtonComponent type="primary" title="Add New Lease" onClick={handleAddLease} />
             </div>
 
             {isLoading ? (

@@ -164,10 +164,7 @@ const AdminViewEditSmartLockers = () => {
 
         return (
             <div>
-                <Dropdown
-                    menu={{ items }}
-                    placement="bottomRight"
-                    overlayClassName={'custom-dropdown'}>
+                <Dropdown menu={{ items }} placement="bottomRight" overlayClassName={'custom-dropdown'}>
                     <Button>
                         <p className="fs-3 fw-bold">...</p>
                     </Button>
@@ -246,7 +243,13 @@ const AdminViewEditSmartLockers = () => {
 
     // Mutation for updating locker
     const updateLockerMutation = useMutation({
-        mutationFn: async ({ lockerId, updates }: { lockerId: number; updates: { user_id?: string; in_use?: boolean; access_code?: string } }) => {
+        mutationFn: async ({
+            lockerId,
+            updates,
+        }: {
+            lockerId: number;
+            updates: { user_id?: string; in_use?: boolean; access_code?: string };
+        }) => {
             console.log('Original updates:', updates);
             console.log('lockerId:', lockerId);
             console.log('API URL:', `${API_URL}/admin/lockers/${lockerId}`);
@@ -387,11 +390,7 @@ const AdminViewEditSmartLockers = () => {
                 <div className="flex flex-column gap-2">
                     {/* View Tenant Complaints */}
                     {/* View Tenant Work Orders */}
-                    <ActionMenu
-                        key={record.id}
-                        lockerId={record.id}
-                        password={record.access_code ?? ''}
-                    />
+                    <ActionMenu key={record.id} lockerId={record.id} password={record.access_code ?? ''} />
                     {/* Leaving these here because I think we might need them. */}
                     {/* Edit Tenant */}
                     {/* <ModalComponent type="Edit Tenant" modalTitle="Edit Tenant" buttonTitle="Edit" content="Edit Tenant" handleOkay={() => { }} buttonType="primary" /> */}
@@ -434,11 +433,7 @@ const AdminViewEditSmartLockers = () => {
                     }}
                 />
             </div>
-            <TableComponent
-                columns={columns}
-                dataSource={dataSource}
-                loading={isLoadingLockers}
-            />
+            <TableComponent columns={columns} dataSource={dataSource} loading={isLoadingLockers} />
         </div>
     );
 };

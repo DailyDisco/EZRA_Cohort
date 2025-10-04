@@ -16,7 +16,8 @@ export default function LoginForm() {
         <div style={{ position: 'relative' }}>
             <div
                 className="container mt-3 pt-md-0 d-flex flex-column gap-5 gap-lg-0 justify-content-start align-items-lg-center justify-content-lg-center flex-lg-row"
-                style={{ minHeight: 'calc(100vh - 3rem)' }}>
+                style={{ minHeight: 'calc(100vh - 3rem)' }}
+            >
                 <div className="d-none d-md-flex justify-content-end mx-lg-2">
                     <img
                         src="https://images.pexels.com/photos/7688073/pexels-photo-7688073.jpeg?auto=compress&cs=tinysrgb"
@@ -32,7 +33,8 @@ export default function LoginForm() {
                 {/* Clerk SignIn Component */}
                 <div
                     className="w-100 w-lg-70 mt-5 mt-lg-0 mx-auto d-flex justify-content-center align-items-center"
-                    style={{ height: '100%' }}>
+                    style={{ height: '100%' }}
+                >
                     <SignIn />
                 </div>
             </div>

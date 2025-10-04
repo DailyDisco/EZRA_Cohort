@@ -123,10 +123,7 @@ const AddTenant = () => {
                 <div className="flex flex-column gap-2">
                     {/* View Tenant Complaints */}
                     {/* View Tenant Work Orders */}
-                    <ActionMenu
-                        key={record.id}
-                        tenantClerkId={record.clerk_id}
-                    />
+                    <ActionMenu key={record.id} tenantClerkId={record.clerk_id} />
                     {/* Leaving these here because I think we might need them. */}
                     {/* Edit Tenant */}
                     {/* <ModalComponent type="Edit Tenant" modalTitle="Edit Tenant" buttonTitle="Edit" content="Edit Tenant" handleOkay={() => { }} buttonType="primary" /> */}
@@ -144,11 +141,7 @@ const AddTenant = () => {
             <div className="mb-3 flex">
                 <InviteUserModal />
             </div>
-            <TableComponent
-                columns={columns}
-                dataSource={tenants}
-                onChange={() => {}}
-            />
+            <TableComponent columns={columns} dataSource={tenants} onChange={() => {}} />
         </div>
     );
 };
@@ -177,10 +170,7 @@ function ActionMenu(props: ActionsDropdownProps) {
 
     return (
         <div>
-            <Dropdown
-                menu={{ items }}
-                placement="bottomRight"
-                overlayClassName={'custom-dropdown'}>
+            <Dropdown menu={{ items }} placement="bottomRight" overlayClassName={'custom-dropdown'}>
                 <Button>
                     <p className="fs-3 fw-bold">...</p>
                 </Button>
@@ -267,9 +257,7 @@ function InviteUserModal() {
 
     return (
         <>
-            <Button
-                type="primary"
-                onClick={showModal}>
+            <Button type="primary" onClick={showModal}>
                 <PlusOutlined />
                 Invite Tenant
             </Button>
@@ -290,11 +278,18 @@ function InviteUserModal() {
                         inviteTenant();
                     }}
                     initialValues={{ email: '', unitNumber: 0 }}
-                    className="">
+                    className=""
+                >
                     <p>Tenant Email</p>
                     <Form.Item
                         name="email"
-                        rules={[{ required: true, message: 'Please provide a valid email' }, { type: 'email' }, { min: 5 }, { max: 255 }]}>
+                        rules={[
+                            { required: true, message: 'Please provide a valid email' },
+                            { type: 'email' },
+                            { min: 5 },
+                            { max: 255 },
+                        ]}
+                    >
                         <Input
                             prefix={<MailOutlined />}
                             placeholder="Tenant Email"
@@ -306,8 +301,14 @@ function InviteUserModal() {
                     </Form.Item>
                     {inviteStatus.show ? (
                         <div className="d-flex align-items-center">
-                            {inviteStatus.type === 'success' ? <CheckOutlined className="text-success fs-6 mb-3 mx-1" /> : <CloseCircleOutlined className="text-danger fs-6 mb-3 mx-1" />}
-                            <p className={`fs-6 ${inviteStatus.type === 'success' ? 'text-success' : 'text-danger'}`}>{inviteStatus.message}</p>
+                            {inviteStatus.type === 'success' ? (
+                                <CheckOutlined className="text-success fs-6 mb-3 mx-1" />
+                            ) : (
+                                <CloseCircleOutlined className="text-danger fs-6 mb-3 mx-1" />
+                            )}
+                            <p className={`fs-6 ${inviteStatus.type === 'success' ? 'text-success' : 'text-danger'}`}>
+                                {inviteStatus.message}
+                            </p>
                         </div>
                     ) : (
                         <p style={{ minHeight: '16px' }}></p>
@@ -374,16 +375,16 @@ function TenantWorkOrderModal(props: TenantModalProps) {
                 open={internalModalOpen}
                 onCancel={handleCancel}
                 okButtonProps={{ hidden: true, disabled: true }}
-                cancelButtonProps={{ hidden: true, disabled: true }}>
+                cancelButtonProps={{ hidden: true, disabled: true }}
+            >
                 <div>
                     {data?.length ? (
-                        <div
-                            className="space-y-4 d-flex flex-column"
-                            style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                        <div className="space-y-4 d-flex flex-column" style={{ maxHeight: '600px', overflowY: 'auto' }}>
                             {data.map((order, idx) => (
                                 <div
                                     key={idx}
-                                    className="p-3 border rounded my-1 shadow-md bg-white d-flex flex-column">
+                                    className="p-3 border rounded my-1 shadow-md bg-white d-flex flex-column"
+                                >
                                     <span className="d-flex flex-column">
                                         <p className="fs-6">Title</p>
                                         <p>{order.title}</p>
@@ -463,16 +464,13 @@ function TenantComplaintModal(props: TenantModalProps) {
                 open={internalModalOpen}
                 onCancel={handleCancel}
                 okButtonProps={{ hidden: true, disabled: true }}
-                cancelButtonProps={{ hidden: true, disabled: true }}>
+                cancelButtonProps={{ hidden: true, disabled: true }}
+            >
                 <div>
                     {data?.length ? (
-                        <div
-                            className="space-y-3 d-flex flex-column"
-                            style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                        <div className="space-y-3 d-flex flex-column" style={{ maxHeight: '600px', overflowY: 'auto' }}>
                             {data.map((order, idx) => (
-                                <div
-                                    key={idx}
-                                    className="p-3 border rounded shadow-sm bg-white d-flex flex-column">
+                                <div key={idx} className="p-3 border rounded shadow-sm bg-white d-flex flex-column">
                                     <div className="mb-2">
                                         <p className="fs-6 fw-semibold mb-1">Title</p>
                                         <p className="mb-0">{order.title}</p>
@@ -564,7 +562,10 @@ function TenantDeleteModal(props: TenantModalProps) {
                 okButtonProps={{ disabled: isPending ? true : false }}
                 // cancelButtonProps={{ hidden: true, disabled: true }}
             >
-                <p>This action cannot be undone. This will permanently delete this account and remove this data from our servers.</p>
+                <p>
+                    This action cannot be undone. This will permanently delete this account and remove this data from
+                    our servers.
+                </p>
             </Modal>
         </>
     );

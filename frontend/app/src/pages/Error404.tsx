@@ -6,7 +6,8 @@ const ErrorNotFound = () => {
             className="d-flex flex-column align-items-center justify-content-center min-vh-100 position-relative overflow-hidden"
             style={{
                 background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%)',
-            }}>
+            }}
+        >
             {/* Decorative background elements */}
             <div
                 className="position-absolute rounded-circle"
@@ -42,7 +43,8 @@ const ErrorNotFound = () => {
                 style={{
                     maxWidth: '48rem',
                     zIndex: 10,
-                }}>
+                }}
+            >
                 <img
                     src="/sad_logo.png"
                     alt="Logo"
@@ -57,7 +59,8 @@ const ErrorNotFound = () => {
                     className="display-1 fw-bold text-dark"
                     style={{
                         letterSpacing: '-0.025em',
-                    }}>
+                    }}
+                >
                     404
                 </h1>
                 <h2 className="h2 fw-semibold text-secondary">Page Not Found</h2>
@@ -67,8 +70,10 @@ const ErrorNotFound = () => {
                         maxWidth: '28rem',
                         lineHeight: '1.75',
                         fontSize: '1rem',
-                    }}>
-                    The page you are looking for does not exist or has been moved. Please check the URL or return to the home page.
+                    }}
+                >
+                    The page you are looking for does not exist or has been moved. Please check the URL or return to the
+                    home page.
                 </p>
                 <Link
                     to="/"
@@ -81,14 +86,16 @@ const ErrorNotFound = () => {
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = '#212529';
-                    }}>
+                    }}
+                >
                     <svg
                         className="bi"
                         width="20"
                         height="20"
                         fill="currentColor"
                         viewBox="0 0 24 24"
-                        aria-hidden="true">
+                        aria-hidden="true"
+                    >
                         <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -104,7 +111,8 @@ const ErrorNotFound = () => {
                     className="mt-4 text-muted text-center border-top border-light pt-4 w-100"
                     style={{
                         fontSize: '0.875rem',
-                    }}>
+                    }}
+                >
                     If you believe this is an error, please contact our support team for assistance.
                 </div>
             </div>

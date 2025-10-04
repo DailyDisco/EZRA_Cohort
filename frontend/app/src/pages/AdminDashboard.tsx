@@ -224,7 +224,13 @@ const AdminDashboard = () => {
 
     // Mutation for updating locker
     const updateLockerMutation = useMutation({
-        mutationFn: async ({ lockerId, updates }: { lockerId: number; updates: { user_id?: string; in_use?: boolean; access_code?: string } }) => {
+        mutationFn: async ({
+            lockerId,
+            updates,
+        }: {
+            lockerId: number;
+            updates: { user_id?: string; in_use?: boolean; access_code?: string };
+        }) => {
             console.log('Original updates:', updates);
             console.log('lockerId:', lockerId);
             console.log('API URL:', `${serverUrl}/admin/lockers/${lockerId}`);
@@ -352,7 +358,11 @@ const AdminDashboard = () => {
         {
             title: 'Status',
             dataIndex: 'status',
-            render: (status: string) => <Tag color={status.toLowerCase() === 'active' ? 'green' : 'red'}>{status.charAt(0).toUpperCase() + status.slice(1)}</Tag>,
+            render: (status: string) => (
+                <Tag color={status.toLowerCase() === 'active' ? 'green' : 'red'}>
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                </Tag>
+            ),
         },
     ];
 
@@ -367,7 +377,9 @@ const AdminDashboard = () => {
         {
             title: 'Type',
             dataIndex: 'type',
-            render: (type: string) => <Tag color={type === 'work_order' ? 'blue' : 'purple'}>{type.replace('_', ' ').toUpperCase()}</Tag>,
+            render: (type: string) => (
+                <Tag color={type === 'work_order' ? 'blue' : 'purple'}>{type.replace('_', ' ').toUpperCase()}</Tag>
+            ),
         },
         {
             title: 'Title',
@@ -380,7 +392,9 @@ const AdminDashboard = () => {
         {
             title: 'Status',
             dataIndex: 'status',
-            render: (status: string) => <Tag color={status.toLowerCase() === 'open' ? 'orange' : 'green'}>{status}</Tag>,
+            render: (status: string) => (
+                <Tag color={status.toLowerCase() === 'open' ? 'orange' : 'green'}>{status}</Tag>
+            ),
         },
         // {
         //     title: "Created",
@@ -395,7 +409,9 @@ const AdminDashboard = () => {
         {
             title: 'Type',
             dataIndex: 'type',
-            render: (type: string) => <Tag color={type === 'work_order' ? 'blue' : 'purple'}>{type.replace('_', ' ').toUpperCase()}</Tag>,
+            render: (type: string) => (
+                <Tag color={type === 'work_order' ? 'blue' : 'purple'}>{type.replace('_', ' ').toUpperCase()}</Tag>
+            ),
         },
         {
             title: 'Title',
@@ -408,12 +424,15 @@ const AdminDashboard = () => {
         {
             title: 'Category',
             dataIndex: 'category',
-            render: (category: string, record: WorkOrderOrComplaint) => (record.type === 'work_order' ? <Tag color="blue">{category}</Tag> : null),
+            render: (category: string, record: WorkOrderOrComplaint) =>
+                record.type === 'work_order' ? <Tag color="blue">{category}</Tag> : null,
         },
         {
             title: 'Status',
             dataIndex: 'status',
-            render: (status: string) => <Tag color={status.toLowerCase() === 'open' ? 'orange' : 'green'}>{status}</Tag>,
+            render: (status: string) => (
+                <Tag color={status.toLowerCase() === 'open' ? 'orange' : 'green'}>{status}</Tag>
+            ),
         },
         // {
         //     title: "Created",
@@ -440,7 +459,9 @@ const AdminDashboard = () => {
         })) ?? [];
 
     // Combine and sort both types by creation date
-    const combinedItems = [...workOrdersWithKeys, ...complaintsWithKeys].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const combinedItems = [...workOrdersWithKeys, ...complaintsWithKeys].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
     const WORK_ORDERS_COUNT = workOrders?.length ?? 0;
     const COMPLAINTS_COUNT = complaints?.length ?? 0;
@@ -464,10 +485,7 @@ const AdminDashboard = () => {
                     icon={<ToolOutlined style={{ fontSize: '24px', color: '#1890ff', marginBottom: '16px' }} />}
                     button={
                         <Link to="/admin/admin-view-and-edit-work-orders-and-complaints">
-                            <ButtonComponent
-                                title="View All"
-                                type="primary"
-                            />
+                            <ButtonComponent title="View All" type="primary" />
                         </Link>
                     }
                 />
@@ -479,10 +497,7 @@ const AdminDashboard = () => {
                     icon={<WarningOutlined style={{ fontSize: '24px', color: '#faad14', marginBottom: '16px' }} />}
                     button={
                         <Link to="/admin/admin-view-and-edit-work-orders-and-complaints">
-                            <ButtonComponent
-                                title="View All"
-                                type="primary"
-                            />
+                            <ButtonComponent title="View All" type="primary" />
                         </Link>
                     }
                 />
@@ -495,10 +510,7 @@ const AdminDashboard = () => {
                     button={
                         <div className="d-flex gap-2">
                             <Link to="/admin/admin-view-and-edit-smart-lockers">
-                                <ButtonComponent
-                                    title="View All"
-                                    type="primary"
-                                />
+                                <ButtonComponent title="View All" type="primary" />
                             </Link>
                             <ModalComponent
                                 buttonTitle="Add Package"
@@ -528,12 +540,7 @@ const AdminDashboard = () => {
                     description="Scheduled this month"
                     hoverable={true}
                     icon={<CalendarOutlined style={{ fontSize: '24px', color: '#722ed1', marginBottom: '16px' }} />}
-                    button={
-                        <ButtonComponent
-                            title="View All"
-                            type="primary"
-                        />
-                    }
+                    button={<ButtonComponent title="View All" type="primary" />}
                 />
             </div>
 
