@@ -3,7 +3,7 @@ import { Alert } from "antd";
 
 interface AlertProps {
     title: string;
-    message: string;
+    message?: string;
     description: string;
     type: "success" | "info" | "warning" | "error";
 }
@@ -19,7 +19,7 @@ const AlertComponent = (props: AlertProps) => {
         <>
             <Alert
                 className="flex text-left"
-                message={props.title}
+                message={props.message || props.title}
                 description={props.description}
                 type={props.type}
                 showIcon

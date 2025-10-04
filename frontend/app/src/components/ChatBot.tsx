@@ -77,7 +77,7 @@ const MyChatBot: React.FC = () => {
             path: "loop",
         },
         loop: {
-            message: async (params) => {
+            message: async (params: { userInput: string; injectMessage: (msg: string) => Promise<void> }) => {
                 await callServerChat(params);
             },
             path: "loop",
