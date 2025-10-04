@@ -70,7 +70,8 @@ createRoot(document.getElementById('root')!).render(
                         itemSelectedColor: 'white',
                     },
                 },
-            }}>
+            }}
+        >
             <QueryClientProvider client={queryClient}>
                 <BrowserRouter>
                     {/* TODO: Set up fallback redirect urls based on user role, or use a redirect url that is set in the Clerk Dashboard */}
@@ -83,7 +84,8 @@ createRoot(document.getElementById('root')!).render(
                     <ClerkProvider
                         publishableKey={CLERK_PUBLISHABLE_KEY}
                         signUpFallbackRedirectUrl="/"
-                        signInFallbackRedirectUrl="/">
+                        signInFallbackRedirectUrl="/"
+                    >
                         {/* Routes: Container for all Route definitions */}
                         <Routes>
                             {/* Example and Explanation of Routes */}
@@ -103,17 +105,7 @@ createRoot(document.getElementById('root')!).render(
                             {/* Pre-authentication Layout Group */}
                             <Route element={<PreAuthedLayout />}>
                                 {/* Landing Page */}
-                                <Route
-                                    index
-                                    element={<App />}
-                                />
-
-                                {/* Reusable Components Route */}
-                                <Route
-                                    path="reusable-components"
-                                    element={<ReusableComponents />}
-                                />
-
+                                <Route index element={<App />} />
                                 {/* Authentication Routes */}
                                 <Route path="auth">
                                     <Route
@@ -128,10 +120,7 @@ createRoot(document.getElementById('root')!).render(
 
                                 {/* Testing Routes */}
                                 <Route path="test">
-                                    <Route
-                                        path="test-clerk-go-backend"
-                                        element={<TestGoBackend />}
-                                    />
+                                    <Route path="test-clerk-go-backend" element={<TestGoBackend />} />
                                 </Route>
                             </Route>
                             {/* End of Pre-authentication Layout Group */}
@@ -142,22 +131,13 @@ createRoot(document.getElementById('root')!).render(
                                 <Route element={<AuthenticatedLayout />}>
                                     {/* Admin Route Group */}
                                     <Route path="admin">
-                                        <Route
-                                            index
-                                            element={<AdminDashboard />}
-                                        />
+                                        <Route index element={<AdminDashboard />} />
                                         <Route
                                             path="init-apartment-complex"
                                             element={<AdminApartmentSetupAndDetailsManagement />}
                                         />
-                                        <Route
-                                            path="manage-tenants"
-                                            element={<AddTenant />}
-                                        />
-                                        <Route
-                                            path="admin-view-and-edit-leases"
-                                            element={<AdminViewEditLeases />}
-                                        />
+                                        <Route path="manage-tenants" element={<AddTenant />} />
+                                        <Route path="admin-view-and-edit-leases" element={<AdminViewEditLeases />} />
                                         <Route
                                             path="admin-view-and-edit-work-orders-and-complaints"
                                             element={<AdminWorkOrder />}
@@ -170,40 +150,25 @@ createRoot(document.getElementById('root')!).render(
 
                                     {/* Tenant Route Group */}
                                     <Route path="tenant">
-                                        <Route
-                                            index
-                                            element={<TenantDashBoard />}
-                                        />
-                                        <Route
-                                            path="guest-parking"
-                                            element={<h1>Guest Parking</h1>}
-                                        />
+                                        <Route index element={<TenantDashBoard />} />
+                                        <Route path="guest-parking" element={<h1>Guest Parking</h1>} />
                                         {/* <Route
                                             path="tenant-view-and-edit-leases"
                                             element={<h1>Digital Documents</h1>}
                                         /> */}
-                                        <Route
-                                            path="tenant-complaints"
-                                            element={<TenantComplaints />}
-                                        />
-                                        <Route
-                                            path="tenant-work-orders"
-                                            element={<TenantWorkOrders />}
-                                        />
+                                        <Route path="tenant-complaints" element={<TenantComplaints />} />
+                                        <Route path="tenant-work-orders" element={<TenantWorkOrders />} />
                                     </Route>
                                 </Route>
                             </Route>
                             {/* End of Protected Routes (Admin & Tenant) */}
 
                             {/* 404 Route - Always place at the end to catch unmatched routes */}
-                            <Route
-                                path="*"
-                                element={<ErrorNotFound />}
-                            />
+                            <Route path="*" element={<ErrorNotFound />} />
                         </Routes>
                     </ClerkProvider>
                 </BrowserRouter>
             </QueryClientProvider>
         </ConfigProvider>
-    </StrictMode>,
+    </StrictMode>
 );

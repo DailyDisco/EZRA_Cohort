@@ -99,35 +99,40 @@ function Items() {
                 className="btn btn-primary m-2"
                 onClick={() => {
                     createGet();
-                }}>
+                }}
+            >
                 GET
             </button>
             <button
                 className="btn btn-secondary  m-2"
                 onClick={() => {
                     createPost();
-                }}>
+                }}
+            >
                 Post
             </button>
             <button
                 className="btn btn-warning  m-2"
                 onClick={() => {
                     createPut();
-                }}>
+                }}
+            >
                 Put
             </button>
             <button
                 className="btn btn-light  m-2"
                 onClick={() => {
                     createDelete();
-                }}>
+                }}
+            >
                 Delete
             </button>
             <button
                 className="btn btn-dark  m-2"
                 onClick={() => {
                     createPatch();
-                }}>
+                }}
+            >
                 Patch
             </button>
         </div>
@@ -137,7 +142,7 @@ function Items() {
 const DemoTestingComponent = () => {
     return (
         <div className="d-flex flex-column gap-2 w-50 mx-auto my-5 border border-1 border-dark p-5 rounded-3 bg-light">
-            <h4>RentDaddy Testing Component</h4>
+            <h4>EZRA Testing Component</h4>
             <Link to="/reusable-components">
                 <Button className="my-2">Checkout the Reusable Components</Button>
             </Link>
