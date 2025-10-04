@@ -26,6 +26,10 @@ export const TenantDashBoard = () => {
     const userId = user?.publicMetadata["db_id"];
     const { getToken } = useAuth();
 
+    console.log("[TENANT_DASHBOARD] User:", user);
+    console.log("[TENANT_DASHBOARD] User ID from metadata:", userId);
+    console.log("[TENANT_DASHBOARD] Clerk User ID:", user?.id);
+
     async function getParkingPermit() {
         const authToken = await getToken();
         if (!authToken) {
@@ -61,7 +65,9 @@ export const TenantDashBoard = () => {
         if (!res.ok) {
             throw new Error("[TENANT_DASHBOARD] Error complaints request failed");
         }
-        return (await res.json()) as ComplaintsData[];
+        const data = (await res.json()) as ComplaintsData[];
+        console.log("[TENANT_DASHBOARD] Complaints data:", data);
+        return data;
     }
 
     async function getWorkOrders() {
@@ -78,9 +84,11 @@ export const TenantDashBoard = () => {
         });
 
         if (!res.ok) {
-            throw new Error("[TENANT_DASHBOARD] Error complaints request failed");
+            throw new Error("[TENANT_DASHBOARD] Error work orders request failed");
         }
-        return (await res.json()) as WorkOrderData[];
+        const data = (await res.json()) as WorkOrderData[];
+        console.log("[TENANT_DASHBOARD] Work orders data:", data);
+        return data;
     }
 
     async function getLockers() {
@@ -102,18 +110,19 @@ export const TenantDashBoard = () => {
         return (await res.json()) as ComplaintsData[];
     }
 
+    const clerkUserId = user?.id;
     const [complaints, workOrders, lockers, parking] = useQueries({
         queries: [
-            { queryKey: [`${userId}-complaints`], queryFn: getComplaints },
-            { queryKey: [`${userId}-work-orders`], queryFn: getWorkOrders },
-            { queryKey: [`${userId}-lockers`], queryFn: getLockers },
-            { queryKey: [`${userId}-parking`], queryFn: getParkingPermit },
+            { queryKey: [`${clerkUserId}-complaints`], queryFn: getComplaints },
+            { queryKey: [`${clerkUserId}-work-orders`], queryFn: getWorkOrders },
+            { queryKey: [`${clerkUserId}-lockers`], queryFn: getLockers },
+            { queryKey: [`${clerkUserId}-parking`], queryFn: getParkingPermit },
         ],
     });
 
     // Fetch lease status using TanStack Query
     const { data: leaseStatus, isLoading } = useQuery<LeaseStatus>({
-        queryKey: ["leaseStatus", userId], // Unique key for the query
+        queryKey: ["leaseStatus", clerkUserId], // Unique key for the query
         queryFn: async () => {
             const authToken = await getToken();
             if (!authToken) {

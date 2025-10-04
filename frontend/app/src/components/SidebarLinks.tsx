@@ -205,7 +205,7 @@ const SidebarLinks = () => {
                         }}>
                         Guest Parking
                     </Link> */}
-                        <Link
+                        {/* <Link
                             to="/tenant/tenant-view-and-edit-leases"
                             className={`${getLinkClass("/tenant/tenant-view-and-edit-leases")} menu-link-hover hover-lift transition-all fw-medium`}
                             style={{
@@ -216,7 +216,7 @@ const SidebarLinks = () => {
                                 transition: "all 0.2s ease-in-out",
                             }}>
                             View Digital Leases
-                        </Link>
+                        </Link> */}
                         <Link
                             to="/tenant/tenant-complaints"
                             className={`${getLinkClass("/tenant/tenant-work-orders-and-complaints")} menu-link-hover hover-lift transition-all fw-medium`}
