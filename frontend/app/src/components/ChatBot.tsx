@@ -49,8 +49,8 @@ const MyChatBot: React.FC = () => {
 
         const updatedConversation = [...conversation, userMessage];
 
-        // Get API URL from environment variables
-        const API_URL = import.meta.env.VITE_API_URL;
+        // Get API URL from environment variables, ensuring no trailing slash
+        const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/$/, "");
 
         if (!API_URL) {
             console.error("VITE_API_URL is not defined.");

@@ -15,7 +15,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/clerk-react";
 import { FileTextOutlined } from "@ant-design/icons";
 
-const API_URL = import.meta.env.VITE_API_URL;
+// Use VITE_API_URL for the server URL, ensuring no trailing slash
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/$/, "");
 
 // Log the API_URL to ensure it's correctly formed
 console.log("API URL:", API_URL);

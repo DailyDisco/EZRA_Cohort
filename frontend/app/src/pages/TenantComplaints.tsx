@@ -7,8 +7,9 @@ import { ComplaintStatus, ComplaintEntry, ComplaintsData, GetApartment } from ".
 import Table, { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 
-const serverUrl = import.meta.env.VITE_SERVER_URL;
-const absoluteServerUrl = `${serverUrl}`;
+// Use VITE_API_URL for the server URL, ensuring no trailing slash
+const serverUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const absoluteServerUrl = serverUrl.replace(/\/$/, ""); // Remove trailing slash if present
 
 const TenantComplaintsAndWorkOrders = () => {
     const { getToken } = useAuth();

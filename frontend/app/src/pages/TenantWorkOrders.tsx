@@ -7,8 +7,9 @@ import PageTitleComponent from "../components/reusableComponents/PageTitleCompon
 import { Button, Divider, Form, Input, Modal, Select } from "antd";
 import dayjs from "dayjs";
 
-const serverUrl = import.meta.env.VITE_SERVER_URL;
-const absoluteServerUrl = `${serverUrl}`;
+// Use VITE_API_URL for the server URL, ensuring no trailing slash
+const serverUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const absoluteServerUrl = serverUrl.replace(/\/$/, ""); // Remove trailing slash if present
 
 export default function WorkOrders() {
     const { getToken } = useAuth();

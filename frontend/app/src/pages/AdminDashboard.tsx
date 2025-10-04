@@ -13,7 +13,8 @@ import PageTitleComponent from "../components/reusableComponents/PageTitleCompon
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/clerk-react";
 
-const serverUrl = import.meta.env.VITE_API_URL;
+// Use VITE_API_URL for the server URL, ensuring no trailing slash
+const serverUrl = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/$/, "");
 
 interface Locker {
     id: number;

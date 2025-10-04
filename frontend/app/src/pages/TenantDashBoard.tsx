@@ -16,13 +16,9 @@ interface LeaseStatus {
     url: string;
 }
 
-const DOMAIN_URL = import.meta.env.VITE_DOMAIN_URL || import.meta.env.DOMAIN_URL || "http://localhost";
-const PORT = import.meta.env.VITE_PORT || import.meta.env.PORT || "8080";
-const API_URL = `${DOMAIN_URL}:${PORT}`.replace(/\/$/, "");
-
-// Use API_URL as fallback if VITE_SERVER_URL is not properly set
-const serverUrl = import.meta.env.VITE_API_URL;
-const absoluteServerUrl = `${serverUrl}`;
+// Use VITE_API_URL for the server URL, ensuring no trailing slash
+const serverUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const absoluteServerUrl = serverUrl.replace(/\/$/, ""); // Remove trailing slash if present
 
 export const TenantDashBoard = () => {
     const [isSigningModalVisible, setSigningModalVisible] = useState(false);
