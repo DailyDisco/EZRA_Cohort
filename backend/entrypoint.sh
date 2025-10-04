@@ -40,8 +40,8 @@ until PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -
 done
 
 echo "Running database migrations..."
-# Pass the dynamically generated PG_URL to the task command
-task migrate:up "$PG_URL" || echo "Migration failed!"
+# Pass the dynamically generated PG_URL to the migrate command directly
+migrate -path internal/db/migrations/ -database "$PG_URL" -verbose up || echo "Migration failed!"
 echo "Database migrations complete."
 
 # Start cron in background
