@@ -309,14 +309,21 @@ func main() {
 		})
 
 		// ChatBot routes
-		r.Route("/api/chat", func(r chi.Router) {
-			r.Post("/", chatbotHandler.ChatHandler)
-			r.Get("/", chatbotHandler.ChatGetHandler)
-		})
+		// r.Route("/api/chat", func(r chi.Router) {
+		// 	r.Post("/", chatbotHandler.ChatHandler)
+		// 	r.Get("/", chatbotHandler.ChatGetHandler)
+		// })
 	}) // End of protected routes group
 
 	// Server config
 	port := os.Getenv("PORT")
+
+	// ChatBot routes (moved outside protected group for testing)
+	r.Route("/api/chat", func(r chi.Router) {
+		r.Post("/", chatbotHandler.ChatHandler)
+		r.Get("/", chatbotHandler.ChatGetHandler)
+	})
+
 	server := &http.Server{
 		Addr:    ":" + port,
 		Handler: r,
