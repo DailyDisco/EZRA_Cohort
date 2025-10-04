@@ -14,7 +14,7 @@ import type { ColumnType } from "antd/es/table";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/clerk-react";
 import { FileTextOutlined, SendOutlined, SyncOutlined, EditOutlined, StopOutlined } from "@ant-design/icons";
-import { PageLoader } from "../components/reusableComponents/CardSkeletonLoader";
+import { PageLoader } from "../components/reusableComponents/CardSkeletonLoader.tsx";
 
 // Use VITE_API_URL for the server URL, ensuring no trailing slash
 const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/$/, "");

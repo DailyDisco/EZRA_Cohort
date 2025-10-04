@@ -6,6 +6,7 @@ import ModalComponent from "../components/ModalComponent";
 import AlertComponent from "../components/reusableComponents/AlertComponent";
 import ButtonComponent from "../components/reusableComponents/ButtonComponent";
 import { CardComponent } from "../components/reusableComponents/CardComponent";
+import { CardSkeletonLoader } from "../components/reusableComponents/CardSkeletonLoader";
 import PageTitleComponent from "../components/reusableComponents/PageTitleComponent";
 import MyChatBot from "../components/ChatBot";
 import { useAuth, useUser } from "@clerk/react-router";
@@ -107,41 +108,40 @@ export const TenantDashBoard = () => {
     }
 
     const clerkUserId = user?.id;
+
+    // Common query configuration to reduce repetition
+    const queryConfig = {
+        retry: 2,
+        staleTime: 5 * 60 * 1000, // 5 minutes
+    };
+
     const [complaints, workOrders, lockers, parking] = useQueries({
         queries: [
             {
                 queryKey: [`${clerkUserId}-complaints`],
                 queryFn: getComplaints,
-                retry: 2,
-                staleTime: 5 * 60 * 1000, // 5 minutes
+                ...queryConfig,
             },
             {
                 queryKey: [`${clerkUserId}-work-orders`],
                 queryFn: getWorkOrders,
-                retry: 2,
-                staleTime: 5 * 60 * 1000, // 5 minutes
+                ...queryConfig,
             },
             {
                 queryKey: [`${clerkUserId}-lockers`],
                 queryFn: getLockers,
-                retry: 2,
-                staleTime: 5 * 60 * 1000, // 5 minutes
+                ...queryConfig,
             },
             {
                 queryKey: [`${clerkUserId}-parking`],
                 queryFn: getParkingPermit,
-                retry: 2,
-                staleTime: 5 * 60 * 1000, // 5 minutes
+                ...queryConfig,
             },
         ],
     });
 
     // Fetch lease status using TanStack Query
-    const {
-        data: leaseStatus,
-        isLoading,
-        error: leaseError,
-    } = useQuery<LeaseStatus>({
+    const { data: leaseStatus, error: leaseError } = useQuery<LeaseStatus>({
         queryKey: ["leaseStatus", clerkUserId], // Unique key for the query
         queryFn: async () => {
             const authToken = await getToken();
@@ -187,10 +187,19 @@ export const TenantDashBoard = () => {
     };
 
     // Show loading only for lease status, other data can load independently
-    const isLeaseLoading = isLoading;
 
-    // Check if any queries have errors
-    const hasErrors = complaints.error || workOrders.error || lockers.error || parking.error || leaseError;
+    // Check if any queries have errors and create specific error messages
+    const errorDetails = [];
+    if (complaints.error) errorDetails.push("complaints");
+    if (workOrders.error) errorDetails.push("work orders");
+    if (lockers.error) errorDetails.push("package information");
+    if (parking.error) errorDetails.push("parking permits");
+    if (leaseError) errorDetails.push("lease status");
+
+    const hasErrors = errorDetails.length > 0;
+
+    // Check if any queries are initially loading
+    const isInitialLoading = complaints.isLoading && workOrders.isLoading && lockers.isLoading && parking.isLoading;
 
     // Memoize card values to prevent unnecessary recalculations
     const cardValues = useMemo(
@@ -212,7 +221,7 @@ export const TenantDashBoard = () => {
             {hasErrors && (
                 <AlertComponent
                     title="Data Loading Error"
-                    message="Some dashboard data could not be loaded"
+                    message={`Unable to load: ${errorDetails.join(", ")}`}
                     description="Please refresh the page or contact support if the problem persists."
                     type="error"
                 />
@@ -230,30 +239,40 @@ export const TenantDashBoard = () => {
             {/* Dashboard Statistics Cards */}
             <h2 className="my-3 p-3 text-center">Quick Actions</h2>
             <div className="flex-container my-3">
-                <CardComponent
-                    title="Complaints"
-                    value={cardValues.complaintsCount}
-                    description="Something not working right or disturbing you? Let us know."
-                    hoverable={true}
-                    icon={<ToolOutlined className="icon" />}
-                    button={<TenantCreateComplaintsModal />}
-                />
-                <CardComponent
-                    title="Package info"
-                    value={cardValues.lockersCount}
-                    description={`${cardValues.lockersCount ? "You have a package. Click the button at your locker to open it." : "When package arrives you will be notified here."}`}
-                    hoverable={true}
-                    icon={<InboxOutlined className="icon" />}
-                    button={<TenantOpenLockerModal numberOfPackages={cardValues.lockersCount} />}
-                />
-                <CardComponent
-                    title="Guest Parking"
-                    value={cardValues.parkingCount}
-                    description="Got a guest coming to visit? Make sure they have spots to park"
-                    hoverable={true}
-                    icon={<CarOutlined className="icon" />}
-                    button={<TenantParkingPeritModal userParkingPermitsUsed={cardValues.parkingCount} />}
-                />
+                {isInitialLoading ? (
+                    <>
+                        <CardSkeletonLoader />
+                        <CardSkeletonLoader />
+                        <CardSkeletonLoader />
+                    </>
+                ) : (
+                    <>
+                        <CardComponent
+                            title="Complaints"
+                            value={cardValues.complaintsCount}
+                            description="Something not working right or disturbing you? Let us know."
+                            hoverable={true}
+                            icon={<ToolOutlined className="icon" />}
+                            button={<TenantCreateComplaintsModal />}
+                        />
+                        <CardComponent
+                            title="Package info"
+                            value={cardValues.lockersCount}
+                            description={`${cardValues.lockersCount ? "You have a package. Click the button at your locker to open it." : "When package arrives you will be notified here."}`}
+                            hoverable={true}
+                            icon={<InboxOutlined className="icon" />}
+                            button={<TenantOpenLockerModal numberOfPackages={cardValues.lockersCount} />}
+                        />
+                        <CardComponent
+                            title="Guest Parking"
+                            value={cardValues.parkingCount}
+                            description="Got a guest coming to visit? Make sure they have spots to park"
+                            hoverable={true}
+                            icon={<CarOutlined className="icon" />}
+                            button={<TenantParkingPeritModal userParkingPermitsUsed={cardValues.parkingCount} />}
+                        />
+                    </>
+                )}
             </div>
 
             {/* Quick Access Documents Section */}
@@ -261,7 +280,7 @@ export const TenantDashBoard = () => {
             <div className="flex-container mb-3">
                 <CardComponent
                     title="Lease"
-                    description="View or Resign your lease"
+                    description="View and sign your lease"
                     hoverable={true}
                     button={
                         <ModalComponent
@@ -335,7 +354,6 @@ function TenantParkingPeritModal(props: ParkingPermitModalProps) {
     const [internalModalOpen, setInternalModalOpen] = useState(false);
     const { userId, getToken } = useAuth();
     const [parkingPermitForm] = Form.useForm<ParkingEntry>();
-    console.log(`FORM VALUES: ${JSON.stringify(parkingPermitForm.getFieldsValue())}`);
     const { mutate: createParkingPermit, isPending: isParkingPending } = useMutation({
         mutationKey: [`${userId}-create-parking`],
         mutationFn: async () => {
@@ -371,12 +389,7 @@ function TenantParkingPeritModal(props: ParkingPermitModalProps) {
         setInternalModalOpen(true);
     };
     const handleCancel = () => {
-        if (internalModalOpen) {
-            setInternalModalOpen(false);
-        }
-        if (internalModalOpen === undefined) {
-            setInternalModalOpen(false);
-        }
+        setInternalModalOpen(false);
     };
     return (
         <>
@@ -442,23 +455,18 @@ function TenantViewWorkOrdersModal(props: WorkOrderModalProps) {
         setInternalModalOpen(true);
     };
     const handleCancel = () => {
-        if (internalModalOpen) {
-            setInternalModalOpen(false);
-        }
-        if (internalModalOpen === undefined) {
-            setInternalModalOpen(false);
-        }
+        setInternalModalOpen(false);
     };
     return (
         <>
             <ButtonComponent
-                title="View Complaints"
+                title="View Work Orders"
                 type="primary"
                 onClick={showModal}
             />
             <Modal
                 className="p-3 flex-wrap-row"
-                title={<h3>Complaints</h3>}
+                title={<h3>Work Orders</h3>}
                 open={internalModalOpen}
                 onOk={() => {}}
                 onCancel={handleCancel}
@@ -483,7 +491,7 @@ function TenantViewWorkOrdersModal(props: WorkOrderModalProps) {
                             ))}
                         </>
                     ) : (
-                        <p>No work orders....</p>
+                        <p>No work orders found.</p>
                     )}
                 </div>
             </Modal>
@@ -501,12 +509,7 @@ function TenantViewComplaintsModal(props: ComplaintModalProps) {
         setInternalModalOpen(true);
     };
     const handleCancel = () => {
-        if (internalModalOpen) {
-            setInternalModalOpen(false);
-        }
-        if (internalModalOpen === undefined) {
-            setInternalModalOpen(false);
-        }
+        setInternalModalOpen(false);
     };
     return (
         <>
@@ -541,7 +544,7 @@ function TenantViewComplaintsModal(props: ComplaintModalProps) {
                             ))}
                         </>
                     ) : (
-                        <p>No complaints....</p>
+                        <p>No complaints found.</p>
                     )}
                 </div>
             </Modal>
@@ -557,12 +560,7 @@ function TenantCreateComplaintsModal() {
         setInternalModalOpen(true);
     };
     const handleCancel = () => {
-        if (internalModalOpen) {
-            setInternalModalOpen(false);
-        }
-        if (internalModalOpen === undefined) {
-            setInternalModalOpen(false);
-        }
+        setInternalModalOpen(false);
     };
 
     const { mutate: createComplaint, isPending: isPendingComplaint } = useMutation({
@@ -630,7 +628,7 @@ function TenantCreateComplaintsModal() {
                         name="description"
                         rules={[{ required: true, type: "string", min: 5, max: 500 }]}>
                         <Input.TextArea
-                            placeholder="Enter a breif description for complaint"
+                            placeholder="Enter a brief description for complaint"
                             rows={4}
                         />
                     </Form.Item>
@@ -662,12 +660,7 @@ function TenantOpenLockerModal(props: LockerModalProps) {
         setInternalModalOpen(true);
     };
     const handleCancel = () => {
-        if (internalModalOpen) {
-            setInternalModalOpen(false);
-        }
-        if (internalModalOpen === undefined) {
-            setInternalModalOpen(false);
-        }
+        setInternalModalOpen(false);
     };
     const { mutate: openLocker } = useMutation({
         mutationKey: [`${userId}-locker`],
@@ -716,9 +709,12 @@ function TenantOpenLockerModal(props: LockerModalProps) {
                 open={internalModalOpen}
                 onCancel={handleCancel}
                 okButtonProps={{ hidden: true, disabled: true }}
-                cancelButtonProps={{ hidden: true, disabled: true }}>
+                cancelButtonProps={{ hidden: true, disabled: true }}
+                aria-describedby="locker-status-message">
                 <Divider />
-                <span className="d-flex align-items-center text-success">
+                <span
+                    id="locker-status-message"
+                    className="d-flex align-items-center text-success">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="24"

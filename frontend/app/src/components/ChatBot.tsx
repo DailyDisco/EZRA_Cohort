@@ -78,7 +78,7 @@ const MyChatBot: React.FC = () => {
 
             setConversation([...updatedConversation, assistantMessage]);
             await params.injectMessage(data.reply);
-        } catch (error) {
+        } catch {
             await params.injectMessage("Unable to load model, try again later.");
         }
     };

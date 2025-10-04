@@ -34,7 +34,7 @@ export const CardComponent = (props: CardComponentProps) => {
                 className="card pb-2"
                 actions={[props.button]}
                 style={{ border: "none", boxShadow: "var(--shadow-sm)" }}
-                bodyStyle={{ padding: "1.5rem" }}>
+                styles={{ body: { padding: "1.5rem" } }}>
                 <div className="flex flex-column text-center">
                     {props.value && (
                         <span
