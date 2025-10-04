@@ -44,6 +44,38 @@ echo "Running database migrations..."
 migrate -path internal/db/migrations/ -database "$PG_URL" -verbose up || echo "Migration failed!"
 echo "Database migrations complete."
 
+# Check if we should seed the database (only in production with specific environment variable)
+if [ "${SEED_PRODUCTION_DATA:-false}" = "true" ]; then
+  echo "Production seeding enabled. Starting database seeding process..."
+
+  # Seed production users first
+  echo "Step 1: Seeding production users..."
+  if [ -f scripts/lease-seed-database.sh ]; then
+    chmod +x scripts/lease-seed-database.sh
+    # Set environment variables for the seeding script
+    export POSTGRES_HOST="$DB_HOST"
+    export POSTGRES_USER="$DB_USER"
+    export POSTGRES_DB="$DB_NAME"
+    export POSTGRES_PASSWORD="$DB_PASSWORD"
+
+    ./scripts/lease-seed-database.sh || echo "User seeding failed, continuing..."
+  else
+    echo "Warning: lease-seed-database.sh not found, skipping user seeding"
+  fi
+
+  # Seed production data (work orders, complaints, etc.)
+  echo "Step 2: Seeding production data..."
+  if [ -f scripts/seed_production_data.go ]; then
+    go run scripts/seed_production_data.go || echo "Data seeding failed, continuing..."
+  else
+    echo "Warning: seed_production_data.go not found, skipping data seeding"
+  fi
+
+  echo "Database seeding complete."
+else
+  echo "Production seeding disabled. Skipping database seeding."
+fi
+
 # Start cron in background
 crond
 

@@ -7,6 +7,7 @@
   },
   "variables": {
     "USE_AIR": "false",
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "SEED_PRODUCTION_DATA": "true"
   }
 }
