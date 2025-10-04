@@ -1,11 +1,10 @@
 version: '3'
 
-dotenv: ['../.env']
+dotenv: ['.env']
 
 vars:
   MPATH: 'internal/db/migrations/'
-  PG_URL: postgresql://{{.POSTGRES_USER}}:{{.POSTGRES_PASSWORD}}@{{.POSTGRES_HOST}}:{{.POSTGRES_PORT}}/{{.POSTGRES_DB}}?sslmode=disable
-  DATABASE_URL: .PG_URL
+
 tasks:
   seed-users:
     desc: 'Seed users into the database and syncs with Clerk'
@@ -32,43 +31,35 @@ tasks:
   migrate:up:
     desc: 'Apply migrations to the database'
     cmds:
-      # The commented block prints credentials to the logs/command-line
-      # - |
-      #   PGPASSWORD="{{.POSTGRES_PASSWORD}}" psql -h postgres -U {{.POSTGRES_USER}} -d {{.POSTGRES_DB}} -c "SELECT 'Hidden'" > /dev/null 2>&1 "
-      #   WITH settings AS (
-      #   SELECT '{{.POSTGRES_USER}}' AS current_user,
-      #      '{{.POSTGRES_PASSWORD}}' AS current_password,
-      #      '{{.POSTGRES_DB}}' AS current_db) SELECT * FROM settings;" > /dev/null 2>&1
-      - psql -h postgres -U {{.POSTGRES_USER}} -d {{.POSTGRES_DB}} -c "SELECT 'Hidden'"
-      - migrate -path {{.MPATH}} -database "{{.PG_URL}}" -verbose up # > /dev/null 2>&1
+      - migrate -path {{.MPATH}} -database "{{.CLI_ARGS}}" -verbose up # > /dev/null 2>&1
       - echo "Migrations applied!"
 
   migrate:down:
     cmds:
-      - migrate -path {{.MPATH}} -database "{{.PG_URL}}" -verbose down 1
+      - migrate -path {{.MPATH}} -database "{{.CLI_ARGS}}" -verbose down 1
       - echo "Migrating down 1 version.."
 
   migrate:version:
     cmds:
-      - migrate -path {{.MPATH}} -database "{{.PG_URL}}" -verbose version
+      - migrate -path {{.MPATH}} -database "{{.CLI_ARGS}}" -verbose version
 
   migrate:status:
     desc: 'Check migration version and if database is dirty'
     cmds:
-      - migrate -path {{.MPATH}} -database "{{.PG_URL}}" -verbose version
+      - migrate -path {{.MPATH}} -database "{{.CLI_ARGS}}" -verbose version
 
   migrate:fix-dirty:
     desc: 'Fix a dirty database state by forcing last successful version'
     cmds:
       - echo "Checking migration status..."
-      - migrate -path {{.MPATH}} -database "{{.PG_URL}}" force 1
+      - migrate -path {{.MPATH}} -database "{{.CLI_ARGS}}" force 1
       - echo "Database migration state reset!"
 
   migrate:reset:
     desc: 'Reset database (wipe all data and re-run migrations)'
     cmds:
-      - migrate -path {{.MPATH}} -database "{{.PG_URL}}" -verbose down
-      - migrate -path {{.MPATH}} -database "{{.PG_URL}}" -verbose up
+      - migrate -path {{.MPATH}} -database "{{.CLI_ARGS}}" -verbose down
+      - migrate -path {{.MPATH}} -database "{{.CLI_ARGS}}" -verbose up
   test:all:
     desc: 'Test all in backend in container'
     cmds:
